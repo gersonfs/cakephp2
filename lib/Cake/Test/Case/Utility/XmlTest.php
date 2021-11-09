@@ -1175,6 +1175,7 @@ XML;
  *
  * @dataProvider invalidToArrayDataProvider
  * @expectedException XmlException
+ * @expectedExceptionMessage The input is not instance of SimpleXMLElement, DOMDocument or DOMNode.
  * @return void
  */
 	public function testToArrayFail($value) {

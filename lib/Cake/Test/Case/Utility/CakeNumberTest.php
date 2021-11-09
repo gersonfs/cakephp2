@@ -753,6 +753,7 @@ class CakeNumberTest extends CakeTestCase {
  * testFromReadableSize
  *
  * @expectedException CakeException
+ * @expectedExceptionMessage No unit type.
  * @return void
  */
 	public function testFromReadableSizeException() {
