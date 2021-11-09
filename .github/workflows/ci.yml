@@ -31,9 +31,9 @@ jobs:
       - name: criando-databases
         run: |
           sudo systemctl start mysql.service
-          mysql -e "CREATE DATABASE cakephp_test"
-          mysql -e "CREATE DATABASE cakephp_test2"
-          mysql -e "CREATE DATABASE cakephp_test3"
+          mysql -uroot -p"root" -e "CREATE DATABASE cakephp_test"
+          mysql -uroot -p"root" -e "CREATE DATABASE cakephp_test2"
+          mysql -uroot -p"root" -e "CREATE DATABASE cakephp_test3"
 
       - name: Rodando PHPUnit
         run: |
