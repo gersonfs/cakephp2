@@ -21,7 +21,7 @@ class DATABASE_CONFIG
 	public $default = array(
 		'persistent' => false,
 		'host' => '',
-		'login' => '',
+		'login' => 'root',
 		'password' => '',
 		'database' => 'cakephp_test',
 		'prefix' => '',
@@ -29,7 +29,7 @@ class DATABASE_CONFIG
 	public $test = array(
 		'persistent' => false,
 		'host' => '',
-		'login' => '',
+		'login' => 'root',
 		'password' => '',
 		'database' => 'cakephp_test',
 		'prefix' => '',
@@ -37,7 +37,7 @@ class DATABASE_CONFIG
 	public $test2 = array(
 		'persistent' => false,
 		'host' => '',
-		'login' => '',
+		'login' => 'root',
 		'password' => '',
 		'database' => 'cakephp_test2',
 		'prefix' => '',
@@ -45,7 +45,7 @@ class DATABASE_CONFIG
 	public $test_database_three = array(
 		'persistent' => false,
 		'host' => '',
-		'login' => '',
+		'login' => 'root',
 		'password' => '',
 		'database' => 'cakephp_test3',
 		'prefix' => '',

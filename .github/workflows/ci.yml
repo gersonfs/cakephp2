@@ -30,6 +30,7 @@ jobs:
 
       - name: criando-databases
         run: |
+          cat app/Config/database.test.php > app/Config/database.php
           mysql -e "CREATE DATABASE cakephp_test"
           mysql -e "CREATE DATABASE cakephp_test2"
           mysql -e "CREATE DATABASE cakephp_test3"
