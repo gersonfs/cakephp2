@@ -28,6 +28,12 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
 
+      - name: criando-databases
+        run: |
+          mysql -e "CREATE DATABASE cakephp_test"
+          mysql -e "CREATE DATABASE cakephp_test2"
+          mysql -e "CREATE DATABASE cakephp_test3"
+
       - name: Rodando PHPUnit
         run: |
           composer test
