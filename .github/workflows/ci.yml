@@ -30,6 +30,7 @@ jobs:
 
       - name: criando-databases
         run: |
+          mkdir app/tmp app/tmp/cache app/tmp/logs app/tmp/sessions app/tmp/tests
           sudo locale-gen de_DE
           sudo locale-gen es_ES
           sudo systemctl start mysql.service
