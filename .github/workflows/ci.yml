@@ -30,6 +30,8 @@ jobs:
 
       - name: criando-databases
         run: |
+          sudo locale-gen de_DE
+          sudo locale-gen es_ES
           sudo systemctl start mysql.service
           mysql -uroot -p"root" -e "CREATE DATABASE cakephp_test"
           mysql -uroot -p"root" -e "CREATE DATABASE cakephp_test2"
