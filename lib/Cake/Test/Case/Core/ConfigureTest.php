@@ -459,7 +459,7 @@ class ConfigureTest extends CakeTestCase {
 		try {
 			Configure::config('test', $reader);
 		} catch (TypeError $e) {
-			throw new \PHPUnit\Framework\Exception('Raised an error', 100, __FILE__, __LINE__);
+			throw new \PHPUnit\Framework\Exception('Raised an error', 100);
 		}
 	}
 

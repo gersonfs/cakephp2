@@ -170,7 +170,7 @@ class CakePluginTest extends CakeTestCase {
  * Tests that loading a missing routes file throws a warning
  *
  * @return void
- * @expectedException \PHPUnit\Framework\Exception_WARNING
+ * @expectedException \PHPUnit\Framework\Exception
  */
 	public function testLoadMultipleWithDefaultsMissingFile() {
 		CakePlugin::load(array('TestPlugin', 'TestPluginTwo'), array('bootstrap' => true, 'routes' => true));
