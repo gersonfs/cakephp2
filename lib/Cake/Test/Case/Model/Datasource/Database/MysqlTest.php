@@ -679,24 +679,24 @@ class MysqlTest extends CakeTestCase {
 				'id' => array('type' => 'integer', 'null' => false, 'default' => 0),
 				'name' => array('type' => 'string', 'null' => false, 'length' => 50),
 				'tableParameters' => array(
-					'charset' => 'utf8',
-					'collate' => 'utf8_general_ci',
+					'charset' => 'utf8mb3',
+					'collate' => 'utf8mb3_general_ci',
 					'engine' => 'InnoDB',
 					'comment' => 'Newly table added comment.',
 				)
 			)
 		));
 		$result = $this->Dbo->alterSchema($schemaB->compare($schemaA));
-		$this->assertContains('DEFAULT CHARSET=utf8', $result);
+		$this->assertContains('DEFAULT CHARSET=utf8mb3', $result);
 		$this->assertContains('ENGINE=InnoDB', $result);
-		$this->assertContains('COLLATE=utf8_general_ci', $result);
+		$this->assertContains('COLLATE=utf8mb3_general_ci', $result);
 		$this->assertContains('COMMENT=\'Newly table added comment.\'', $result);
 
 		$this->Dbo->rawQuery($result);
 		$result = $this->Dbo->listDetailedSources($this->Dbo->fullTableName('altertest', false, false));
-		$this->assertEquals('utf8_general_ci', $result['Collation']);
+		$this->assertEquals('utf8mb3_general_ci', $result['Collation']);
 		$this->assertEquals('InnoDB', $result['Engine']);
-		$this->assertEquals('utf8', $result['charset']);
+		$this->assertEquals('utf8mb3', $result['charset']);
 
 		$this->Dbo->rawQuery($this->Dbo->dropSchema($schemaA));
 	}
@@ -748,8 +748,8 @@ class MysqlTest extends CakeTestCase {
 		$result = $this->Dbo->readTableParameters($this->Dbo->fullTableName($tableName, false, false));
 		$this->Dbo->rawQuery('DROP TABLE ' . $table);
 		$expected = array(
-			'charset' => 'utf8',
-			'collate' => 'utf8_unicode_ci',
+			'charset' => 'utf8mb3',
+			'collate' => 'utf8mb3_unicode_ci',
 			'engine' => 'InnoDB');
 		$this->assertEquals($expected, $result);
 
@@ -774,13 +774,13 @@ class MysqlTest extends CakeTestCase {
 	public function testBuildTableParameters() {
 		$this->Dbo->cacheSources = $this->Dbo->testing = false;
 		$data = array(
-			'charset' => 'utf8',
-			'collate' => 'utf8_unicode_ci',
+			'charset' => 'utf8mb3',
+			'collate' => 'utf8mb3_unicode_ci',
 			'engine' => 'InnoDB');
 		$result = $this->Dbo->buildTableParameters($data);
 		$expected = array(
-			'DEFAULT CHARSET=utf8',
-			'COLLATE=utf8_unicode_ci',
+			'DEFAULT CHARSET=utf8mb3',
+			'COLLATE=utf8mb3_unicode_ci',
 			'ENGINE=InnoDB');
 		$this->assertEquals($expected, $result);
 	}
@@ -792,8 +792,8 @@ class MysqlTest extends CakeTestCase {
  */
 	public function testGetCharsetName() {
 		$this->Dbo->cacheSources = $this->Dbo->testing = false;
-		$result = $this->Dbo->getCharsetName('utf8_unicode_ci');
-		$this->assertEquals('utf8', $result);
+		$result = $this->Dbo->getCharsetName('utf8mb3_unicode_ci');
+		$this->assertEquals('utf8mb3', $result);
 		$result = $this->Dbo->getCharsetName('cp1250_general_ci');
 		$this->assertEquals('cp1250', $result);
 	}
@@ -2892,7 +2892,7 @@ SQL;
 			$this->Dbo->dropSchema(null);
 			$this->fail('No exception');
 		} catch (TypeError $e) {
-			throw new \PHPUnit\Framework\Exception('Raised an error', 100, __FILE__, __LINE__);
+			throw new \PHPUnit\Framework\Exception('Raised an error', 100);
 		}
 	}
 
