@@ -128,7 +128,7 @@ class CacheTest extends CakeTestCase {
  *
  * Test that the cache class doesn't cause fatal errors with a partial path
  *
- * @expectedException \PHPUnit\Framework\Exception_Warning
+ * @expectedException \PHPUnit\Framework\Exception
  * @return void
  */
 	public function testInvalidConfig() {
