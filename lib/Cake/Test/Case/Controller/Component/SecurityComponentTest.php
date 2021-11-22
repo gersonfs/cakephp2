@@ -176,6 +176,7 @@ class SecurityComponentTest extends CakeTestCase {
 		$this->Security->csrfCheck = false;
 
 		Configure::write('Security.salt', 'foo!');
+		$_SERVER['REQUEST_METHOD'] = 'GET';
 	}
 
 /**
