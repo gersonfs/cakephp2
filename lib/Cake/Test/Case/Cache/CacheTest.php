@@ -128,7 +128,7 @@ class CacheTest extends CakeTestCase {
  *
  * Test that the cache class doesn't cause fatal errors with a partial path
  *
- * @expectedException PHPUnit_Framework_Error_Warning
+ * @expectedException \PHPUnit\Framework\Exception_Warning
  * @return void
  */
 	public function testInvalidConfig() {
@@ -410,7 +410,7 @@ class CacheTest extends CakeTestCase {
 		try {
 			Cache::write('fail', 'value', 'test_trigger');
 			$this->fail('No exception thrown');
-		} catch (PHPUnit_Framework_Error $e) {
+		} catch (\PHPUnit\Framework\Exception $e) {
 			$this->assertTrue(true);
 		}
 		Cache::drop('test_trigger');

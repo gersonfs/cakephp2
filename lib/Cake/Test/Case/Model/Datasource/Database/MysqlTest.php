@@ -2883,16 +2883,16 @@ SQL;
 /**
  * testDropSchemaNoSchema method
  *
- * @expectedException PHPUnit_Framework_Error
+ * @expectedException \PHPUnit\Framework\Exception
  * @return void
- * @throws PHPUnit_Framework_Error
+ * @throws \PHPUnit\Framework\Exception
  */
 	public function testDropSchemaNoSchema() {
 		try {
 			$this->Dbo->dropSchema(null);
 			$this->fail('No exception');
 		} catch (TypeError $e) {
-			throw new PHPUnit_Framework_Error('Raised an error', 100, __FILE__, __LINE__);
+			throw new \PHPUnit\Framework\Exception('Raised an error', 100, __FILE__, __LINE__);
 		}
 	}
 
@@ -3232,7 +3232,7 @@ SQL;
 /**
  * testBuildColumnBadType method
  *
- * @expectedException PHPUnit_Framework_Error
+ * @expectedException \PHPUnit\Framework\Exception
  * @return void
  */
 	public function testBuildColumnBadType() {

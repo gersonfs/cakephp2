@@ -2294,7 +2294,7 @@ class ValidationTest extends CakeTestCase {
 /**
  * test pass through failure on postal
  *
- * @expectedException PHPUnit_Framework_Error
+ * @expectedException \PHPUnit\Framework\Exception
  * @return void
  */
 	public function testPassThroughMethodFailure() {
@@ -2304,7 +2304,7 @@ class ValidationTest extends CakeTestCase {
 /**
  * test the pass through calling of an alternate locale with postal()
  *
- * @expectedException PHPUnit_Framework_Error
+ * @expectedException \PHPUnit\Framework\Exception
  * @return void
  */
 	public function testPassThroughClassFailure() {

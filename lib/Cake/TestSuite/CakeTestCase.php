@@ -24,7 +24,7 @@ App::uses('CakeTestFixture', 'TestSuite/Fixture');
  *
  * @package       Cake.TestSuite
  */
-abstract class CakeTestCase extends PHPUnit_Framework_TestCase {
+abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 
 /**
  * The class responsible for managing the creation, loading and removing of fixtures
@@ -71,11 +71,11 @@ abstract class CakeTestCase extends PHPUnit_Framework_TestCase {
  * If no TestResult object is passed a new one will be created.
  * This method is run for each test method in this class
  *
- * @param PHPUnit_Framework_TestResult $result The test result object
- * @return PHPUnit_Framework_TestResult
+ * @param \PHPUnit\Framework\TestResult $result The test result object
+ * @return \PHPUnit\Framework\TestResult
  * @throws InvalidArgumentException
  */
-	public function run(PHPUnit_Framework_TestResult $result = null) {
+	public function run(\PHPUnit\Framework\TestResult $result = null) {
 		$level = ob_get_level();
 
 		if (!empty($this->fixtureManager)) {
@@ -493,7 +493,7 @@ abstract class CakeTestCase extends PHPUnit_Framework_TestCase {
 				continue;
 			}
 
-			list($description, $expressions, $itemNum) = $assertion;
+			[$description, $expressions, $itemNum] = $assertion;
 			foreach ((array)$expressions as $expression) {
 				if (preg_match(sprintf('/^%s/s', $expression), $string, $match)) {
 					$matches = true;
@@ -647,6 +647,7 @@ abstract class CakeTestCase extends PHPUnit_Framework_TestCase {
 			$expected = 'Exception';
 		}
 		$this->setExpectedException($expected, $message);
+		$this->expectException();
 	}
 
 /**
@@ -659,6 +660,13 @@ abstract class CakeTestCase extends PHPUnit_Framework_TestCase {
  */
 	public function expectException($name = 'Exception', $message = null) {
 		$this->setExpectedException($name, $message);
+	}
+
+	protected function setExpectedException($name = 'Exception', $message = null) {
+		parent::expectException($name);
+		if (is_string($message)) {
+			parent::expectExceptionMessage($message);
+		}
 	}
 
 /**
@@ -816,7 +824,7 @@ abstract class CakeTestCase extends PHPUnit_Framework_TestCase {
 		$callOriginalMethods = false,
 		$proxyTarget = null
 	) {
-		$phpUnitVersion = PHPUnit_Runner_Version::id();
+		$phpUnitVersion = \PHPUnit\Runner\Version::id();
 		if (version_compare($phpUnitVersion, '5.7.0', '<')) {
 			return parent::getMock($originalClassName, $methods, $arguments,
 					$mockClassName, $callOriginalConstructor, $callOriginalClone,
@@ -855,7 +863,7 @@ abstract class CakeTestCase extends PHPUnit_Framework_TestCase {
 		$defaults = ClassRegistry::config('Model');
 		unset($defaults['ds']);
 
-		list($plugin, $name) = pluginSplit($model, true);
+		[$plugin, $name] = pluginSplit($model, true);
 		App::uses($name, $plugin . 'Model');
 
 		$config = array_merge($defaults, (array)$config, array('name' => $name));

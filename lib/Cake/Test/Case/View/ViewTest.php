@@ -767,7 +767,7 @@ class ViewTest extends CakeTestCase {
 /**
  * Test elementInexistent method
  *
- * @expectedException PHPUnit_Framework_Error_Notice
+ * @expectedException \PHPUnit\Framework\Exception_Notice
  * @return void
  */
 	public function testElementInexistent() {
@@ -777,7 +777,7 @@ class ViewTest extends CakeTestCase {
 /**
  * Test elementInexistent2 method
  *
- * @expectedException PHPUnit_Framework_Error_Notice
+ * @expectedException \PHPUnit\Framework\Exception_Notice
  * @return void
  */
 	public function testElementInexistent2() {
@@ -787,7 +787,7 @@ class ViewTest extends CakeTestCase {
 /**
  * Test elementInexistent3 method
  *
- * @expectedException PHPUnit_Framework_Error_Notice
+ * @expectedException \PHPUnit\Framework\Exception_Notice
  * @return void
  */
 	public function testElementInexistent3() {
@@ -1844,7 +1844,7 @@ TEXT;
 		if (version_compare(PHP_VERSION, '7.4', '>=')) {
 			$this->setExpectedException('Error', $message);
 		} else {
-			$this->setExpectedException('PHPUnit_Framework_Error', $message);
+			$this->setExpectedException('\PHPUnit\Framework\Exception', $message);
 		}
 	}
 }

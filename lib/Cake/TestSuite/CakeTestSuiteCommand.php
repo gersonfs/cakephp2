@@ -16,8 +16,10 @@
  * @license       https://opensource.org/licenses/mit-license.php MIT License
  */
 
+use PHPUnit\TextUI\TestRunner;
+
 if (!class_exists('PHPUnit_TextUI_Command')) {
-	require_once 'PHPUnit/TextUI/Command.php';
+	//require_once 'PHPUnit/TextUI/Command.php';
 }
 
 App::uses('CakeTestRunner', 'TestSuite');
@@ -32,7 +34,7 @@ App::uses('CakeTestModel', 'TestSuite/Fixture');
  *
  * @package       Cake.TestSuite
  */
-class CakeTestSuiteCommand extends PHPUnit_TextUI_Command {
+class CakeTestSuiteCommand extends \PHPUnit\TextUI\Command {
 
 /**
  * Construct method
@@ -67,7 +69,7 @@ class CakeTestSuiteCommand extends PHPUnit_TextUI_Command {
 		$runner = $this->getRunner($this->arguments['loader']);
 
 		if (is_object($this->arguments['test']) &&
-			$this->arguments['test'] instanceof PHPUnit_Framework_Test) {
+			$this->arguments['test'] instanceof \PHPUnit\Framework\Test) {
 			$suite = $this->arguments['test'];
 		} else {
 			$suite = $runner->getTest(
@@ -77,7 +79,7 @@ class CakeTestSuiteCommand extends PHPUnit_TextUI_Command {
 		}
 
 		if ($this->arguments['listGroups']) {
-			PHPUnit_TextUI_TestRunner::printVersionString();
+			TestRunner::printVersionString();
 
 			print "Available test group(s):\n";
 
@@ -88,7 +90,7 @@ class CakeTestSuiteCommand extends PHPUnit_TextUI_Command {
 				print " - $group\n";
 			}
 
-			exit(PHPUnit_TextUI_TestRunner::SUCCESS_EXIT);
+			exit(TestRunner::SUCCESS_EXIT);
 		}
 
 		unset($this->arguments['test']);
@@ -96,20 +98,20 @@ class CakeTestSuiteCommand extends PHPUnit_TextUI_Command {
 
 		try {
 			$result = $runner->doRun($suite, $this->arguments, false);
-		} catch (PHPUnit_Framework_Exception $e) {
+		} catch (\PHPUnit\Framework\Exception $e) {
 			print $e->getMessage() . "\n";
 		}
 
 		if ($exit) {
 			if (!isset($result) || $result->errorCount() > 0) {
-				exit(PHPUnit_TextUI_TestRunner::EXCEPTION_EXIT);
+				exit(\PHPUnit\TextUI\TestRunner::EXCEPTION_EXIT);
 			}
 			if ($result->failureCount() > 0) {
-				exit(PHPUnit_TextUI_TestRunner::FAILURE_EXIT);
+				exit(\PHPUnit\TextUI\TestRunner::FAILURE_EXIT);
 			}
 
 			// Default to success even if there are warnings to match phpunit's behavior
-			exit(PHPUnit_TextUI_TestRunner::SUCCESS_EXIT);
+			exit(\PHPUnit\TextUI\TestRunner::SUCCESS_EXIT);
 		}
 	}
 

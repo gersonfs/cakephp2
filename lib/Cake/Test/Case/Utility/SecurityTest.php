@@ -87,7 +87,7 @@ class SecurityTest extends CakeTestCase {
 /**
  * testHashInvalidSalt method
  *
- * @expectedException PHPUnit_Framework_Error
+ * @expectedException \PHPUnit\Framework\Exception
  * @return void
  */
 	public function testHashInvalidSalt() {
@@ -97,7 +97,7 @@ class SecurityTest extends CakeTestCase {
 /**
  * testHashAnotherInvalidSalt
  *
- * @expectedException PHPUnit_Framework_Error
+ * @expectedException \PHPUnit\Framework\Exception
  * @return void
  */
 	public function testHashAnotherInvalidSalt() {
@@ -107,7 +107,7 @@ class SecurityTest extends CakeTestCase {
 /**
  * testHashYetAnotherInvalidSalt
  *
- * @expectedException PHPUnit_Framework_Error
+ * @expectedException \PHPUnit\Framework\Exception
  * @return void
  */
 	public function testHashYetAnotherInvalidSalt() {
@@ -117,7 +117,7 @@ class SecurityTest extends CakeTestCase {
 /**
  * testHashInvalidCost method
  *
- * @expectedException PHPUnit_Framework_Error
+ * @expectedException \PHPUnit\Framework\Exception
  * @return void
  */
 	public function testHashInvalidCost() {
@@ -269,7 +269,7 @@ class SecurityTest extends CakeTestCase {
 /**
  * testCipherEmptyKey method
  *
- * @expectedException PHPUnit_Framework_Error
+ * @expectedException \PHPUnit\Framework\Exception
  * @return void
  */
 	public function testCipherEmptyKey() {
@@ -321,7 +321,7 @@ class SecurityTest extends CakeTestCase {
 /**
  * testRijndaelInvalidOperation method
  *
- * @expectedException PHPUnit_Framework_Error
+ * @expectedException \PHPUnit\Framework\Exception
  * @return void
  */
 	public function testRijndaelInvalidOperation() {
@@ -333,7 +333,7 @@ class SecurityTest extends CakeTestCase {
 /**
  * testRijndaelInvalidKey method
  *
- * @expectedException PHPUnit_Framework_Error
+ * @expectedException \PHPUnit\Framework\Exception
  * @return void
  */
 	public function testRijndaelInvalidKey() {

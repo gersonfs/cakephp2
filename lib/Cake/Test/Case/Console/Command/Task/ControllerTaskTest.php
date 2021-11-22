@@ -307,7 +307,7 @@ class ControllerTaskTest extends CakeTestCase {
 
 		$this->Task->expects($this->at(1))->method('createFile')->with(
 			$path,
-			new PHPUnit_Framework_Constraint_IsAnything()
+			new \PHPUnit\Framework\Constraint\IsAnything()
 		);
 		$this->Task->expects($this->at(3))->method('createFile')->with(
 			$path,

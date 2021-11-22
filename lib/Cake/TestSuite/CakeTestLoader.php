@@ -25,7 +25,7 @@
  *
  * @package Cake.TestSuite
  */
-class CakeTestLoader extends PHPUnit_Runner_StandardTestSuiteLoader {
+class CakeTestLoader extends \PHPUnit\Runner\StandardTestSuiteLoader {
 
 /**
  * Load a file and find the first test case / suite in that file.
