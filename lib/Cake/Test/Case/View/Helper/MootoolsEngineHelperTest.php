@@ -277,7 +277,7 @@ class MootoolsEngineHelperTest extends CakeTestCase {
 	 * @return void
 	 */
 	public function testDropWithMissingOption() {
-		$this->expectException('PHPUnit\Framework\Exception_Warning');
+		$this->expectException('PHPUnit\Framework\Exception');
 		$this->Moo->get('#drop-me');
 		$this->Moo->drop(array(
 			'drop' => 'onDrop',

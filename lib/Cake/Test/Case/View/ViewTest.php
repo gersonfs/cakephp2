@@ -770,7 +770,7 @@ class ViewTest extends CakeTestCase {
 	 * @return void
 	 */
 	public function testElementInexistent() {
-		$this->expectException('PHPUnit\Framework\Exception_Notice');
+		$this->expectException('PHPUnit\Framework\Exception');
 		$this->View->element('non_existent_element');
 	}
 
@@ -780,7 +780,7 @@ class ViewTest extends CakeTestCase {
 	 * @return void
 	 */
 	public function testElementInexistent2() {
-		$this->expectException('PHPUnit\Framework\Exception_Notice');
+		$this->expectException('PHPUnit\Framework\Exception');
 		$this->View->element('TestPlugin.plugin_element', array(), array('plugin' => 'test_plugin'));
 	}
 
@@ -790,7 +790,7 @@ class ViewTest extends CakeTestCase {
 	 * @return void
 	 */
 	public function testElementInexistent3() {
-		$this->expectException('PHPUnit\Framework\Exception_Notice');
+		$this->expectException('PHPUnit\Framework\Exception');
 		$this->View->element('test_plugin.plugin_element');
 	}
 
