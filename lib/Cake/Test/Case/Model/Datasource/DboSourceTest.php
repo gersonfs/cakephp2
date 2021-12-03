@@ -679,10 +679,10 @@ class DboSourceTest extends CakeTestCase {
 	}
 
 /**
- * @expectedException PDOException
- * @return void
- */
+	 * @return void
+	 */
 	public function testDirectCallThrowsException() {
+		$this->expectException(\PDOException::class);
 		$this->db->query('directCall', array(), $this->Model);
 	}
 

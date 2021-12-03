@@ -205,13 +205,13 @@ class SecurityComponentTest extends CakeTestCase {
 	}
 
 /**
- * Test that requests are still blackholed when controller has incorrect
- * visibility keyword in the blackhole callback
- *
- * @expectedException BadRequestException
- * @return void
- */
+	 * Test that requests are still blackholed when controller has incorrect
+	 * visibility keyword in the blackhole callback
+	 *
+	 * @return void
+	 */
 	public function testBlackholeWithBrokenCallback() {
+		$this->expectException('BadRequestException');
 		$request = new CakeRequest('posts/index', false);
 		$request->addParams(array(
 			'controller' => 'posts', 'action' => 'index')
@@ -1494,13 +1494,13 @@ class SecurityComponentTest extends CakeTestCase {
 	}
 
 /**
- * test that blackhole throws an exception when the key is missing and balckHoleCallback is not set.
- *
- * @return void
- * @expectedException SecurityException
- * @expectedExceptionMessage Missing CSRF token
- */
+	 * test that blackhole throws an exception when the key is missing and balckHoleCallback is not set.
+	 *
+	 * @return void
+	 */
 	public function testCsrfExceptionOnMissingKey() {
+		$this->expectException('SecurityException');
+		$this->expectExceptionMessage('Missing CSRF token');
 		$this->Security->validatePost = false;
 		$this->Security->csrfCheck = true;
 		$this->Security->blackHoleCallback = '';
@@ -1540,13 +1540,13 @@ class SecurityComponentTest extends CakeTestCase {
 	}
 
 /**
- * test that blackhole throws an exception when the keys are mismatched and balckHoleCallback is not set.
- *
- * @return void
- * @expectedException SecurityException
- * @expectedExceptionMessage CSRF token mismatch
- */
+	 * test that blackhole throws an exception when the keys are mismatched and balckHoleCallback is not set.
+	 *
+	 * @return void
+	 */
 	public function testCsrfExceptionOnKeyMismatch() {
+		$this->expectException('SecurityException');
+		$this->expectExceptionMessage('CSRF token mismatch');
 		$this->Security->validatePost = false;
 		$this->Security->csrfCheck = true;
 		$this->Security->csrfExpires = '+10 minutes';
@@ -1592,13 +1592,13 @@ class SecurityComponentTest extends CakeTestCase {
 	}
 
 /**
- * test that blackhole throws an exception when the key is expired and balckHoleCallback is not set
- *
- * @return void
- * @expectedException SecurityException
- * @expectedExceptionMessage CSRF token expired
- */
+	 * test that blackhole throws an exception when the key is expired and balckHoleCallback is not set
+	 *
+	 * @return void
+	 */
 	public function testCsrfExceptionOnExpiredKey() {
+		$this->expectException('SecurityException');
+		$this->expectExceptionMessage('CSRF token expired');
 		$this->Security->validatePost = false;
 		$this->Security->csrfCheck = true;
 		$this->Security->csrfExpires = '+10 minutes';
@@ -1760,13 +1760,13 @@ class SecurityComponentTest extends CakeTestCase {
 	}
 
 /**
- * test blackhole will now throw passed exception if debug enabled
- *
- * @expectedException SecurityException
- * @expectedExceptionMessage error description
- * @return void
- */
+	 * test blackhole will now throw passed exception if debug enabled
+	 *
+	 * @return void
+	 */
 	public function testBlackholeThrowsException() {
+		$this->expectException('SecurityException');
+		$this->expectExceptionMessage('error description');
 		$this->Security->blackHoleCallback = '';
 		$this->Security->blackHole($this->Controller, 'auth', new SecurityException('error description'));
 	}
@@ -1876,13 +1876,13 @@ class SecurityComponentTest extends CakeTestCase {
 	}
 
 /**
- * Auth required throws exception token not found
- *
- * @return void
- * @expectedException AuthSecurityException
- * @expectedExceptionMessage '_Token' was not found in request data.
- */
+	 * Auth required throws exception token not found
+	 *
+	 * @return void
+	 */
 	public function testAuthRequiredThrowsExceptionTokenNotFoundPost() {
+		$this->expectException('AuthSecurityException');
+		$this->expectExceptionMessage('\'_Token\' was not found in request data.');
 		$this->Controller->Security->requireAuth = array('protected');
 		$this->Controller->request->params['action'] = 'protected';
 		$this->Controller->request->data = array('some-key' => 'some-value');
@@ -1890,13 +1890,13 @@ class SecurityComponentTest extends CakeTestCase {
 	}
 
 /**
- * Auth required throws exception token not found in Session
- *
- * @return void
- * @expectedException AuthSecurityException
- * @expectedExceptionMessage '_Token' was not found in session.
- */
+	 * Auth required throws exception token not found in Session
+	 *
+	 * @return void
+	 */
 	public function testAuthRequiredThrowsExceptionTokenNotFoundSession() {
+		$this->expectException('AuthSecurityException');
+		$this->expectExceptionMessage('\'_Token\' was not found in session.');
 		$this->Controller->Security->requireAuth = array('protected');
 		$this->Controller->request->params['action'] = 'protected';
 		$this->Controller->request->data = array('_Token' => 'not empty');
@@ -1904,13 +1904,13 @@ class SecurityComponentTest extends CakeTestCase {
 	}
 
 /**
- * Auth required throws exception controller not allowed
- *
- * @return void
- * @expectedException AuthSecurityException
- * @expectedExceptionMessage Controller 'NotAllowed' was not found in allowed controllers: 'Allowed, AnotherAllowed'.
- */
+	 * Auth required throws exception controller not allowed
+	 *
+	 * @return void
+	 */
 	public function testAuthRequiredThrowsExceptionControllerNotAllowed() {
+		$this->expectException('AuthSecurityException');
+		$this->expectExceptionMessage('Controller \'NotAllowed\' was not found in allowed controllers: \'Allowed, AnotherAllowed\'.');
 		$this->Controller->Security->requireAuth = array('protected');
 		$this->Controller->request->params['controller'] = 'NotAllowed';
 		$this->Controller->request->params['action'] = 'protected';
@@ -1922,13 +1922,13 @@ class SecurityComponentTest extends CakeTestCase {
 	}
 
 /**
- * Auth required throws exception controller not allowed
- *
- * @return void
- * @expectedException AuthSecurityException
- * @expectedExceptionMessage Action 'NotAllowed::protected' was not found in allowed actions: 'index, view'.
- */
+	 * Auth required throws exception controller not allowed
+	 *
+	 * @return void
+	 */
 	public function testAuthRequiredThrowsExceptionActionNotAllowed() {
+		$this->expectException('AuthSecurityException');
+		$this->expectExceptionMessage('Action \'NotAllowed::protected\' was not found in allowed actions: \'index, view\'.');
 		$this->Controller->Security->requireAuth = array('protected');
 		$this->Controller->request->params['controller'] = 'NotAllowed';
 		$this->Controller->request->params['action'] = 'protected';
@@ -1957,13 +1957,13 @@ class SecurityComponentTest extends CakeTestCase {
 	}
 
 /**
- * Auth required throws exception controller not allowed
- *
- * @return void
- * @expectedException SecurityException
- * @expectedExceptionMessage The request method must be POST
- */
+	 * Auth required throws exception controller not allowed
+	 *
+	 * @return void
+	 */
 	public function testMethodsRequiredThrowsExceptionMethodNotAllowed() {
+		$this->expectException('SecurityException');
+		$this->expectExceptionMessage('The request method must be POST');
 		$_SERVER['REQUEST_METHOD'] = 'GET';
 		$this->Controller->Security->requirePost = array('delete');
 		$this->Controller->request->params['controller'] = 'Test';

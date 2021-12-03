@@ -750,13 +750,13 @@ class CakeNumberTest extends CakeTestCase {
 	}
 
 /**
- * testFromReadableSize
- *
- * @expectedException CakeException
- * @expectedExceptionMessage No unit type.
- * @return void
- */
+	 * testFromReadableSize
+	 *
+	 * @return void
+	 */
 	public function testFromReadableSizeException() {
+		$this->expectException('CakeException');
+		$this->expectExceptionMessage('No unit type.');
 		$this->Number->fromReadableSize('bogus', false);
 	}
 

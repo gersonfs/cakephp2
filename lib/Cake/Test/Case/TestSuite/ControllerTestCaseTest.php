@@ -400,12 +400,12 @@ class ControllerTestCaseTest extends CakeTestCase {
 	}
 
 /**
- * Tests not using loaded routes during tests
- *
- * @expectedException MissingActionException
- * @return void
- */
+	 * Tests not using loaded routes during tests
+	 *
+	 * @return void
+	 */
 	public function testSkipRoutes() {
+		$this->expectException('MissingActionException');
 		Router::connect('/:controller/:action/*');
 		include CAKE . 'Test' . DS . 'test_app' . DS . 'Config' . DS . 'routes.php';
 

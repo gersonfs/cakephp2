@@ -167,12 +167,12 @@ class CakePluginTest extends CakeTestCase {
 	}
 
 /**
- * Tests that loading a missing routes file throws a warning
- *
- * @return void
- * @expectedException \PHPUnit\Framework\Exception
- */
+	 * Tests that loading a missing routes file throws a warning
+	 *
+	 * @return void
+	 */
 	public function testLoadMultipleWithDefaultsMissingFile() {
+		$this->expectException(\PHPUnit\Framework\Exception::class);
 		CakePlugin::load(array('TestPlugin', 'TestPluginTwo'), array('bootstrap' => true, 'routes' => true));
 		CakePlugin::routes();
 	}
@@ -192,12 +192,12 @@ class CakePluginTest extends CakeTestCase {
 	}
 
 /**
- * Tests that CakePlugin::load() throws an exception on unknown plugin
- *
- * @return void
- * @expectedException MissingPluginException
- */
+	 * Tests that CakePlugin::load() throws an exception on unknown plugin
+	 *
+	 * @return void
+	 */
 	public function testLoadNotFound() {
+		$this->expectException('MissingPluginException');
 		CakePlugin::load('MissingPlugin');
 	}
 
@@ -216,12 +216,12 @@ class CakePluginTest extends CakeTestCase {
 	}
 
 /**
- * Tests that CakePlugin::path() throws an exception on unknown plugin
- *
- * @return void
- * @expectedException MissingPluginException
- */
+	 * Tests that CakePlugin::path() throws an exception on unknown plugin
+	 *
+	 * @return void
+	 */
 	public function testPathNotFound() {
+		$this->expectException('MissingPluginException');
 		CakePlugin::path('TestPlugin');
 	}
 

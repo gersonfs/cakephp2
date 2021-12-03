@@ -204,12 +204,12 @@ class JsHelperTest extends CakeTestCase {
 	}
 
 /**
- * test that methods dispatch internally and to the engine class
- *
- * @expectedException \PHPUnit\Framework\Exception_Warning
- * @return void
- */
+	 * test that methods dispatch internally and to the engine class
+	 *
+	 * @return void
+	 */
 	public function testMethodDispatching() {
+		$this->expectException('PHPUnit\Framework\Exception_Warning');
 		$this->_useMock();
 
 		$this->Js->TestJsEngine

@@ -58,12 +58,12 @@ class CrudAuthorizeTest extends CakeTestCase {
 	}
 
 /**
- * test authorize() without a mapped action, ensure an error is generated.
- *
- * @expectedException \PHPUnit\Framework\Exception
- * @return void
- */
+	 * test authorize() without a mapped action, ensure an error is generated.
+	 *
+	 * @return void
+	 */
 	public function testAuthorizeNoMappedAction() {
+		$this->expectException(\PHPUnit\Framework\Exception::class);
 		$request = new CakeRequest('/posts/foobar', false);
 		$request->addParams(array(
 			'controller' => 'posts',

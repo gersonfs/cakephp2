@@ -2881,13 +2881,13 @@ SQL;
 	}
 
 /**
- * testDropSchemaNoSchema method
- *
- * @expectedException \PHPUnit\Framework\Exception
- * @return void
- * @throws \PHPUnit\Framework\Exception
- */
+	 * testDropSchemaNoSchema method
+	 *
+	 * @return void
+	 * @throws \PHPUnit\Framework\Exception
+	 */
 	public function testDropSchemaNoSchema() {
+		$this->expectException(\PHPUnit\Framework\Exception::class);
 		try {
 			$this->Dbo->dropSchema(null);
 			$this->fail('No exception');
@@ -3230,12 +3230,12 @@ SQL;
 	}
 
 /**
- * testBuildColumnBadType method
- *
- * @expectedException \PHPUnit\Framework\Exception
- * @return void
- */
+	 * testBuildColumnBadType method
+	 *
+	 * @return void
+	 */
 	public function testBuildColumnBadType() {
+		$this->expectException(\PHPUnit\Framework\Exception::class);
 		$data = array(
 			'name' => 'testName',
 			'type' => 'varchar(255)',
@@ -3977,10 +3977,10 @@ SQL;
 	}
 
 /**
- * @expectedException MissingConnectionException
- * @return void
- */
+	 * @return void
+	 */
 	public function testExceptionOnBrokenConnection() {
+		$this->expectException('MissingConnectionException');
 		new Mysql(array(
 			'driver' => 'mysql',
 			'host' => 'imaginary_host',

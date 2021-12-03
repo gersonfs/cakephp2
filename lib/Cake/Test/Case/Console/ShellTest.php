@@ -1012,12 +1012,12 @@ TEXT;
 	}
 
 /**
- * Test getting an invalid helper
- *
- * @expectedException RunTimeException
- * @return void
- */
+	 * Test getting an invalid helper
+	 *
+	 * @return void
+	 */
 	public function testGetInvalidHelper() {
+		$this->expectException(\RunTimeException::class);
 		$this->Shell->helper("tomato");
 	}
 

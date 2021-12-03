@@ -935,10 +935,10 @@ class RequestHandlerComponentTest extends CakeTestCase {
 	}
 
 /**
- * @expectedException CakeException
- * @return void
- */
+	 * @return void
+	 */
 	public function testAddInputTypeException() {
+		$this->expectException('CakeException');
 		$this->RequestHandler->addInputType('csv', array('I am not callable'));
 	}
 
