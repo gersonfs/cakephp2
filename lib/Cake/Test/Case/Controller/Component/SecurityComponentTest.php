@@ -1489,7 +1489,8 @@ class SecurityComponentTest extends CakeTestCase {
 		$this->Security->startup($this->Controller);
 		$tokens = $this->Security->Session->read('_Token.csrfTokens');
 		$this->assertEquals(2, count($tokens), 'Too many tokens left behind');
-		$this->assertNotEmpty('valid', $tokens, 'Valid token was removed.');
+		$this->assertArrayHasKey('valid', $tokens);
+		//$this->assertNotEmpty('valid', $tokens, 'Valid token was removed.');
 	}
 
 /**
