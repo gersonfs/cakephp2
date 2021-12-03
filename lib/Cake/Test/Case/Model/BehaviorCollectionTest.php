@@ -606,10 +606,10 @@ class BehaviorCollectionTest extends CakeTestCase {
 /**
  * test that attaching a non existent Behavior triggers a cake error.
  *
- * @expectedException MissingBehaviorException
  * @return void
  */
 	public function testInvalidBehaviorCausingCakeError() {
+		$this->expectException('MissingBehaviorException');
 		$Apple = new Apple();
 		$Apple->Behaviors->load('NoSuchBehavior');
 	}
@@ -1135,6 +1135,7 @@ class BehaviorCollectionTest extends CakeTestCase {
 		$Sample->Behaviors->unload('Test3');
 
 		$Sample->Behaviors->trigger('beforeTest', array(&$Sample));
+		$this->assertTrue(true);
 	}
 
 /**

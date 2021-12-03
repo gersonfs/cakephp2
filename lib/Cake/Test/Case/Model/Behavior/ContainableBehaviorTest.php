@@ -150,10 +150,10 @@ class ContainableBehaviorTest extends CakeTestCase {
 /**
  * testInvalidContainments method
  *
- * @expectedException \PHPUnit\Framework\Exception
  * @return void
  */
 	public function testInvalidContainments() {
+		$this->expectException('\PHPUnit\Framework\Exception');
 		$this->_containments($this->Article, array('Comment', 'InvalidBinding'));
 	}
 
@@ -165,6 +165,7 @@ class ContainableBehaviorTest extends CakeTestCase {
 	public function testInvalidContainmentsNoNotices() {
 		$this->Article->Behaviors->load('Containable', array('notices' => false));
 		$this->_containments($this->Article, array('Comment', 'InvalidBinding'));
+		$this->assertTrue(true);
 	}
 
 /**
@@ -241,10 +242,10 @@ class ContainableBehaviorTest extends CakeTestCase {
 /**
  * testBeforeFindWithNonExistingBinding method
  *
- * @expectedException \PHPUnit\Framework\Exception
  * @return void
  */
 	public function testBeforeFindWithNonExistingBinding() {
+		$this->expectException('\PHPUnit\Framework\Exception');
 		$this->Article->find('all', array('contain' => array('Comment' => 'NonExistingBinding')));
 	}
 
