@@ -496,8 +496,8 @@ class ConfigureTest extends CakeTestCase {
 		$result = Configure::dump('config_test.php', 'test_reader');
 		$this->assertTrue($result > 0);
 		$result = file_get_contents(TMP . 'config_test.php');
-		$this->assertContains('<?php', $result);
-		$this->assertContains('$config = ', $result);
+		$this->assertStringContainsString('<?php', $result);
+		$this->assertStringContainsString('$config = ', $result);
 		if (file_exists(TMP . 'config_test.php')) {
 			unlink(TMP . 'config_test.php');
 		}
@@ -514,10 +514,10 @@ class ConfigureTest extends CakeTestCase {
 		$result = Configure::dump('config_test.php', 'test_reader', array('Error'));
 		$this->assertTrue($result > 0);
 		$result = file_get_contents(TMP . 'config_test.php');
-		$this->assertContains('<?php', $result);
-		$this->assertContains('$config = ', $result);
-		$this->assertContains('Error', $result);
-		$this->assertNotContains('debug', $result);
+		$this->assertStringContainsString('<?php', $result);
+		$this->assertStringContainsString('$config = ', $result);
+		$this->assertStringContainsString('Error', $result);
+		$this->assertStringNotContainsString('debug', $result);
 
 		if (file_exists(TMP . 'config_test.php')) {
 			unlink(TMP . 'config_test.php');

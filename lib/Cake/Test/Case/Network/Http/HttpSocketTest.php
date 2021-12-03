@@ -1845,7 +1845,7 @@ class HttpSocketTest extends CakeTestCase {
 		} catch (SocketException $e) {
 			$message = $e->getMessage();
 			$this->skipIf(strpos($message, 'Invalid HTTP') !== false, 'Invalid HTTP Response received, skipping.');
-			$this->assertContains('Failed to enable crypto', $message);
+			$this->assertStringContainsString('Failed to enable crypto', $message);
 		}
 	}
 

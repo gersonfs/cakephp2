@@ -22,5 +22,5 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services = $containerConfigurator->services();
 
     // register a single rule
-    $services->set(\Rector\PHPUnit\Rector\ClassMethod\ExceptionAnnotationRector::class);
+    $services->set(\Rector\PHPUnit\Rector\MethodCall\SpecificAssertContainsRector::class);
 };
