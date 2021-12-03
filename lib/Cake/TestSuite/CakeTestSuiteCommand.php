@@ -63,7 +63,7 @@ class CakeTestSuiteCommand extends \PHPUnit\TextUI\Command {
  * @param bool $exit The exit mode.
  * @return void
  */
-	public function run(array $argv, $exit = true) {
+	public function run(array $argv, bool $exit = true): int {
 		$this->handleArguments($argv);
 
 		$runner = $this->getRunner($this->arguments['loader']);

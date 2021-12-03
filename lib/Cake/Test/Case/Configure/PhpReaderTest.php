@@ -50,7 +50,7 @@ class PhpReaderTest extends CakeTestCase {
  *
  * @return void
  */
-	public function setUp() {
+	public function setUp(): void {
 		parent::setUp();
 		$this->path = CAKE . 'Test' . DS . 'test_app' . DS . 'Config' . DS;
 	}
@@ -145,10 +145,10 @@ class PhpReaderTest extends CakeTestCase {
 		$expected = <<<PHP
 <?php
 \$config = array (
-  'One' => 
+  'One' =>
   array (
     'two' => 'value',
-    'three' => 
+    'three' =>
     array (
       'four' => 'value four',
     ),
@@ -156,7 +156,7 @@ class PhpReaderTest extends CakeTestCase {
     'bool_false' => false,
     'bool_true' => true,
   ),
-  'Asset' => 
+  'Asset' =>
   array (
     'timestamp' => 'force',
   ),

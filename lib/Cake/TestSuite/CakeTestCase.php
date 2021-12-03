@@ -75,7 +75,7 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  * @return \PHPUnit\Framework\TestResult
  * @throws InvalidArgumentException
  */
-	public function run(\PHPUnit\Framework\TestResult $result = null) {
+	public function run(\PHPUnit\Framework\TestResult $result = null) : \PHPUnit\Framework\TestResult {
 		$level = ob_get_level();
 
 		if (!empty($this->fixtureManager)) {
@@ -133,7 +133,7 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  *
  * @return void
  */
-	public function setUp() {
+	protected function setUp() : void {
 		parent::setUp();
 
 		if (empty($this->_configure)) {
@@ -152,7 +152,7 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  *
  * @return void
  */
-	public function tearDown() {
+	protected function tearDown() : void {
 		parent::tearDown();
 		App::build($this->_pathRestore, App::RESET);
 		if (class_exists('ClassRegistry', false)) {
@@ -185,7 +185,7 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  *
  * @return void
  */
-	protected function assertPreConditions() {
+	protected function assertPreConditions() : void {
 		parent::assertPreConditions();
 		$this->startTest($this->getName());
 	}
@@ -195,7 +195,7 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  *
  * @return void
  */
-	protected function assertPostConditions() {
+	protected function assertPostConditions(): void {
 		parent::assertPostConditions();
 		$this->endTest($this->getName());
 	}
@@ -642,24 +642,8 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  * @deprecated 3.0.0 This is a compatibility wrapper for 1.x. It will be removed in 3.0
  * @return void
  */
-	protected function expectError($expected = false, $message = '') {
-		if (!$expected) {
-			$expected = 'Exception';
-		}
-		$this->setExpectedException($expected, $message);
-		$this->expectException();
-	}
-
-/**
- * Compatibility wrapper function for setExpectedException
- *
- * @param mixed $name The name of the expected Exception.
- * @param string $message the text to display if the assertion is not correct
- * @deprecated 3.0.0 This is a compatibility wrapper for 1.x. It will be removed in 3.0.
- * @return void
- */
-	public function expectException($name = 'Exception', $message = null) {
-		$this->setExpectedException($name, $message);
+	public function expectError(): void {
+		parent::expectError();
 	}
 
 	protected function setExpectedException($name = 'Exception', $message = null) {
