@@ -112,6 +112,16 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	public function endTest($method) {
 	}
 
+	public function isPHP8(): bool
+	{
+		return version_compare(PHP_VERSION, '8.0.0') >= 0;
+	}
+
+	public function isPHP7(): bool
+	{
+		return version_compare(PHP_VERSION, '8.0.0') < 0;
+	}
+
 /**
  * Overrides SimpleTestCase::skipIf to provide a boolean return value
  *
