@@ -51,8 +51,7 @@ Our primary goal is to provide a structured framework that enables PHP users at 
 ## Comparativo dos testes
 
 PHP 8:
-Tests: 4282, Assertions: 20773, Errors: 14, Failures: 60, Warnings: 348, Skipped: 213, Risky: 15.
-
+Tests: 4283, Assertions: 21101, Errors: 8, Failures: 43, Warnings: 68, Skipped: 215, Risky: 11.
 PHP 5.6
 Tests: 4282, Assertions: 20839, Failures: 39, Skipped: 193, Risky: 1.
 
