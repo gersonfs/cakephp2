@@ -113,8 +113,16 @@ class DebuggerTest extends CakeTestCase {
 		$out .= '';
 		$result = Debugger::output(true);
 
-		$this->assertEquals('Notice', $result[0]['error']);
-		$this->assertRegExp('/Undefined variable\:\s+out/', $result[0]['description']);
+		$type = $this->isPHP7() ? 'Notice' : 'Warning';
+		$this->assertEquals($type, $result[0]['error']);
+		if ($this->isPHP8()) {
+			$this->assertRegExp('/Undefined variable \$out/', $result[0]['description']);
+		}
+
+		if ($this->isPHP7()) {
+			$this->assertRegExp('/Undefined variable\:\s+out/', $result[0]['description']);
+		}
+
 		$this->assertRegExp('/DebuggerTest::testOutput/i', $result[0]['trace']);
 
 		ob_start();
@@ -122,8 +130,15 @@ class DebuggerTest extends CakeTestCase {
 		$other .= '';
 		$result = ob_get_clean();
 
-		$this->assertRegExp('/Undefined variable:\s+other/', $result);
-		$this->assertRegExp('/Context:/', $result);
+		if ($this->isPHP7()) {
+			$this->assertRegExp('/Undefined variable:\s+other/', $result);
+		}
+
+		if ($this->isPHP8()) {
+			$this->assertRegExp('/Undefined variable \$other/', $result);
+		}
+
+		$this->assertRegExp('/Trace:/', $result);
 		$this->assertRegExp('/DebuggerTest::testOutput/i', $result);
 
 		ob_start();
@@ -131,14 +146,22 @@ class DebuggerTest extends CakeTestCase {
 		$wrong .= '';
 		$result = ob_get_clean();
 		$this->assertRegExp('/<pre class="cake-error">.+<\/pre>/', $result);
-		$this->assertRegExp('/<b>Notice<\/b>/', $result);
-		$this->assertRegExp('/variable:\s+wrong/', $result);
+		if ($this->isPHP7()) {
+			$this->assertRegExp('/<b>Notice<\/b>/', $result);
+			$this->assertRegExp('/variable:\s+wrong/', $result);
+		}
+
+		if ($this->isPHP8()) {
+			$this->assertRegExp('/<b>Warning<\/b>/', $result);
+			$this->assertRegExp('/variable \$wrong/', $result);
+		}
+
 
 		ob_start();
 		Debugger::output('js');
 		$buzz .= '';
 		$result = explode('</a>', ob_get_clean());
-		$this->assertTags($result[0], array(
+		$tags = array(
 			'pre' => array('class' => 'cake-error'),
 			'a' => array(
 				'href' => "javascript:void(0);",
@@ -147,12 +170,32 @@ class DebuggerTest extends CakeTestCase {
 					" \? '' \: 'none'\);/"
 			),
 			'b' => array(), 'Notice', '/b', ' (8)',
-		));
+		);
 
-		$this->assertRegExp('/Undefined variable:\s+buzz/', $result[1]);
+		if ($this->isPHP8()) {
+			$tags = array(
+				'pre' => array('class' => 'cake-error'),
+				'a' => array(
+					'href' => "javascript:void(0);",
+					'onclick' => "preg:/document\.getElementById\('cakeErr[a-z0-9]+\-trace'\)\.style\.display = " .
+						"\(document\.getElementById\('cakeErr[a-z0-9]+\-trace'\)\.style\.display == 'none'" .
+						" \? '' \: 'none'\);/"
+				),
+				'b' => array(), 'Warning', '/b', ' (2)',
+			);
+		}
+		$this->assertTags($result[0], $tags);
+
+		$pattern = '/Undefined variable:\s+buzz/';
+		if ($this->isPHP8()) {
+			$pattern = '/Undefined variable \$buzz/';
+		}
+		$this->assertRegExp($pattern, $result[1]);
 		$this->assertRegExp('/<a[^>]+>Code/', $result[1]);
 		$this->assertRegExp('/<a[^>]+>Context/', $result[2]);
-		$this->assertStringContainsString('$wrong = &#039;&#039;', $result[3], 'Context should be HTML escaped.');
+		if (!$this->isPHP8()) {
+			$this->assertStringContainsString('$wrong = &#039;&#039;', $result[3], 'Context should be HTML escaped.');
+		}
 	}
 
 /**
@@ -209,6 +252,17 @@ class DebuggerTest extends CakeTestCase {
 			'preg:/Undefined variable:\s+foo/',
 			'/error'
 		);
+
+		if ($this->isPHP8()) {
+			$data = array(
+				'error' => array(),
+				'code' => array(), '2', '/code',
+				'file' => array(), 'preg:/[^<]+/', '/file',
+				'line' => array(), '' . ((int)__LINE__ - 17), '/line',
+				'preg:/Undefined variable \$foo/',
+				'/error'
+			);
+		}
 		$this->assertTags($result, $data, true);
 	}
 
@@ -268,6 +322,16 @@ class DebuggerTest extends CakeTestCase {
 			'preg:/Undefined variable:\s+foo/',
 			'/error'
 		);
+		if ($this->isPHP8()) {
+			$data = array(
+				'<error',
+				'<code', '2', '/code',
+				'<file', 'preg:/[^<]+/', '/file',
+				'<line', '' . ((int)__LINE__ - 16), '/line',
+				'preg:/Undefined variable \$foo/',
+				'/error'
+			);
+		}
 		$this->assertTags($result, $data, true);
 	}
 
@@ -286,7 +350,8 @@ class DebuggerTest extends CakeTestCase {
 		ob_start();
 		$foo .= '';
 		$result = ob_get_clean();
-		$this->assertStringContainsString('Notice: I eated an error', $result);
+		$type = $this->isPHP7() ? 'Notice' : 'Warning';
+		$this->assertStringContainsString($type . ': I eated an error', $result);
 		$this->assertStringContainsString('DebuggerTest.php', $result);
 	}
 
@@ -631,7 +696,7 @@ TEXT;
  */
 	public function testExportVarRecursion() {
 		$output = Debugger::exportVar($GLOBALS);
-		$this->assertContains("'GLOBALS' => [recursion]", $output);
+		$this->assertStringContainsString("'GLOBALS' => [recursion]", $output);
 	}
 
 /**

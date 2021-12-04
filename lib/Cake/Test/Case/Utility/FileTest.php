@@ -142,14 +142,14 @@ class FileTest extends CakeTestCase {
 		$this->skipIf(DIRECTORY_SEPARATOR === '\\', 'File permissions tests not supported on Windows.');
 
 		$dir = TMP . 'tests' . DS . 'permissions' . DS;
-		$old = umask();
+		$old = umask(0);
 
 		umask(0002);
 		$file = $dir . 'permission_' . uniqid();
 		$expecting = decoct(0664 & ~umask());
 		$File = new File($file, true);
 		$result = $File->perms();
-		$this->assertEquals($expecting, $result);
+		$this->assertStringEndsWith($expecting, $result);
 		$File->delete();
 
 		umask(0022);
@@ -157,7 +157,7 @@ class FileTest extends CakeTestCase {
 		$expecting = decoct(0644 & ~umask());
 		$File = new File($file, true);
 		$result = $File->perms();
-		$this->assertEquals($expecting, $result);
+		$this->assertStringEndsWith($expecting, $result);
 		$File->delete();
 
 		umask(0422);
@@ -165,7 +165,7 @@ class FileTest extends CakeTestCase {
 		$expecting = decoct(0244 & ~umask());
 		$File = new File($file, true);
 		$result = $File->perms();
-		$this->assertEquals($expecting, $result);
+		$this->assertStringEndsWith($expecting, $result);
 		$File->delete();
 
 		umask(0444);
@@ -173,7 +173,7 @@ class FileTest extends CakeTestCase {
 		$expecting = decoct(0222 & ~umask());
 		$File = new File($file, true);
 		$result = $File->perms();
-		$this->assertEquals($expecting, $result);
+		$this->assertStringEndsWith($expecting, $result);
 		$File->delete();
 
 		umask($old);
@@ -326,6 +326,7 @@ class FileTest extends CakeTestCase {
  * @covers ::create
  */
 	public function testOpeningNonExistentFileCreatesIt() {
+		umask(0022);
 		$someFile = new File(TMP . 'some_file.txt', false);
 		$this->assertTrue($someFile->open());
 		$this->assertEquals('', $someFile->read());
@@ -631,7 +632,7 @@ class FileTest extends CakeTestCase {
 		// Double check
 		$expected = 'This is the welcome.tmp file in vendors directory';
 		$contents = $TmpFile->read();
-		$this->assertContains($expected, $contents);
+		$this->assertStringContainsString($expected, $contents);
 
 		$search = array('This is the', 'welcome.php file', 'in tmp directory');
 		$replace = array('This should be a', 'welcome.tmp file', 'in the Lib directory');
@@ -643,7 +644,7 @@ class FileTest extends CakeTestCase {
 		// Double check
 		$expected = 'This should be a welcome.tmp file in vendors directory';
 		$contents = $TmpFile->read();
-		$this->assertContains($expected, $contents);
+		$this->assertStringContainsString($expected, $contents);
 
 		$TmpFile->delete();
 	}
