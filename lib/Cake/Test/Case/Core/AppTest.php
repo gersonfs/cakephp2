@@ -836,6 +836,7 @@ class AppTest extends CakeTestCase {
  * @return void
  */
 	public function testIncreaseMemoryLimit($memoryLimit, $additionalKb, $expected) {
+		$this->markTestSkipped('Não será utilizado');
 		$this->skipIf(!function_exists('ini_set'));
 		$this->skipIf($this->isPHP8());
 

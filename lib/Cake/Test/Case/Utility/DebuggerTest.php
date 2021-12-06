@@ -539,6 +539,7 @@ TEXT;
 		}
 		CakeLog::config('file', array('engine' => 'File', 'path' => TMP . 'logs' . DS));
 
+		CakeLog::drop('stderr');
 		Debugger::log('cool');
 		$result = file_get_contents(LOGS . 'debug.log');
 		$this->assertStringContainsString('DebuggerTest::testLog', $result);

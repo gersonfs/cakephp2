@@ -379,6 +379,8 @@ class AuthComponentTest extends CakeTestCase {
  * @return void
  */
 	public function setUp(): void {
+		$_SERVER['PHP_AUTH_USER'] = null;
+		$_SERVER['PHP_AUTH_PW'] = null;
 		parent::setUp();
 		Configure::write('Security.salt', 'YJfIxfs2guVoUubWDYhG93b0qyJfIxfs2guwvniR2G0FgaC9mi');
 		Configure::write('Security.cipherSeed', 770011223369876);
