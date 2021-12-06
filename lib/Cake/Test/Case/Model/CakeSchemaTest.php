@@ -550,6 +550,7 @@ class CakeSchemaTest extends CakeTestCase {
 				'name' => 'TestApp',
 				'models' => array('AppModel')
 			));
+			$this->assertTrue(true);
 		} catch(MissingTableException $mte) {
 			ConnectionManager::drop('default');
 			$this->fail($mte->getMessage());
