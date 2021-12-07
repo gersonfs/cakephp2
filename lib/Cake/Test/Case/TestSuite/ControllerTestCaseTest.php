@@ -666,6 +666,8 @@ class ControllerTestCaseTest extends CakeTestCase {
 
 		$this->assertEquals($restored, $_GET);
 		$this->assertEquals($restored, $_POST);
+		$_POST = [];
+		$_GET = [];
 	}
 
 /**

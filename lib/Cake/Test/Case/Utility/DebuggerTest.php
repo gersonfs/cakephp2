@@ -336,6 +336,7 @@ class DebuggerTest extends CakeTestCase {
 			);
 		}
 		$this->assertTags($result, $data, true);
+		restore_error_handler();
 	}
 
 /**
@@ -356,6 +357,7 @@ class DebuggerTest extends CakeTestCase {
 		$type = $this->isPHP7() ? 'Notice' : 'Warning';
 		$this->assertStringContainsString($type . ': I eated an error', $result);
 		$this->assertStringContainsString('DebuggerTest.php', $result);
+		restore_error_handler();
 	}
 
 /**

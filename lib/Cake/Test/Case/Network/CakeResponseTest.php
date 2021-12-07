@@ -30,6 +30,8 @@ class CakeResponseTest extends CakeTestCase {
  * @return void
  */
 	public function setUp(): void {
+		$_SERVER['HTTP_IF_NONE_MATCH'] = null;
+		$_SERVER['HTTP_IF_MODIFIED_SINCE'] = null;
 		parent::setUp();
 		ob_start();
 	}

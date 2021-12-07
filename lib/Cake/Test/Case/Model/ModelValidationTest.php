@@ -2235,7 +2235,7 @@ class ModelValidationTest extends BaseModelTest {
 			new ModelValidator('asdasds');
 			$this->fail('No exeption raised');
 		} catch (TypeError $e) {
-			throw new \PHPUnit\Framework\Exception('Raised an error', 100, __FILE__, __LINE__);
+			throw new \PHPUnit\Framework\Exception('Raised an error', 100);
 		}
 	}
 
