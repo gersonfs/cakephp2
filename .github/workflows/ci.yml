@@ -19,6 +19,7 @@ jobs:
         php-version: ['7.4', '8.0']
 
     steps:
+      - uses: niden/actions-memcached@v7
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
