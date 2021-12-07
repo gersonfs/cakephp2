@@ -694,9 +694,9 @@ class MysqlTest extends CakeTestCase {
 
 		$this->Dbo->rawQuery($result);
 		$result = $this->Dbo->listDetailedSources($this->Dbo->fullTableName('altertest', false, false));
-		$this->assertEquals('utf8mb3_general_ci', $result['Collation']);
+		$this->assertTrue(in_array($result['Collation'], ['utf8mb3_general_ci', 'utf8_general_ci']));
 		$this->assertEquals('InnoDB', $result['Engine']);
-		$this->assertEquals('utf8mb3', $result['charset']);
+		$this->assertTrue(in_array($result['charset'], ['utf8mb3', 'utf8']));
 
 		$this->Dbo->rawQuery($this->Dbo->dropSchema($schemaA));
 	}
@@ -747,11 +747,9 @@ class MysqlTest extends CakeTestCase {
 		$this->Dbo->rawQuery('CREATE TABLE ' . $table . ' (id int(11) AUTO_INCREMENT, bool tinyint(1), small_int tinyint(2), primary key(id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;');
 		$result = $this->Dbo->readTableParameters($this->Dbo->fullTableName($tableName, false, false));
 		$this->Dbo->rawQuery('DROP TABLE ' . $table);
-		$expected = array(
-			'charset' => 'utf8mb3',
-			'collate' => 'utf8mb3_unicode_ci',
-			'engine' => 'InnoDB');
-		$this->assertEquals($expected, $result);
+		$this->assertTrue(in_array($result['charset'], ['utf8mb3', 'utf8']));
+		$this->assertTrue(in_array($result['collate'], ['utf8mb3_unicode_ci', 'utf8_unicode_ci']));
+		$this->assertEquals('InnoDB', $result['engine']);
 
 		$table = $this->Dbo->fullTableName($tableName);
 		$this->Dbo->rawQuery('CREATE TABLE ' . $table . ' (id int(11) AUTO_INCREMENT, bool tinyint(1), small_int tinyint(2), primary key(id)) ENGINE=MyISAM DEFAULT CHARSET=cp1250 COLLATE=cp1250_general_ci COMMENT=\'Table\'\'s comment\';');
@@ -792,8 +790,8 @@ class MysqlTest extends CakeTestCase {
  */
 	public function testGetCharsetName() {
 		$this->Dbo->cacheSources = $this->Dbo->testing = false;
-		$result = $this->Dbo->getCharsetName('utf8mb3_unicode_ci');
-		$this->assertEquals('utf8mb3', $result);
+		$result = $this->Dbo->getCharsetName('utf8mb3_unicode_ci') . $this->Dbo->getCharsetName('utf8_unicode_ci');
+		$this->assertStringStartsWith('utf8', $result);
 		$result = $this->Dbo->getCharsetName('cp1250_general_ci');
 		$this->assertEquals('cp1250', $result);
 	}
