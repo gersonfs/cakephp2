@@ -79,6 +79,7 @@ class CakeRequestTest extends CakeTestCase {
 			unset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']);
 		}
 
+		$_SERVER['HTTP_AUTHORIZATION'] = null;
 		unset($_SERVER['HTTP_X_FORWARDED_HOST']);
 
 		Configure::write('App.baseUrl', false);
