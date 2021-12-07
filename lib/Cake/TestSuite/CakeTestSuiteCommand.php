@@ -79,7 +79,7 @@ class CakeTestSuiteCommand extends \PHPUnit\TextUI\Command {
 		}
 
 		if ($this->arguments['listGroups']) {
-			TestRunner::printVersionString();
+			//TestRunner::printVersionString();
 
 			print "Available test group(s):\n";
 

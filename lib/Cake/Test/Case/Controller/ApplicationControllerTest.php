@@ -92,6 +92,7 @@ class ApplicationControllerTest extends ControllerTestCase {
 				'session.cookie_httponly' => 1,
 				'session.use_cookies' => 0,
 				'session.use_only_cookies' => 0,
+				'session.cookie_secure' => 1
 			),
 			'defaults' => 'php',
 			'cookieTimeout' => 240,

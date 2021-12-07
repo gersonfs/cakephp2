@@ -32,6 +32,7 @@ class CakeResponseTest extends CakeTestCase {
 	public function setUp(): void {
 		$_SERVER['HTTP_IF_NONE_MATCH'] = null;
 		$_SERVER['HTTP_IF_MODIFIED_SINCE'] = null;
+		$_SERVER['HTTP_RANGE'] = null;
 		parent::setUp();
 		ob_start();
 	}
@@ -42,6 +43,9 @@ class CakeResponseTest extends CakeTestCase {
  * @return void
  */
 	public function tearDown(): void {
+		$_SERVER['HTTP_IF_NONE_MATCH'] = null;
+		$_SERVER['HTTP_IF_MODIFIED_SINCE'] = null;
+		$_SERVER['HTTP_RANGE'] = null;
 		parent::tearDown();
 		ob_end_clean();
 	}
