@@ -16,6 +16,8 @@
  * @license       https://opensource.org/licenses/mit-license.php MIT License
  */
 
+use PHPUnit\Framework\Exception;
+
 App::uses('CakeFixtureManager', 'TestSuite/Fixture');
 App::uses('CakeTestFixture', 'TestSuite/Fixture');
 
@@ -101,6 +103,50 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  * @return void
  */
 	public function startTest($method) {
+	}
+
+	public static function assertAttributeEquals($expected, string $actualAttributeName, $actualClassOrObject, string $message = '', float $delta = 0.0, int $maxDepth = 10, bool $canonicalize = false, bool $ignoreCase = false): void
+	{
+		if (is_object($actualClassOrObject)) {
+			$value = self::getObjectAttributeCake($actualClassOrObject, $actualAttributeName);
+			self::assertEquals($expected, $value, $message);
+			return;
+		}
+
+		parent::assertAttributeEquals($expected,  $actualAttributeName, $actualClassOrObject, $message, $delta ,$maxDepth,  $canonicalize, $ignoreCase);
+	}
+
+	public static function getObjectAttributeCake($object, string $attributeName)
+	{
+		if (!is_object($object)) {
+			throw InvalidArgumentException::create(1, 'object');
+		}
+
+		$reflector = new ReflectionObject($object);
+
+		do {
+			try {
+				$attribute = $reflector->getProperty($attributeName);
+
+				if (!$attribute || $attribute->isPublic()) {
+					return $object->{$attributeName};
+				}
+
+				$attribute->setAccessible(true);
+				$value = $attribute->getValue($object);
+				$attribute->setAccessible(false);
+
+				return $value;
+			} catch (ReflectionException $e) {
+			}
+		} while ($reflector = $reflector->getParentClass());
+
+		throw new Exception(
+			sprintf(
+				'Attribute "%s" not found in object.',
+				$attributeName
+			)
+		);
 	}
 
 /**

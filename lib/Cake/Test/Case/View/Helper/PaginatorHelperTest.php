@@ -1487,12 +1487,13 @@ class PaginatorHelperTest extends CakeTestCase {
 		));
 	}
 
-/**
- * testNumbers method
- *
- * @return void
- */
-	public function testNumbers() {
+	/**
+	 * testNumbers method
+	 *
+	 * @return void
+	 */
+	public function testNumbers()
+	{
 		$this->Paginator->request->params['paging'] = array(
 			'Client' => array(
 				'page' => 8,

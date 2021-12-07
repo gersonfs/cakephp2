@@ -594,7 +594,7 @@ class HttpSocketTest extends CakeTestCase {
 			'method' => 'GET'
 		);
 		$this->Socket->request($request);
-		$this->assertContains('Host: cakephp.org:8080', $this->Socket->request['header']);
+		$this->assertStringContainsString('Host: cakephp.org:8080', $this->Socket->request['header']);
 	}
 
 /**
@@ -618,7 +618,7 @@ class HttpSocketTest extends CakeTestCase {
 			'method' => 'GET'
 		);
 		$this->Socket->request($request);
-		$this->assertContains("GET /index.php?somestring HTTP/1.1", $this->Socket->request['line']);
+		$this->assertStringContainsString("GET /index.php?somestring HTTP/1.1", $this->Socket->request['line']);
 	}
 
 /**
