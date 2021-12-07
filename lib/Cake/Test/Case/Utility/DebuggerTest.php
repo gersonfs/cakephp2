@@ -196,6 +196,7 @@ class DebuggerTest extends CakeTestCase {
 		if (!$this->isPHP8()) {
 			$this->assertStringContainsString('$wrong = &#039;&#039;', $result[3], 'Context should be HTML escaped.');
 		}
+		restore_error_handler();
 	}
 
 /**
@@ -214,6 +215,7 @@ class DebuggerTest extends CakeTestCase {
 
 		$this->assertStringNotContainsString('<script>alert(1)', $result);
 		$this->assertStringContainsString('&lt;script&gt;alert(1)', $result);
+		restore_error_handler();
 	}
 
 /**
@@ -264,6 +266,7 @@ class DebuggerTest extends CakeTestCase {
 			);
 		}
 		$this->assertTags($result, $data, true);
+		restore_error_handler();
 	}
 
 /**

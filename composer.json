@@ -25,7 +25,8 @@
 		"ext-mcrypt": "You need to install ext-openssl or ext-mcrypt to use AES-256 encryption"
 	},
 	"require-dev": {
-		"rector/rector": "^0.12.5"
+		"rector/rector": "^0.12.5",
+		"phpunit/phpunit": "8.x"
 	},
 	"config": {
 		"vendor-dir": "vendors/",

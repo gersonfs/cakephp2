@@ -111,4 +111,4 @@ CakeLog::config('error', array(
 ));
 
 Configure::write('Security.useOpenSsl', true);
-//require_once 'vendors/autoload.php';
+require_once 'vendors/autoload.php';
