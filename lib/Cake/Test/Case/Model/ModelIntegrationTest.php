@@ -2236,8 +2236,9 @@ class ModelIntegrationTest extends BaseModelTest {
 		} elseif (isset($this->db->columns['integer']['length'])) {
 			$intLength = $this->db->columns['integer']['length'];
 		} else {
-			$intLength = 11;
+			$intLength = $this->getDefaultLength();
 		}
+
 		foreach (array('collate', 'charset', 'comment', 'unsigned') as $type) {
 			foreach ($result as $i => $r) {
 				unset($result[$i][$type]);
@@ -2333,6 +2334,25 @@ class ModelIntegrationTest extends BaseModelTest {
 		));
 
 		$this->assertEquals($expected, $FeaturedModel->create($data));
+	}
+
+	protected function getDefaultLength(): ?int
+	{
+		if ($this->isMysql8()) {
+			return null;
+		}
+
+		return 11;
+	}
+
+	protected function isMysql8() : bool
+	{
+		if (get_class($this->db) != 'Mysql') {
+			return false;
+		}
+		$version = $this->db->getVersion();
+
+		return preg_match('/^8\.[0-9]+\.[0-9]+$/', $version) === 1;
 	}
 
 /**
