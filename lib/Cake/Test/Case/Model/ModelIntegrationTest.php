@@ -2352,7 +2352,11 @@ class ModelIntegrationTest extends BaseModelTest {
 		}
 		$version = $this->db->getVersion();
 
-		return preg_match('/^8\.[0-9]+\.[0-9]+$/', $version) === 1;
+		if (strpos(strtolower($version), 'mariadb') !== false) {
+			return false;
+		}
+
+		return preg_match('/^8\.[0-9]+\.[0-9]+\-/', $version) === 1;
 	}
 
 /**
