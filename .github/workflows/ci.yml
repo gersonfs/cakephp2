@@ -42,5 +42,6 @@ jobs:
 
       - name: Rodando PHPUnit
         run: |
+          mysql -uroot -proot -e "SELECT VERSION()"
           composer install --no-progress --no-suggest -o --no-ansi --no-interaction
           composer test
