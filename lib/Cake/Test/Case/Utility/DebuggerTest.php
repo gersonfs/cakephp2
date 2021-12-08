@@ -40,7 +40,7 @@ class DebuggerTest extends CakeTestCase {
  *
  * @return void
  */
-	public function setUp() {
+	public function setUp(): void {
 		parent::setUp();
 		Configure::write('debug', 2);
 		Configure::write('log', false);
@@ -51,7 +51,7 @@ class DebuggerTest extends CakeTestCase {
  *
  * @return void
  */
-	public function tearDown() {
+	public function tearDown(): void {
 		parent::tearDown();
 		Configure::write('log', true);
 		if ($this->_restoreError) {
@@ -113,8 +113,16 @@ class DebuggerTest extends CakeTestCase {
 		$out .= '';
 		$result = Debugger::output(true);
 
-		$this->assertEquals('Notice', $result[0]['error']);
-		$this->assertRegExp('/Undefined variable\:\s+out/', $result[0]['description']);
+		$type = $this->isPHP7() ? 'Notice' : 'Warning';
+		$this->assertEquals($type, $result[0]['error']);
+		if ($this->isPHP8()) {
+			$this->assertRegExp('/Undefined variable \$out/', $result[0]['description']);
+		}
+
+		if ($this->isPHP7()) {
+			$this->assertRegExp('/Undefined variable\:\s+out/', $result[0]['description']);
+		}
+
 		$this->assertRegExp('/DebuggerTest::testOutput/i', $result[0]['trace']);
 
 		ob_start();
@@ -122,8 +130,15 @@ class DebuggerTest extends CakeTestCase {
 		$other .= '';
 		$result = ob_get_clean();
 
-		$this->assertRegExp('/Undefined variable:\s+other/', $result);
-		$this->assertRegExp('/Context:/', $result);
+		if ($this->isPHP7()) {
+			$this->assertRegExp('/Undefined variable:\s+other/', $result);
+		}
+
+		if ($this->isPHP8()) {
+			$this->assertRegExp('/Undefined variable \$other/', $result);
+		}
+
+		$this->assertRegExp('/Trace:/', $result);
 		$this->assertRegExp('/DebuggerTest::testOutput/i', $result);
 
 		ob_start();
@@ -131,14 +146,22 @@ class DebuggerTest extends CakeTestCase {
 		$wrong .= '';
 		$result = ob_get_clean();
 		$this->assertRegExp('/<pre class="cake-error">.+<\/pre>/', $result);
-		$this->assertRegExp('/<b>Notice<\/b>/', $result);
-		$this->assertRegExp('/variable:\s+wrong/', $result);
+		if ($this->isPHP7()) {
+			$this->assertRegExp('/<b>Notice<\/b>/', $result);
+			$this->assertRegExp('/variable:\s+wrong/', $result);
+		}
+
+		if ($this->isPHP8()) {
+			$this->assertRegExp('/<b>Warning<\/b>/', $result);
+			$this->assertRegExp('/variable \$wrong/', $result);
+		}
+
 
 		ob_start();
 		Debugger::output('js');
 		$buzz .= '';
 		$result = explode('</a>', ob_get_clean());
-		$this->assertTags($result[0], array(
+		$tags = array(
 			'pre' => array('class' => 'cake-error'),
 			'a' => array(
 				'href' => "javascript:void(0);",
@@ -147,12 +170,33 @@ class DebuggerTest extends CakeTestCase {
 					" \? '' \: 'none'\);/"
 			),
 			'b' => array(), 'Notice', '/b', ' (8)',
-		));
+		);
 
-		$this->assertRegExp('/Undefined variable:\s+buzz/', $result[1]);
+		if ($this->isPHP8()) {
+			$tags = array(
+				'pre' => array('class' => 'cake-error'),
+				'a' => array(
+					'href' => "javascript:void(0);",
+					'onclick' => "preg:/document\.getElementById\('cakeErr[a-z0-9]+\-trace'\)\.style\.display = " .
+						"\(document\.getElementById\('cakeErr[a-z0-9]+\-trace'\)\.style\.display == 'none'" .
+						" \? '' \: 'none'\);/"
+				),
+				'b' => array(), 'Warning', '/b', ' (2)',
+			);
+		}
+		$this->assertTags($result[0], $tags);
+
+		$pattern = '/Undefined variable:\s+buzz/';
+		if ($this->isPHP8()) {
+			$pattern = '/Undefined variable \$buzz/';
+		}
+		$this->assertRegExp($pattern, $result[1]);
 		$this->assertRegExp('/<a[^>]+>Code/', $result[1]);
 		$this->assertRegExp('/<a[^>]+>Context/', $result[2]);
-		$this->assertContains('$wrong = &#039;&#039;', $result[3], 'Context should be HTML escaped.');
+		if (!$this->isPHP8()) {
+			$this->assertStringContainsString('$wrong = &#039;&#039;', $result[3], 'Context should be HTML escaped.');
+		}
+		restore_error_handler();
 	}
 
 /**
@@ -169,8 +213,9 @@ class DebuggerTest extends CakeTestCase {
 		$b = $a['<script>alert(1)</script>'];
 		$result = ob_get_clean();
 
-		$this->assertNotContains('<script>alert(1)', $result);
-		$this->assertContains('&lt;script&gt;alert(1)', $result);
+		$this->assertStringNotContainsString('<script>alert(1)', $result);
+		$this->assertStringContainsString('&lt;script&gt;alert(1)', $result);
+		restore_error_handler();
 	}
 
 /**
@@ -209,7 +254,19 @@ class DebuggerTest extends CakeTestCase {
 			'preg:/Undefined variable:\s+foo/',
 			'/error'
 		);
+
+		if ($this->isPHP8()) {
+			$data = array(
+				'error' => array(),
+				'code' => array(), '2', '/code',
+				'file' => array(), 'preg:/[^<]+/', '/file',
+				'line' => array(), '' . ((int)__LINE__ - 17), '/line',
+				'preg:/Undefined variable \$foo/',
+				'/error'
+			);
+		}
 		$this->assertTags($result, $data, true);
+		restore_error_handler();
 	}
 
 /**
@@ -223,12 +280,12 @@ class DebuggerTest extends CakeTestCase {
 	}
 
 /**
- * Test that choosing a non-existent format causes an exception
- *
- * @expectedException CakeException
- * @return void
- */
+	 * Test that choosing a non-existent format causes an exception
+	 *
+	 * @return void
+	 */
 	public function testOutputAsException() {
+		$this->expectException('CakeException');
 		Debugger::outputAs('Invalid junk');
 	}
 
@@ -268,7 +325,18 @@ class DebuggerTest extends CakeTestCase {
 			'preg:/Undefined variable:\s+foo/',
 			'/error'
 		);
+		if ($this->isPHP8()) {
+			$data = array(
+				'<error',
+				'<code', '2', '/code',
+				'<file', 'preg:/[^<]+/', '/file',
+				'<line', '' . ((int)__LINE__ - 16), '/line',
+				'preg:/Undefined variable \$foo/',
+				'/error'
+			);
+		}
 		$this->assertTags($result, $data, true);
+		restore_error_handler();
 	}
 
 /**
@@ -286,8 +354,10 @@ class DebuggerTest extends CakeTestCase {
 		ob_start();
 		$foo .= '';
 		$result = ob_get_clean();
-		$this->assertContains('Notice: I eated an error', $result);
-		$this->assertContains('DebuggerTest.php', $result);
+		$type = $this->isPHP7() ? 'Notice' : 'Warning';
+		$this->assertStringContainsString($type . ': I eated an error', $result);
+		$this->assertStringContainsString('DebuggerTest.php', $result);
+		restore_error_handler();
 	}
 
 /**
@@ -474,20 +544,21 @@ TEXT;
 		}
 		CakeLog::config('file', array('engine' => 'File', 'path' => TMP . 'logs' . DS));
 
+		CakeLog::drop('stderr');
 		Debugger::log('cool');
 		$result = file_get_contents(LOGS . 'debug.log');
-		$this->assertContains('DebuggerTest::testLog', $result);
-		$this->assertContains("'cool'", $result);
+		$this->assertStringContainsString('DebuggerTest::testLog', $result);
+		$this->assertStringContainsString("'cool'", $result);
 
 		unlink(LOGS . 'debug.log');
 
 		Debugger::log(array('whatever', 'here'));
 		$result = file_get_contents(LOGS . 'debug.log');
-		$this->assertContains('DebuggerTest::testLog', $result);
-		$this->assertContains('[main]', $result);
-		$this->assertContains('array', $result);
-		$this->assertContains("'whatever',", $result);
-		$this->assertContains("'here'", $result);
+		$this->assertStringContainsString('DebuggerTest::testLog', $result);
+		$this->assertStringContainsString('[main]', $result);
+		$this->assertStringContainsString('array', $result);
+		$this->assertStringContainsString("'whatever',", $result);
+		$this->assertStringContainsString("'here'", $result);
 	}
 
 /**
@@ -506,8 +577,8 @@ TEXT;
 		);
 		Debugger::log($val, LOG_DEBUG, 0);
 		$result = file_get_contents(LOGS . 'debug.log');
-		$this->assertContains('DebuggerTest::testLog', $result);
-		$this->assertNotContains("/'val'/", $result);
+		$this->assertStringContainsString('DebuggerTest::testLog', $result);
+		$this->assertStringNotContainsString("/'val'/", $result);
 
 		unlink(LOGS . 'debug.log');
 	}
@@ -631,7 +702,7 @@ TEXT;
  */
 	public function testExportVarRecursion() {
 		$output = Debugger::exportVar($GLOBALS);
-		$this->assertContains("'GLOBALS' => [recursion]", $output);
+		$this->assertStringContainsString("'GLOBALS' => [recursion]", $output);
 	}
 
 /**

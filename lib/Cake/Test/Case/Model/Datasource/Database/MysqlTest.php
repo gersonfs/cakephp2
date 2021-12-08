@@ -60,7 +60,7 @@ class MysqlTest extends CakeTestCase {
  *
  * @return void
  */
-	public function setUp() {
+	public function setUp(): void {
 		parent::setUp();
 		$this->Dbo = ConnectionManager::getDataSource('test');
 		if (!($this->Dbo instanceof Mysql)) {
@@ -76,7 +76,7 @@ class MysqlTest extends CakeTestCase {
  *
  * @return void
  */
-	public function tearDown() {
+	public function tearDown(): void {
 		parent::tearDown();
 		unset($this->model);
 		ClassRegistry::flush();
@@ -166,7 +166,7 @@ class MysqlTest extends CakeTestCase {
 		$this->assertEquals('1234567.11', $result);
 
 		$result = $this->db->value(123456.45464748, 'float');
-		$this->assertContains('123456.454647', $result);
+		$this->assertStringContainsString('123456.454647', $result);
 
 		$result = $this->db->value(0.987654321, 'float');
 		$this->assertEquals('0.987654321', (string)$result);
@@ -441,7 +441,7 @@ class MysqlTest extends CakeTestCase {
 		);
 
 		$mockDbo->expects($this->once())->method('getVersion')->will($this->returnValue('4.1'));
-		$resultMock = $this->getMock('PDOStatement', array('fetch'));
+		$resultMock = $this->getMock('PDOStatement', array('fetch', 'closeCursor'));
 		$mockDbo->expects($this->once())
 			->method('_execute')
 			->with('SHOW INDEX FROM ' . $name)
@@ -552,10 +552,10 @@ class MysqlTest extends CakeTestCase {
 				'group2' => array('type' => 'integer', 'null' => true)
 		)));
 		$result = $this->Dbo->createSchema($schemaA);
-		$this->assertContains('`id` int(11) DEFAULT 0 NOT NULL,', $result);
-		$this->assertContains('`name` varchar(50) NOT NULL,', $result);
-		$this->assertContains('`group1` int(11) DEFAULT NULL', $result);
-		$this->assertContains('`group2` int(11) DEFAULT NULL', $result);
+		$this->assertStringContainsString('`id` int(11) DEFAULT 0 NOT NULL,', $result);
+		$this->assertStringContainsString('`name` varchar(50) NOT NULL,', $result);
+		$this->assertStringContainsString('`group1` int(11) DEFAULT NULL', $result);
+		$this->assertStringContainsString('`group2` int(11) DEFAULT NULL', $result);
 
 		//Test that the string is syntactically correct
 		$query = $this->Dbo->getConnection()->prepare($result);
@@ -577,11 +577,11 @@ class MysqlTest extends CakeTestCase {
 		)));
 
 		$result = $this->Dbo->alterSchema($schemaB->compare($schemaA));
-		$this->assertContains("ALTER TABLE $table", $result);
-		$this->assertContains('ADD KEY `name_idx` (`name`),', $result);
-		$this->assertContains('ADD KEY `group_idx` (`group1`),', $result);
-		$this->assertContains('ADD KEY `compound_idx` (`group1`, `group2`),', $result);
-		$this->assertContains('ADD PRIMARY KEY  (`id`);', $result);
+		$this->assertStringContainsString("ALTER TABLE $table", $result);
+		$this->assertStringContainsString('ADD KEY `name_idx` (`name`),', $result);
+		$this->assertStringContainsString('ADD KEY `group_idx` (`group1`),', $result);
+		$this->assertStringContainsString('ADD KEY `compound_idx` (`group1`, `group2`),', $result);
+		$this->assertStringContainsString('ADD PRIMARY KEY  (`id`);', $result);
 
 		//Test that the string is syntactically correct
 		$query = $this->Dbo->getConnection()->prepare($result);
@@ -604,15 +604,15 @@ class MysqlTest extends CakeTestCase {
 		)));
 
 		$result = $this->Dbo->alterSchema($schemaC->compare($schemaB));
-		$this->assertContains("ALTER TABLE $table", $result);
-		$this->assertContains('DROP PRIMARY KEY,', $result);
-		$this->assertContains('DROP KEY `name_idx`,', $result);
-		$this->assertContains('DROP KEY `group_idx`,', $result);
-		$this->assertContains('DROP KEY `compound_idx`,', $result);
-		$this->assertContains('ADD KEY `id_name_idx` (`id`, `name`),', $result);
-		$this->assertContains('ADD UNIQUE KEY `name_idx` (`name`),', $result);
-		$this->assertContains('ADD KEY `group_idx` (`group2`),', $result);
-		$this->assertContains('ADD KEY `compound_idx` (`group2`, `group1`);', $result);
+		$this->assertStringContainsString("ALTER TABLE $table", $result);
+		$this->assertStringContainsString('DROP PRIMARY KEY,', $result);
+		$this->assertStringContainsString('DROP KEY `name_idx`,', $result);
+		$this->assertStringContainsString('DROP KEY `group_idx`,', $result);
+		$this->assertStringContainsString('DROP KEY `compound_idx`,', $result);
+		$this->assertStringContainsString('ADD KEY `id_name_idx` (`id`, `name`),', $result);
+		$this->assertStringContainsString('ADD UNIQUE KEY `name_idx` (`name`),', $result);
+		$this->assertStringContainsString('ADD KEY `group_idx` (`group2`),', $result);
+		$this->assertStringContainsString('ADD KEY `compound_idx` (`group2`, `group1`);', $result);
 
 		$query = $this->Dbo->getConnection()->prepare($result);
 		$this->assertEquals($query->queryString, $result);
@@ -623,11 +623,11 @@ class MysqlTest extends CakeTestCase {
 		// Drop the indexes
 		$result = $this->Dbo->alterSchema($schemaA->compare($schemaC));
 
-		$this->assertContains("ALTER TABLE $table", $result);
-		$this->assertContains('DROP KEY `name_idx`,', $result);
-		$this->assertContains('DROP KEY `group_idx`,', $result);
-		$this->assertContains('DROP KEY `compound_idx`,', $result);
-		$this->assertContains('DROP KEY `id_name_idx`;', $result);
+		$this->assertStringContainsString("ALTER TABLE $table", $result);
+		$this->assertStringContainsString('DROP KEY `name_idx`,', $result);
+		$this->assertStringContainsString('DROP KEY `group_idx`,', $result);
+		$this->assertStringContainsString('DROP KEY `compound_idx`,', $result);
+		$this->assertStringContainsString('DROP KEY `id_name_idx`;', $result);
 
 		$query = $this->Dbo->getConnection()->prepare($result);
 		$this->assertEquals($query->queryString, $result);
@@ -679,24 +679,24 @@ class MysqlTest extends CakeTestCase {
 				'id' => array('type' => 'integer', 'null' => false, 'default' => 0),
 				'name' => array('type' => 'string', 'null' => false, 'length' => 50),
 				'tableParameters' => array(
-					'charset' => 'utf8',
-					'collate' => 'utf8_general_ci',
+					'charset' => 'utf8mb3',
+					'collate' => 'utf8mb3_general_ci',
 					'engine' => 'InnoDB',
 					'comment' => 'Newly table added comment.',
 				)
 			)
 		));
 		$result = $this->Dbo->alterSchema($schemaB->compare($schemaA));
-		$this->assertContains('DEFAULT CHARSET=utf8', $result);
-		$this->assertContains('ENGINE=InnoDB', $result);
-		$this->assertContains('COLLATE=utf8_general_ci', $result);
-		$this->assertContains('COMMENT=\'Newly table added comment.\'', $result);
+		$this->assertStringContainsString('DEFAULT CHARSET=utf8mb3', $result);
+		$this->assertStringContainsString('ENGINE=InnoDB', $result);
+		$this->assertStringContainsString('COLLATE=utf8mb3_general_ci', $result);
+		$this->assertStringContainsString('COMMENT=\'Newly table added comment.\'', $result);
 
 		$this->Dbo->rawQuery($result);
 		$result = $this->Dbo->listDetailedSources($this->Dbo->fullTableName('altertest', false, false));
-		$this->assertEquals('utf8_general_ci', $result['Collation']);
+		$this->assertTrue(in_array($result['Collation'], ['utf8mb3_general_ci', 'utf8_general_ci']));
 		$this->assertEquals('InnoDB', $result['Engine']);
-		$this->assertEquals('utf8', $result['charset']);
+		$this->assertTrue(in_array($result['charset'], ['utf8mb3', 'utf8']));
 
 		$this->Dbo->rawQuery($this->Dbo->dropSchema($schemaA));
 	}
@@ -747,11 +747,9 @@ class MysqlTest extends CakeTestCase {
 		$this->Dbo->rawQuery('CREATE TABLE ' . $table . ' (id int(11) AUTO_INCREMENT, bool tinyint(1), small_int tinyint(2), primary key(id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;');
 		$result = $this->Dbo->readTableParameters($this->Dbo->fullTableName($tableName, false, false));
 		$this->Dbo->rawQuery('DROP TABLE ' . $table);
-		$expected = array(
-			'charset' => 'utf8',
-			'collate' => 'utf8_unicode_ci',
-			'engine' => 'InnoDB');
-		$this->assertEquals($expected, $result);
+		$this->assertTrue(in_array($result['charset'], ['utf8mb3', 'utf8']));
+		$this->assertTrue(in_array($result['collate'], ['utf8mb3_unicode_ci', 'utf8_unicode_ci']));
+		$this->assertEquals('InnoDB', $result['engine']);
 
 		$table = $this->Dbo->fullTableName($tableName);
 		$this->Dbo->rawQuery('CREATE TABLE ' . $table . ' (id int(11) AUTO_INCREMENT, bool tinyint(1), small_int tinyint(2), primary key(id)) ENGINE=MyISAM DEFAULT CHARSET=cp1250 COLLATE=cp1250_general_ci COMMENT=\'Table\'\'s comment\';');
@@ -774,13 +772,13 @@ class MysqlTest extends CakeTestCase {
 	public function testBuildTableParameters() {
 		$this->Dbo->cacheSources = $this->Dbo->testing = false;
 		$data = array(
-			'charset' => 'utf8',
-			'collate' => 'utf8_unicode_ci',
+			'charset' => 'utf8mb3',
+			'collate' => 'utf8mb3_unicode_ci',
 			'engine' => 'InnoDB');
 		$result = $this->Dbo->buildTableParameters($data);
 		$expected = array(
-			'DEFAULT CHARSET=utf8',
-			'COLLATE=utf8_unicode_ci',
+			'DEFAULT CHARSET=utf8mb3',
+			'COLLATE=utf8mb3_unicode_ci',
 			'ENGINE=InnoDB');
 		$this->assertEquals($expected, $result);
 	}
@@ -792,8 +790,8 @@ class MysqlTest extends CakeTestCase {
  */
 	public function testGetCharsetName() {
 		$this->Dbo->cacheSources = $this->Dbo->testing = false;
-		$result = $this->Dbo->getCharsetName('utf8_unicode_ci');
-		$this->assertEquals('utf8', $result);
+		$result = $this->Dbo->getCharsetName('utf8mb3_unicode_ci') . $this->Dbo->getCharsetName('utf8_unicode_ci');
+		$this->assertStringStartsWith('utf8', $result);
 		$result = $this->Dbo->getCharsetName('cp1250_general_ci');
 		$this->assertEquals('cp1250', $result);
 	}
@@ -896,7 +894,7 @@ SQL;
 			'testdescribes' => $result
 		));
 		$result = $this->Dbo->createSchema($schema);
-		$this->assertContains('`limit_date` timestamp NOT NULL,', $result);
+		$this->assertStringContainsString('`limit_date` timestamp NOT NULL,', $result);
 	}
 
 /**
@@ -906,7 +904,7 @@ SQL;
  * @return void
  */
 	public function testDescribeHandleCurrentTimestampDatetime() {
-		$mysqlVersion = $this->Dbo->query('SELECT VERSION() as version', array('log' => false));
+		$mysqlVersion = $this->Dbo->query('SELECT VERSION() as version');
 		$this->skipIf(version_compare($mysqlVersion[0][0]['version'], '5.6.0', '<'));
 
 		$name = $this->Dbo->fullTableName('timestamp_default_values');
@@ -934,7 +932,7 @@ SQL;
 			'testdescribes' => $result
 		));
 		$result = $this->Dbo->createSchema($schema);
-		$this->assertContains('`limit_date` datetime NOT NULL,', $result);
+		$this->assertStringContainsString('`limit_date` datetime NOT NULL,', $result);
 	}
 
 /**
@@ -1007,8 +1005,8 @@ SQL;
 		));
 
 		$result = $this->Dbo->createSchema($schema);
-		$this->assertContains('`role_id` int(11) NOT NULL,', $result);
-		$this->assertContains('`user_id` int(11) NOT NULL,', $result);
+		$this->assertStringContainsString('`role_id` int(11) NOT NULL,', $result);
+		$this->assertStringContainsString('`user_id` int(11) NOT NULL,', $result);
 	}
 
 /**
@@ -1026,8 +1024,8 @@ SQL;
 			)
 		);
 		$result = $this->Dbo->createSchema($schema, 'no_indexes');
-		$this->assertContains('PRIMARY KEY  (`id`)', $result);
-		$this->assertNotContains('UNIQUE KEY', $result);
+		$this->assertStringContainsString('PRIMARY KEY  (`id`)', $result);
+		$this->assertStringNotContainsString('UNIQUE KEY', $result);
 
 		$schema->tables = array(
 			'primary_index' => array(
@@ -1040,8 +1038,8 @@ SQL;
 			)
 		);
 		$result = $this->Dbo->createSchema($schema, 'primary_index');
-		$this->assertContains('PRIMARY KEY  (`id`)', $result);
-		$this->assertContains('UNIQUE KEY `some_index` (`data`)', $result);
+		$this->assertStringContainsString('PRIMARY KEY  (`id`)', $result);
+		$this->assertStringContainsString('UNIQUE KEY `some_index` (`data`)', $result);
 
 		$schema->tables = array(
 			'primary_flag_has_index' => array(
@@ -1053,8 +1051,8 @@ SQL;
 			)
 		);
 		$result = $this->Dbo->createSchema($schema, 'primary_flag_has_index');
-		$this->assertContains('PRIMARY KEY  (`id`)', $result);
-		$this->assertContains('UNIQUE KEY `some_index` (`data`)', $result);
+		$this->assertStringContainsString('PRIMARY KEY  (`id`)', $result);
+		$this->assertStringContainsString('UNIQUE KEY `some_index` (`data`)', $result);
 	}
 
 /**
@@ -2881,18 +2879,18 @@ SQL;
 	}
 
 /**
- * testDropSchemaNoSchema method
- *
- * @expectedException PHPUnit_Framework_Error
- * @return void
- * @throws PHPUnit_Framework_Error
- */
+	 * testDropSchemaNoSchema method
+	 *
+	 * @return void
+	 * @throws \PHPUnit\Framework\Exception
+	 */
 	public function testDropSchemaNoSchema() {
+		$this->expectException(\PHPUnit\Framework\Exception::class);
 		try {
 			$this->Dbo->dropSchema(null);
 			$this->fail('No exception');
 		} catch (TypeError $e) {
-			throw new PHPUnit_Framework_Error('Raised an error', 100, __FILE__, __LINE__);
+			throw new \PHPUnit\Framework\Exception('Raised an error', 100);
 		}
 	}
 
@@ -3230,12 +3228,12 @@ SQL;
 	}
 
 /**
- * testBuildColumnBadType method
- *
- * @expectedException PHPUnit_Framework_Error
- * @return void
- */
+	 * testBuildColumnBadType method
+	 *
+	 * @return void
+	 */
 	public function testBuildColumnBadType() {
+		$this->expectException(\PHPUnit\Framework\Exception::class);
 		$data = array(
 			'name' => 'testName',
 			'type' => 'varchar(255)',
@@ -3869,8 +3867,15 @@ SQL;
 		$result = $this->Dbo->value('1.234', 'float');
 		$this->assertEquals('1.234', $result);
 
-		$result = $this->Dbo->value(' 1.234 ', 'float');
-		$this->assertEquals("' 1.234 '", $result);
+		if (!$this->isPHP8()) {
+			$result = $this->Dbo->value(' 1.234 ', 'float');
+			$this->assertEquals("' 1.234 '", $result);
+		}
+
+		if ($this->isPHP8()) {
+			$result = $this->Dbo->value(' 1.234 ', 'float');
+			$this->assertEquals(' 1.234 ', $result);
+		}
 
 		$result = $this->Dbo->value('1.234e05', 'float');
 		$this->assertEquals("'1.234e05'", $result);
@@ -3977,10 +3982,10 @@ SQL;
 	}
 
 /**
- * @expectedException MissingConnectionException
- * @return void
- */
+	 * @return void
+	 */
 	public function testExceptionOnBrokenConnection() {
+		$this->expectException('MissingConnectionException');
 		new Mysql(array(
 			'driver' => 'mysql',
 			'host' => 'imaginary_host',

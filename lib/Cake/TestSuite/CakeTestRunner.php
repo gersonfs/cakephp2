@@ -15,8 +15,11 @@
  * @license       https://opensource.org/licenses/mit-license.php MIT License
  */
 
+use PHPUnit\Framework\Test;
+use PHPUnit\Framework\TestResult;
+
 if (!class_exists('PHPUnit_TextUI_TestRunner')) {
-	require_once 'PHPUnit/TextUI/TestRunner.php';
+	//require_once 'PHPUnit/TextUI/TestRunner.php';
 }
 if (class_exists('SebastianBergmann\CodeCoverage\CodeCoverage')) {
 	class_alias('SebastianBergmann\CodeCoverage\CodeCoverage', 'PHP_CodeCoverage');
@@ -34,7 +37,7 @@ App::uses('CakeFixtureManager', 'TestSuite/Fixture');
  *
  * @package       Cake.TestSuite
  */
-class CakeTestRunner extends PHPUnit_TextUI_TestRunner {
+class CakeTestRunner {
 
 /**
  * Lets us pass in some options needed for CakePHP's webrunner.
@@ -42,21 +45,24 @@ class CakeTestRunner extends PHPUnit_TextUI_TestRunner {
  * @param mixed $loader The test suite loader
  * @param array $params list of options to be used for this run
  */
+
+	private \PHPUnit\TextUI\TestRunner $runner;
+
 	public function __construct($loader, $params) {
-		parent::__construct($loader);
 		$this->_params = $params;
+		$this->runner = new \PHPUnit\TextUI\TestRunner($loader);
 	}
 
 /**
  * Actually run a suite of tests. Cake initializes fixtures here using the chosen fixture manager
  *
- * @param PHPUnit_Framework_Test $suite The test suite to run
+ * @param \PHPUnit\Framework\Test $suite The test suite to run
  * @param array $arguments The CLI arguments
  * @param bool $exit Exits by default or returns the results
  * This argument is ignored if >PHPUnit5.2.0
  * @return void
  */
-	public function doRun(PHPUnit_Framework_Test $suite, array $arguments = array(), $exit = true) {
+	public function doRun(\PHPUnit\Framework\Test $suite, array $arguments = array(), bool $exit = true): TestResult {
 		if (isset($arguments['printer'])) {
 			static::$versionStringPrinted = true;
 		}
@@ -73,7 +79,7 @@ class CakeTestRunner extends PHPUnit_TextUI_TestRunner {
 			}
 		}
 
-		$return = parent::doRun($suite, $arguments, $exit);
+		$return = $this->runner->doRun($suite, $arguments, [], $exit);
 		$fixture->shutdown();
 		return $return;
 	}
@@ -82,10 +88,10 @@ class CakeTestRunner extends PHPUnit_TextUI_TestRunner {
 /**
  * Create the test result and splice on our code coverage reports.
  *
- * @return PHPUnit_Framework_TestResult
+ * @return \PHPUnit\Framework\TestResult
  */
-	protected function createTestResult() {
-		$result = new PHPUnit_Framework_TestResult;
+	protected function createTestResult(): TestResult {
+		$result = new \PHPUnit\Framework\TestResult;
 		if (!empty($this->_params['codeCoverage'])) {
 			if (method_exists($result, 'collectCodeCoverageInformation')) {
 				$result->collectCodeCoverageInformation(true);
@@ -118,6 +124,51 @@ class CakeTestRunner extends PHPUnit_TextUI_TestRunner {
 			return new AppFixtureManager();
 		}
 		return new CakeFixtureManager();
+	}
+
+	public function getTest(string $suiteClassName, array $data = [], $suffixes = '') : ?Test
+	{
+		$suiteClassFile = $this->_resolveTestFile($suiteClassName, $data);
+		return $this->runner->getTest($suiteClassName, $suiteClassFile, $suffixes);
+	}
+
+	/**
+	 * Convert path fragments used by CakePHP's test runner to absolute paths that can be fed to PHPUnit.
+	 *
+	 * @param string $filePath The file path to load.
+	 * @param string $params Additional parameters.
+	 * @return string Converted path fragments.
+	 */
+	protected function _resolveTestFile($filePath, $params) {
+		$basePath = $this->_basePath($params) . DS . $filePath;
+		$ending = 'Test.php';
+		return (strpos($basePath, $ending) === (strlen($basePath) - strlen($ending))) ? $basePath : $basePath . $ending;
+	}
+
+	/**
+	 * Generates the base path to a set of tests based on the parameters.
+	 *
+	 * @param array $params The path parameters.
+	 * @return string The base path.
+	 */
+	protected static function _basePath($params) {
+		$result = null;
+		if (!empty($params['core'])) {
+			$result = CORE_TEST_CASES;
+		} elseif (!empty($params['plugin'])) {
+			if (!CakePlugin::loaded($params['plugin'])) {
+				try {
+					CakePlugin::load($params['plugin']);
+					$result = CakePlugin::path($params['plugin']) . 'Test' . DS . 'Case';
+				} catch (MissingPluginException $e) {
+				}
+			} else {
+				$result = CakePlugin::path($params['plugin']) . 'Test' . DS . 'Case';
+			}
+		} elseif (!empty($params['app'])) {
+			$result = APP_TEST_CASES;
+		}
+		return $result;
 	}
 
 }

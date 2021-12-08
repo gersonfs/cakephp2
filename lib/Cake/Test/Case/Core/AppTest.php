@@ -28,7 +28,7 @@ class AppTest extends CakeTestCase {
  *
  * @return void
  */
-	public function tearDown() {
+	public function tearDown(): void {
 		parent::tearDown();
 		CakePlugin::unload();
 	}
@@ -776,6 +776,7 @@ class AppTest extends CakeTestCase {
  * @return void
  */
 	public function testLoadClassInLibs() {
+		$this->skipIf(class_exists('CustomLibClass', false));
 		App::build(array(
 			'libs' => array(CAKE . 'Test' . DS . 'test_app' . DS . 'Lib' . DS),
 			'plugins' => array(CAKE . 'Test' . DS . 'test_app' . DS . 'Plugin' . DS)
@@ -836,6 +837,8 @@ class AppTest extends CakeTestCase {
  * @return void
  */
 	public function testIncreaseMemoryLimit($memoryLimit, $additionalKb, $expected) {
+		//$this->markTestSkipped('Não será utilizado');
+		//$this->skipIf($this->isPHP8() || !function_exists('ini_set'));
 		$this->skipIf(!function_exists('ini_set'));
 
 		$originalMemoryLimit = ini_get('memory_limit');
@@ -848,7 +851,7 @@ class AppTest extends CakeTestCase {
 	}
 
 /**
- * Data provider function for testIncreaseMemoryLimit 
+ * Data provider function for testIncreaseMemoryLimit
  *
  * @return void
  */

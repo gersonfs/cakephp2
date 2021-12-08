@@ -1056,6 +1056,7 @@ class TreeBehaviorNumberTest extends CakeTestCase {
 		$this->Tree = new $modelClass();
 		$this->Tree->initialize(2, 2);
 		$this->Tree->delete(99999);
+		$this->assertTrue(true);
 	}
 
 /**

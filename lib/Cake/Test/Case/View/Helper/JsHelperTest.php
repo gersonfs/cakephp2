@@ -137,7 +137,7 @@ class JsHelperTest extends CakeTestCase {
  *
  * @return void
  */
-	public function setUp() {
+	public function setUp(): void {
 		parent::setUp();
 
 		Configure::write('Asset.timestamp', false);
@@ -161,7 +161,7 @@ class JsHelperTest extends CakeTestCase {
  *
  * @return void
  */
-	public function tearDown() {
+	public function tearDown(): void {
 		parent::tearDown();
 		unset($this->Js);
 	}
@@ -204,12 +204,12 @@ class JsHelperTest extends CakeTestCase {
 	}
 
 /**
- * test that methods dispatch internally and to the engine class
- *
- * @expectedException PHPUnit_Framework_Error_Warning
- * @return void
- */
+	 * test that methods dispatch internally and to the engine class
+	 *
+	 * @return void
+	 */
 	public function testMethodDispatching() {
+		$this->expectException('PHPUnit\Framework\Exception');
 		$this->_useMock();
 
 		$this->Js->TestJsEngine
@@ -749,7 +749,7 @@ class JsBaseEngineTest extends CakeTestCase {
  *
  * @return void
  */
-	public function setUp() {
+	public function setUp(): void {
 		parent::setUp();
 		$controller = null;
 		$this->View = $this->getMock('View', array('append'), array(&$controller));
@@ -761,7 +761,7 @@ class JsBaseEngineTest extends CakeTestCase {
  *
  * @return void
  */
-	public function tearDown() {
+	public function tearDown(): void {
 		parent::tearDown();
 		unset($this->JsEngine);
 	}

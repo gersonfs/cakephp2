@@ -52,7 +52,7 @@ class ErrorHandlerTest extends CakeTestCase {
  *
  * @return void
  */
-	public function setUp() {
+	public function setUp(): void {
 		parent::setUp();
 		App::build(array(
 			'View' => array(
@@ -75,7 +75,7 @@ class ErrorHandlerTest extends CakeTestCase {
  *
  * @return void
  */
-	public function tearDown() {
+	public function tearDown(): void {
 		parent::tearDown();
 		if ($this->_restoreError) {
 			restore_error_handler();
@@ -100,8 +100,9 @@ class ErrorHandlerTest extends CakeTestCase {
 		$result = ob_get_clean();
 
 		$this->assertRegExp('/<pre class="cake-error">/', $result);
-		$this->assertRegExp('/<b>Notice<\/b>/', $result);
-		$this->assertRegExp('/variable:\s+wrong/', $result);
+		$this->assertRegExp('/<b>(Notice|Warning)<\/b>/', $result);
+		$this->assertRegExp('/variable\:?\s+\$?wrong/', $result);
+		restore_error_handler();
 	}
 
 /**
@@ -133,6 +134,7 @@ class ErrorHandlerTest extends CakeTestCase {
 
 		$result = ob_get_clean();
 		$this->assertRegExp('/<b>' . $expected . '<\/b>/', $result);
+		restore_error_handler();
 	}
 
 /**
@@ -149,7 +151,13 @@ class ErrorHandlerTest extends CakeTestCase {
 		@include 'invalid.file';
 		//@codingStandardsIgnoreEnd
 		$result = ob_get_clean();
-		$this->assertTrue(empty($result));
+
+		if ($this->isPHP8()) {
+			$this->assertFalse(empty($result));
+		}else{
+			$this->assertTrue(empty($result));
+		}
+		restore_error_handler();
 	}
 
 /**
@@ -158,6 +166,7 @@ class ErrorHandlerTest extends CakeTestCase {
  * @return void
  */
 	public function testHandleErrorDebugOff() {
+		$this->skipIf($this->isPHP8());
 		Configure::write('debug', 0);
 		Configure::write('Error.trace', false);
 		if (file_exists(LOGS . 'debug.log')) {
@@ -170,6 +179,7 @@ class ErrorHandlerTest extends CakeTestCase {
 		$out .= '';
 
 		$result = file(LOGS . 'debug.log');
+		$this->assertIsArray($result);
 		$this->assertEquals(1, count($result));
 		$this->assertRegExp(
 			'/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} (Notice|Debug): Notice \(8\): Undefined variable:\s+out in \[.+ line \d+\]$/',
@@ -178,6 +188,33 @@ class ErrorHandlerTest extends CakeTestCase {
 		if (file_exists(LOGS . 'debug.log')) {
 			unlink(LOGS . 'debug.log');
 		}
+		restore_error_handler();
+	}
+
+	public function testHandleErrorDebugOffPHP8() {
+		$this->skipIf($this->isPHP7());
+		Configure::write('debug', 0);
+		Configure::write('Error.trace', false);
+		if (file_exists(LOGS . 'error.log')) {
+			unlink(LOGS . 'error.log');
+		}
+
+		set_error_handler('ErrorHandler::handleError');
+		$this->_restoreError = true;
+
+		$out .= '';
+
+		$result = file(LOGS . 'error.log');
+		$this->assertIsArray($result);
+		$this->assertEquals(1, count($result));
+		$this->assertRegExp(
+			'/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} Warning: Warning \(2\): Undefined variable \$out in \[.+ line \d+\]$/',
+			$result[0]
+		);
+		if (file_exists(LOGS . 'error.log')) {
+			unlink(LOGS . 'error.log');
+		}
+		restore_error_handler();
 	}
 
 /**
@@ -186,6 +223,8 @@ class ErrorHandlerTest extends CakeTestCase {
  * @return void
  */
 	public function testHandleErrorLoggingTrace() {
+		$this->skipIf($this->isPHP8());
+
 		Configure::write('debug', 0);
 		Configure::write('Error.trace', true);
 		if (file_exists(LOGS . 'debug.log')) {
@@ -207,6 +246,35 @@ class ErrorHandlerTest extends CakeTestCase {
 		if (file_exists(LOGS . 'debug.log')) {
 			unlink(LOGS . 'debug.log');
 		}
+		restore_error_handler();
+	}
+
+	public function testHandleErrorLoggingTracePHP8() {
+		$this->skipIf($this->isPHP7());
+		Configure::write('debug', 0);
+		Configure::write('Error.trace', true);
+
+		if (file_exists(LOGS . 'error.log')) {
+			unlink(LOGS . 'error.log');
+		}
+
+		set_error_handler('ErrorHandler::handleError');
+		$this->_restoreError = true;
+
+		$out .= '';
+
+		$result = file(LOGS . 'error.log');
+
+		$this->assertRegExp(
+			'/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} Warning: Warning \(2\): Undefined variable \$out in \[.+ line \d+\]$/',
+			$result[0]
+		);
+		$this->assertRegExp('/^Trace:/', $result[1]);
+		$this->assertRegExp('/^ErrorHandlerTest\:\:testHandleErrorLoggingTracePHP8\(\)/', $result[3]);
+		if (file_exists(LOGS . 'error.log')) {
+			unlink(LOGS . 'error.log');
+		}
+		restore_error_handler();
 	}
 
 /**
@@ -240,8 +308,8 @@ class ErrorHandlerTest extends CakeTestCase {
 		$this->assertRegExp('/Kaboom!/', $result, 'message missing.');
 
 		$log = file(LOGS . 'error.log');
-		$this->assertContains('[NotFoundException] Kaboom!', $log[0], 'message missing.');
-		$this->assertContains('ErrorHandlerTest->testHandleExceptionLog', $log[2], 'Stack trace missing.');
+		$this->assertStringContainsString('[NotFoundException] Kaboom!', $log[0], 'message missing.');
+		$this->assertStringContainsString('ErrorHandlerTest->testHandleExceptionLog', $log[2], 'Stack trace missing.');
 	}
 
 /**
@@ -269,8 +337,8 @@ class ErrorHandlerTest extends CakeTestCase {
 		$this->assertRegExp('/Fooled you!/', $result, 'message missing.');
 
 		$log = file(LOGS . 'error.log');
-		$this->assertNotContains('[NotFoundException] Kaboom!', $log[0], 'message should not be logged.');
-		$this->assertContains('[ForbiddenException] Fooled you!', $log[0], 'message missing.');
+		$this->assertStringNotContainsString('[NotFoundException] Kaboom!', $log[0], 'message should not be logged.');
+		$this->assertStringContainsString('[ForbiddenException] Fooled you!', $log[0], 'message missing.');
 	}
 
 /**
@@ -309,18 +377,18 @@ class ErrorHandlerTest extends CakeTestCase {
 		Configure::write('debug', 1);
 		ErrorHandler::handleFatalError(E_ERROR, 'Something wrong', __FILE__, $line);
 		$result = ob_get_clean();
-		$this->assertContains('Something wrong', $result, 'message missing.');
-		$this->assertContains(__FILE__, $result, 'filename missing.');
-		$this->assertContains((string)$line, $result, 'line missing.');
+		$this->assertStringContainsString('Something wrong', $result, 'message missing.');
+		$this->assertStringContainsString(__FILE__, $result, 'filename missing.');
+		$this->assertStringContainsString((string)$line, $result, 'line missing.');
 
 		ob_start();
 		ob_start();
 		Configure::write('debug', 0);
 		ErrorHandler::handleFatalError(E_ERROR, 'Something wrong', __FILE__, $line);
 		$result = ob_get_clean();
-		$this->assertNotContains('Something wrong', $result, 'message must not appear.');
-		$this->assertNotContains(__FILE__, $result, 'filename must not appear.');
-		$this->assertContains('An Internal Error Has Occurred', $result);
+		$this->assertStringNotContainsString('Something wrong', $result, 'message must not appear.');
+		$this->assertStringNotContainsString(__FILE__, $result, 'filename must not appear.');
+		$this->assertStringContainsString('An Internal Error Has Occurred', $result);
 	}
 
 /**
@@ -338,8 +406,8 @@ class ErrorHandlerTest extends CakeTestCase {
 		ob_clean();
 
 		$log = file(LOGS . 'error.log');
-		$this->assertContains(__FILE__, $log[0], 'missing filename');
-		$this->assertContains('[FatalErrorException] Something wrong', $log[1], 'message missing.');
+		$this->assertStringContainsString(__FILE__, $log[0], 'missing filename');
+		$this->assertStringContainsString('[FatalErrorException] Something wrong', $log[1], 'message missing.');
 	}
 
 /**

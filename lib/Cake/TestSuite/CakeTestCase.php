@@ -16,6 +16,8 @@
  * @license       https://opensource.org/licenses/mit-license.php MIT License
  */
 
+use PHPUnit\Framework\Exception;
+
 App::uses('CakeFixtureManager', 'TestSuite/Fixture');
 App::uses('CakeTestFixture', 'TestSuite/Fixture');
 
@@ -24,7 +26,7 @@ App::uses('CakeTestFixture', 'TestSuite/Fixture');
  *
  * @package       Cake.TestSuite
  */
-abstract class CakeTestCase extends PHPUnit_Framework_TestCase {
+abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 
 /**
  * The class responsible for managing the creation, loading and removing of fixtures
@@ -71,11 +73,11 @@ abstract class CakeTestCase extends PHPUnit_Framework_TestCase {
  * If no TestResult object is passed a new one will be created.
  * This method is run for each test method in this class
  *
- * @param PHPUnit_Framework_TestResult $result The test result object
- * @return PHPUnit_Framework_TestResult
+ * @param \PHPUnit\Framework\TestResult $result The test result object
+ * @return \PHPUnit\Framework\TestResult
  * @throws InvalidArgumentException
  */
-	public function run(PHPUnit_Framework_TestResult $result = null) {
+	public function run(\PHPUnit\Framework\TestResult $result = null) : \PHPUnit\Framework\TestResult {
 		$level = ob_get_level();
 
 		if (!empty($this->fixtureManager)) {
@@ -103,6 +105,50 @@ abstract class CakeTestCase extends PHPUnit_Framework_TestCase {
 	public function startTest($method) {
 	}
 
+	public static function assertAttributeEquals($expected, string $actualAttributeName, $actualClassOrObject, string $message = '', float $delta = 0.0, int $maxDepth = 10, bool $canonicalize = false, bool $ignoreCase = false): void
+	{
+		if (is_object($actualClassOrObject)) {
+			$value = self::getObjectAttributeCake($actualClassOrObject, $actualAttributeName);
+			self::assertEquals($expected, $value, $message);
+			return;
+		}
+
+		parent::assertAttributeEquals($expected,  $actualAttributeName, $actualClassOrObject, $message, $delta ,$maxDepth,  $canonicalize, $ignoreCase);
+	}
+
+	public static function getObjectAttributeCake($object, string $attributeName)
+	{
+		if (!is_object($object)) {
+			throw InvalidArgumentException::create(1, 'object');
+		}
+
+		$reflector = new ReflectionObject($object);
+
+		do {
+			try {
+				$attribute = $reflector->getProperty($attributeName);
+
+				if (!$attribute || $attribute->isPublic()) {
+					return $object->{$attributeName};
+				}
+
+				$attribute->setAccessible(true);
+				$value = $attribute->getValue($object);
+				$attribute->setAccessible(false);
+
+				return $value;
+			} catch (ReflectionException $e) {
+			}
+		} while ($reflector = $reflector->getParentClass());
+
+		throw new Exception(
+			sprintf(
+				'Attribute "%s" not found in object.',
+				$attributeName
+			)
+		);
+	}
+
 /**
  * Called when a test case method has been executed (to be overridden when needed.)
  *
@@ -110,6 +156,16 @@ abstract class CakeTestCase extends PHPUnit_Framework_TestCase {
  * @return void
  */
 	public function endTest($method) {
+	}
+
+	public function isPHP8(): bool
+	{
+		return version_compare(PHP_VERSION, '8.0.0') >= 0;
+	}
+
+	public function isPHP7(): bool
+	{
+		return version_compare(PHP_VERSION, '8.0.0') < 0;
 	}
 
 /**
@@ -133,7 +189,7 @@ abstract class CakeTestCase extends PHPUnit_Framework_TestCase {
  *
  * @return void
  */
-	public function setUp() {
+	protected function setUp() : void {
 		parent::setUp();
 
 		if (empty($this->_configure)) {
@@ -152,7 +208,7 @@ abstract class CakeTestCase extends PHPUnit_Framework_TestCase {
  *
  * @return void
  */
-	public function tearDown() {
+	protected function tearDown() : void {
 		parent::tearDown();
 		App::build($this->_pathRestore, App::RESET);
 		if (class_exists('ClassRegistry', false)) {
@@ -185,7 +241,7 @@ abstract class CakeTestCase extends PHPUnit_Framework_TestCase {
  *
  * @return void
  */
-	protected function assertPreConditions() {
+	protected function assertPreConditions() : void {
 		parent::assertPreConditions();
 		$this->startTest($this->getName());
 	}
@@ -195,7 +251,7 @@ abstract class CakeTestCase extends PHPUnit_Framework_TestCase {
  *
  * @return void
  */
-	protected function assertPostConditions() {
+	protected function assertPostConditions(): void {
 		parent::assertPostConditions();
 		$this->endTest($this->getName());
 	}
@@ -324,7 +380,7 @@ abstract class CakeTestCase extends PHPUnit_Framework_TestCase {
 	public function assertTextContains($needle, $haystack, $message = '', $ignoreCase = false) {
 		$needle = str_replace(array("\r\n", "\r"), "\n", $needle);
 		$haystack = str_replace(array("\r\n", "\r"), "\n", $haystack);
-		return $this->assertContains($needle, $haystack, $message, $ignoreCase);
+		return $this->assertStringContainsString($needle, $haystack, $message, $ignoreCase);
 	}
 
 /**
@@ -340,7 +396,7 @@ abstract class CakeTestCase extends PHPUnit_Framework_TestCase {
 	public function assertTextNotContains($needle, $haystack, $message = '', $ignoreCase = false) {
 		$needle = str_replace(array("\r\n", "\r"), "\n", $needle);
 		$haystack = str_replace(array("\r\n", "\r"), "\n", $haystack);
-		return $this->assertNotContains($needle, $haystack, $message, $ignoreCase);
+		return $this->assertStringNotContainsString($needle, $haystack, $message, $ignoreCase);
 	}
 
 /**
@@ -493,7 +549,7 @@ abstract class CakeTestCase extends PHPUnit_Framework_TestCase {
 				continue;
 			}
 
-			list($description, $expressions, $itemNum) = $assertion;
+			[$description, $expressions, $itemNum] = $assertion;
 			foreach ((array)$expressions as $expression) {
 				if (preg_match(sprintf('/^%s/s', $expression), $string, $match)) {
 					$matches = true;
@@ -642,23 +698,15 @@ abstract class CakeTestCase extends PHPUnit_Framework_TestCase {
  * @deprecated 3.0.0 This is a compatibility wrapper for 1.x. It will be removed in 3.0
  * @return void
  */
-	protected function expectError($expected = false, $message = '') {
-		if (!$expected) {
-			$expected = 'Exception';
-		}
-		$this->setExpectedException($expected, $message);
+	public function expectError(): void {
+		parent::expectError();
 	}
 
-/**
- * Compatibility wrapper function for setExpectedException
- *
- * @param mixed $name The name of the expected Exception.
- * @param string $message the text to display if the assertion is not correct
- * @deprecated 3.0.0 This is a compatibility wrapper for 1.x. It will be removed in 3.0.
- * @return void
- */
-	public function expectException($name = 'Exception', $message = null) {
-		$this->setExpectedException($name, $message);
+	protected function setExpectedException($name = 'Exception', $message = null) {
+		parent::expectException($name);
+		if (is_string($message)) {
+			parent::expectExceptionMessage($message);
+		}
 	}
 
 /**
@@ -816,7 +864,7 @@ abstract class CakeTestCase extends PHPUnit_Framework_TestCase {
 		$callOriginalMethods = false,
 		$proxyTarget = null
 	) {
-		$phpUnitVersion = PHPUnit_Runner_Version::id();
+		$phpUnitVersion = \PHPUnit\Runner\Version::id();
 		if (version_compare($phpUnitVersion, '5.7.0', '<')) {
 			return parent::getMock($originalClassName, $methods, $arguments,
 					$mockClassName, $callOriginalConstructor, $callOriginalClone,
@@ -855,7 +903,7 @@ abstract class CakeTestCase extends PHPUnit_Framework_TestCase {
 		$defaults = ClassRegistry::config('Model');
 		unset($defaults['ds']);
 
-		list($plugin, $name) = pluginSplit($model, true);
+		[$plugin, $name] = pluginSplit($model, true);
 		App::uses($name, $plugin . 'Model');
 
 		$config = array_merge($defaults, (array)$config, array('name' => $name));

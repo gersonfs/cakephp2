@@ -64,7 +64,7 @@ class CakeRequestTest extends CakeTestCase {
  *
  * @return void
  */
-	public function setUp() {
+	public function setUp(): void {
 		parent::setUp();
 		$this->_app = Configure::read('App');
 		$this->_case = null;
@@ -72,6 +72,18 @@ class CakeRequestTest extends CakeTestCase {
 			$this->_case = $_GET['case'];
 			unset($_GET['case']);
 		}
+
+		$_POST = [];
+		$_FILES = [];
+		if (isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
+			unset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']);
+		}
+
+		$_SERVER['REQUEST_METHOD'] = null;
+		$_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] = null;
+
+		$_SERVER['HTTP_AUTHORIZATION'] = null;
+		unset($_SERVER['HTTP_X_FORWARDED_HOST']);
 
 		Configure::write('App.baseUrl', false);
 	}
@@ -81,12 +93,13 @@ class CakeRequestTest extends CakeTestCase {
  *
  * @return void
  */
-	public function tearDown() {
+	public function tearDown(): void {
 		parent::tearDown();
 		if (!empty($this->_case)) {
 			$_GET['case'] = $this->_case;
 		}
 		Configure::write('App', $this->_app);
+		unset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']);
 	}
 
 /**
@@ -976,12 +989,12 @@ class CakeRequestTest extends CakeTestCase {
 	}
 
 /**
- * Test __call exceptions
- *
- * @expectedException CakeException
- * @return void
- */
+	 * Test __call exceptions
+	 *
+	 * @return void
+	 */
 	public function testMagicCallExceptionOnUnknownMethod() {
+		$this->expectException('CakeException');
 		$request = new CakeRequest('some/path');
 		$request->IamABanana();
 	}
@@ -1487,6 +1500,7 @@ class CakeRequestTest extends CakeTestCase {
 		$_SERVER['SCRIPT_FILENAME'] = '/Users/markstory/Sites/cake/index.php';
 		$_SERVER['PHP_SELF'] = '/cake/index.php/posts/index';
 		$_SERVER['REQUEST_URI'] = '/cake/index.php/posts/index';
+		$_SERVER['PATH_INFO'] = '';
 
 		Configure::write('App', array(
 			'dir' => APP_DIR,
@@ -1859,6 +1873,7 @@ class CakeRequestTest extends CakeTestCase {
 						'REQUEST_URI' => '/site/index.php/',
 						'SCRIPT_NAME' => '/site/index.php',
 						'PHP_SELF' => '/site/index.php/',
+						'PATH_INFO' => '/',
 					),
 				),
 				array(
@@ -1911,6 +1926,7 @@ class CakeRequestTest extends CakeTestCase {
 						'REQUEST_URI' => '/site/',
 						'SCRIPT_NAME' => '/site/app/webroot/index.php',
 						'PHP_SELF' => '/site/app/webroot/index.php',
+						'PATH_INFO' => '/',
 					),
 				),
 				array(

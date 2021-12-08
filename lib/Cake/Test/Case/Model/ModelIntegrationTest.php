@@ -138,12 +138,12 @@ class ModelIntegrationTest extends BaseModelTest {
 	}
 
 /**
- * Tests that creating a model with no existent database table associated will throw an exception
- *
- * @expectedException MissingTableException
- * @return void
- */
+	 * Tests that creating a model with no existent database table associated will throw an exception
+	 *
+	 * @return void
+	 */
 	public function testMissingTable() {
+		$this->expectException('MissingTableException');
 		$Article = new ArticleB(false, uniqid());
 		$Article->schema();
 	}
@@ -1229,39 +1229,39 @@ class ModelIntegrationTest extends BaseModelTest {
 
 		$TestModel = new Apple();
 		$TestModel->setDataSource('database1');
-		$this->assertContains('aaa_apples', $this->db->fullTableName($TestModel));
-		$this->assertContains('aaa_apples', $db1->fullTableName($TestModel));
-		$this->assertContains('aaa_apples', $db2->fullTableName($TestModel));
+		$this->assertStringContainsString('aaa_apples', $this->db->fullTableName($TestModel));
+		$this->assertStringContainsString('aaa_apples', $db1->fullTableName($TestModel));
+		$this->assertStringContainsString('aaa_apples', $db2->fullTableName($TestModel));
 
 		$TestModel->setDataSource('database2');
-		$this->assertContains('bbb_apples', $this->db->fullTableName($TestModel));
-		$this->assertContains('bbb_apples', $db1->fullTableName($TestModel));
-		$this->assertContains('bbb_apples', $db2->fullTableName($TestModel));
+		$this->assertStringContainsString('bbb_apples', $this->db->fullTableName($TestModel));
+		$this->assertStringContainsString('bbb_apples', $db1->fullTableName($TestModel));
+		$this->assertStringContainsString('bbb_apples', $db2->fullTableName($TestModel));
 
 		$TestModel = new Apple();
 		$TestModel->tablePrefix = 'custom_';
-		$this->assertContains('custom_apples', $this->db->fullTableName($TestModel));
+		$this->assertStringContainsString('custom_apples', $this->db->fullTableName($TestModel));
 		$TestModel->setDataSource('database1');
-		$this->assertContains('custom_apples', $this->db->fullTableName($TestModel));
-		$this->assertContains('custom_apples', $db1->fullTableName($TestModel));
+		$this->assertStringContainsString('custom_apples', $this->db->fullTableName($TestModel));
+		$this->assertStringContainsString('custom_apples', $db1->fullTableName($TestModel));
 
 		$TestModel = new Apple();
 		$TestModel->setDataSource('database1');
-		$this->assertContains('aaa_apples', $this->db->fullTableName($TestModel));
+		$this->assertStringContainsString('aaa_apples', $this->db->fullTableName($TestModel));
 		$TestModel->tablePrefix = '';
 		$TestModel->setDataSource('database2');
-		$this->assertContains('apples', $db2->fullTableName($TestModel));
-		$this->assertContains('apples', $db1->fullTableName($TestModel));
+		$this->assertStringContainsString('apples', $db2->fullTableName($TestModel));
+		$this->assertStringContainsString('apples', $db1->fullTableName($TestModel));
 
 		$TestModel->tablePrefix = null;
 		$TestModel->setDataSource('database1');
-		$this->assertContains('aaa_apples', $db2->fullTableName($TestModel));
-		$this->assertContains('aaa_apples', $db1->fullTableName($TestModel));
+		$this->assertStringContainsString('aaa_apples', $db2->fullTableName($TestModel));
+		$this->assertStringContainsString('aaa_apples', $db1->fullTableName($TestModel));
 
 		$TestModel->tablePrefix = false;
 		$TestModel->setDataSource('database2');
-		$this->assertContains('apples', $db2->fullTableName($TestModel));
-		$this->assertContains('apples', $db1->fullTableName($TestModel));
+		$this->assertStringContainsString('apples', $db2->fullTableName($TestModel));
+		$this->assertStringContainsString('apples', $db1->fullTableName($TestModel));
 	}
 
 /**
@@ -2236,8 +2236,9 @@ class ModelIntegrationTest extends BaseModelTest {
 		} elseif (isset($this->db->columns['integer']['length'])) {
 			$intLength = $this->db->columns['integer']['length'];
 		} else {
-			$intLength = 11;
+			$intLength = $this->getDefaultLength();
 		}
+
 		foreach (array('collate', 'charset', 'comment', 'unsigned') as $type) {
 			foreach ($result as $i => $r) {
 				unset($result[$i][$type]);
@@ -2333,6 +2334,29 @@ class ModelIntegrationTest extends BaseModelTest {
 		));
 
 		$this->assertEquals($expected, $FeaturedModel->create($data));
+	}
+
+	protected function getDefaultLength(): ?int
+	{
+		if ($this->isMysql8()) {
+			return null;
+		}
+
+		return 11;
+	}
+
+	protected function isMysql8() : bool
+	{
+		if (get_class($this->db) != 'Mysql') {
+			return false;
+		}
+		$version = $this->db->getVersion();
+
+		if (strpos(strtolower($version), 'mariadb') !== false) {
+			return false;
+		}
+
+		return preg_match('/^8\.[0-9]+\.[0-9]+\-/', $version) === 1;
 	}
 
 /**

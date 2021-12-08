@@ -826,7 +826,7 @@ class Shell extends CakeObject {
  * @return bool Success
  */
 	protected function _checkUnitTest() {
-		if (class_exists('PHPUnit_Framework_TestCase')) {
+		if (class_exists('\PHPUnit\Framework\TestCase')) {
 			return true;
 			//@codingStandardsIgnoreStart
 		} elseif (@include 'PHPUnit' . DS . 'Autoload.php') {

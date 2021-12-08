@@ -184,7 +184,7 @@ class DboSourceTest extends CakeTestCase {
  *
  * @return void
  */
-	public function setUp() {
+	public function setUp(): void {
 		parent::setUp();
 
 		$this->testDb = new DboTestSource();
@@ -200,7 +200,7 @@ class DboSourceTest extends CakeTestCase {
  *
  * @return void
  */
-	public function tearDown() {
+	public function tearDown(): void {
 		parent::tearDown();
 		unset($this->Model);
 	}
@@ -679,10 +679,10 @@ class DboSourceTest extends CakeTestCase {
 	}
 
 /**
- * @expectedException PDOException
- * @return void
- */
+	 * @return void
+	 */
 	public function testDirectCallThrowsException() {
+		$this->expectException(\PDOException::class);
 		$this->db->query('directCall', array(), $this->Model);
 	}
 
@@ -1248,10 +1248,10 @@ class DboSourceTest extends CakeTestCase {
 		);
 
 		$result = $this->db->generateAssociationQuery($Article, null, null, null, null, $queryData, false);
-		$this->assertContains('SELECT', $result);
-		$this->assertContains('FROM', $result);
-		$this->assertContains('WHERE', $result);
-		$this->assertContains('ORDER', $result);
+		$this->assertStringContainsString('SELECT', $result);
+		$this->assertStringContainsString('FROM', $result);
+		$this->assertStringContainsString('WHERE', $result);
+		$this->assertStringContainsString('ORDER', $result);
 	}
 
 /**
@@ -1387,6 +1387,7 @@ class DboSourceTest extends CakeTestCase {
 		$db->setConnection($conn);
 		$conn->expects($this->exactly(2))->method('beginTransaction')
 			->will($this->returnValue(true));
+		$conn->expects($this->once())->method('inTransaction')->will($this->returnValue(true));
 		$conn->expects($this->once())->method('commit')->will($this->returnValue(true));
 		$conn->expects($this->once())->method('rollback')->will($this->returnValue(true));
 
@@ -1447,6 +1448,7 @@ class DboSourceTest extends CakeTestCase {
 
 		$conn->expects($this->once())->method('beginTransaction')->will($this->returnValue(true));
 		$conn->expects($this->never())->method('exec');
+		$conn->expects($this->once())->method('inTransaction')->will($this->returnValue(true));
 		$conn->expects($this->once())->method('commit')->will($this->returnValue(true));
 
 		$this->_runTransactions($db);
@@ -1466,6 +1468,7 @@ class DboSourceTest extends CakeTestCase {
 
 		$conn->expects($this->once())->method('beginTransaction')->will($this->returnValue(true));
 		$conn->expects($this->never())->method('exec');
+		$conn->expects($this->once())->method('inTransaction')->will($this->returnValue(true));
 		$conn->expects($this->once())->method('commit')->will($this->returnValue(true));
 
 		$this->_runTransactions($db);
@@ -1783,7 +1786,7 @@ class DboSourceTest extends CakeTestCase {
 
 		$result = $db->limit(10, 300000000000000000000000000000);
 		$scientificNotation = sprintf('%.1E', 300000000000000000000000000000);
-		$this->assertNotContains($scientificNotation, $result);
+		$this->assertStringNotContainsString($scientificNotation, $result);
 	}
 
 /**

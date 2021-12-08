@@ -452,7 +452,7 @@ class CakeSchemaTest extends CakeTestCase {
  *
  * @return void
  */
-	public function setUp() {
+	public function setUp(): void {
 		parent::setUp();
 		ConnectionManager::getDataSource('test')->cacheSources = false;
 		$this->Schema = new TestAppSchema();
@@ -463,7 +463,7 @@ class CakeSchemaTest extends CakeTestCase {
  *
  * @return void
  */
-	public function tearDown() {
+	public function tearDown(): void {
 		parent::tearDown();
 		if (file_exists(TMP . 'tests' . DS . 'schema.php')) {
 			unlink(TMP . 'tests' . DS . 'schema.php');
@@ -550,6 +550,7 @@ class CakeSchemaTest extends CakeTestCase {
 				'name' => 'TestApp',
 				'models' => array('AppModel')
 			));
+			$this->assertTrue(true);
 		} catch(MissingTableException $mte) {
 			ConnectionManager::drop('default');
 			$this->fail($mte->getMessage());

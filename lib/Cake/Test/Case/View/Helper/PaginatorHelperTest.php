@@ -38,7 +38,7 @@ class PaginatorHelperTest extends CakeTestCase {
  *
  * @return void
  */
-	public function setUp() {
+	public function setUp(): void {
 		parent::setUp();
 		Configure::write('Config.language', 'eng');
 		$controller = null;
@@ -76,7 +76,7 @@ class PaginatorHelperTest extends CakeTestCase {
  *
  * @return void
  */
-	public function tearDown() {
+	public function tearDown(): void {
 		parent::tearDown();
 		unset($this->View, $this->Paginator);
 	}
@@ -1487,12 +1487,13 @@ class PaginatorHelperTest extends CakeTestCase {
 		));
 	}
 
-/**
- * testNumbers method
- *
- * @return void
- */
-	public function testNumbers() {
+	/**
+	 * testNumbers method
+	 *
+	 * @return void
+	 */
+	public function testNumbers()
+	{
 		$this->Paginator->request->params['paging'] = array(
 			'Client' => array(
 				'page' => 8,
@@ -2809,12 +2810,12 @@ class PaginatorHelperTest extends CakeTestCase {
 	}
 
 /**
- * test that mock classes injected into paginatorHelper are called when using link()
- *
- * @expectedException CakeException
- * @return void
- */
+	 * test that mock classes injected into paginatorHelper are called when using link()
+	 *
+	 * @return void
+	 */
 	public function testMockAjaxProviderClassInjection() {
+		$this->expectException('CakeException');
 		$mock = $this->getMock('PaginatorHelper', array(), array($this->View), 'PaginatorMockJsHelper');
 		$Paginator = new PaginatorHelper($this->View, array('ajax' => 'PaginatorMockJs'));
 		$Paginator->request->params['paging'] = array(

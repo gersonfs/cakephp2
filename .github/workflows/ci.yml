@@ -19,6 +19,7 @@ jobs:
         php-version: ['7.4', '8.0']
 
     steps:
+      - uses: niden/actions-memcached@v7
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -31,6 +32,7 @@ jobs:
       - name: criando-databases
         run: |
           mkdir app/tmp app/tmp/cache app/tmp/cache/models app/tmp/cache/persistent app/tmp/cache/views app/tmp/logs app/tmp/sessions app/tmp/tests
+          mkdir lib/Cake/Test/test_app/tmp/cache lib/Cake/Test/test_app/tmp/cache/models lib/Cake/Test/test_app/tmp/cache/persistent lib/Cake/Test/test_app/tmp/cache/views lib/Cake/Test/test_app/tmp/logs lib/Cake/Test/test_app/tmp/sessions lib/Cake/Test/test_app/tmp/tests
           sudo locale-gen de_DE
           sudo locale-gen es_ES
           sudo systemctl start mysql.service
@@ -40,4 +42,5 @@ jobs:
 
       - name: Rodando PHPUnit
         run: |
+          composer install --no-progress --no-suggest -o --no-ansi --no-interaction
           composer test

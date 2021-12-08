@@ -18,15 +18,15 @@
 		"source": "https://github.com/cakephp/cakephp"
 	},
 	"require": {
-		"php": ">=7.4,<=8.0.0"
+		"php": ">=7.4,<8.1"
 	},
 	"suggest": {
 		"ext-openssl": "You need to install ext-openssl or ext-mcrypt to use AES-256 encryption",
 		"ext-mcrypt": "You need to install ext-openssl or ext-mcrypt to use AES-256 encryption"
 	},
 	"require-dev": {
-		"phpunit/phpunit": "^5.7.19",
-		"cakephp/cakephp-codesniffer": "^1.0.0"
+		"rector/rector": "^0.12.5",
+		"phpunit/phpunit": "8.x"
 	},
 	"config": {
 		"vendor-dir": "vendors/",

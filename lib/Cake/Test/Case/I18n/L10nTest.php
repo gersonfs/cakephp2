@@ -30,7 +30,8 @@ class L10nTest extends CakeTestCase {
  *
  * @return void
  */
-	public function setUp() {
+	public function setUp(): void {
+		$_SERVER['HTTP_ACCEPT_LANGUAGE'] = null;
 		parent::setUp();
 		Configure::delete('Config.language');
 	}
