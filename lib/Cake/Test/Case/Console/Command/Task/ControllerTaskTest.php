@@ -64,6 +64,10 @@ class ControllerTaskTest extends CakeTestCase {
  */
 	public $fixtures = array('core.bake_article', 'core.bake_articles_bake_tag', 'core.bake_comment', 'core.bake_tag');
 
+	/**
+	 * @var ControllerTask
+	 */
+	protected $Task;
 /**
  * setUp method
  *

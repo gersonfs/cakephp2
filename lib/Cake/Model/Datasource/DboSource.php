@@ -3743,6 +3743,11 @@ class DboSource extends DataSource {
 		return false;
 	}
 
+	public function getQueryCacheForTests(): array
+	{
+		return $this->_queryCache;
+	}
+
 /**
  * Used for storing in cache the results of the in-memory methodCache
  */
