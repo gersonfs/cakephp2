@@ -2356,7 +2356,7 @@ class ModelIntegrationTest extends BaseModelTest {
 			return false;
 		}
 
-		return preg_match('/^8\.[0-9]+\.[0-9]+\-/', $version) === 1;
+		return preg_match('/^8\.[0-9]+\.[0-9]+\-?/', $version) === 1;
 	}
 
 /**
