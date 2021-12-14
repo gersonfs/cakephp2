@@ -45,3 +45,8 @@ jobs:
         run: |
           composer install --no-progress --no-suggest -o --no-ansi --no-interaction
           composer test
+
+      - name: Rodando PHPUnit para SQLite
+        run: |
+          composer install --no-progress --no-suggest -o --no-ansi --no-interaction
+          DB=sqlite php ./lib/Cake/Console/cake.php test core Model/Datasource/Database/Sqlite --stderr --verbose
