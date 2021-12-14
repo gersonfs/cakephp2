@@ -17,21 +17,14 @@ jobs:
       fail-fast: false
       matrix:
         php-version: ['7.4', '8.0']
-    services:
-      redis:
-        image: redis
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
     steps:
       - uses: niden/actions-memcached@v7
+      - uses: shogo82148/actions-setup-redis@v1
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
-          extensions: mbstring, intl, mysql, zlib, dom, openssl, soap, json, simplexml, libxml, mcrypt
+          extensions: mbstring, intl, mysql, zlib, dom, openssl, soap, json, simplexml, libxml, mcrypt, sqlite3
 
       - name: checkout
         uses: actions/checkout@v2
