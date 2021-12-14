@@ -17,6 +17,18 @@ class DATABASE_CONFIG
 				'test_database_three' => '/tmp/cakephp_test3.db',
 			),
 		),
+		'pgsql' => array(
+			'datasource' => 'Database/Postgres',
+			'host' => '127.0.0.1',
+			'login' => 'postgres',
+			'database' => 'cakephp_test',
+			'schema' => array(
+				'default' => 'public',
+				'test' => 'public',
+				'test2' => 'test2',
+				'test_database_three' => 'test3'
+			)
+		),
 	);
 	public $default = array(
 		'persistent' => false,
