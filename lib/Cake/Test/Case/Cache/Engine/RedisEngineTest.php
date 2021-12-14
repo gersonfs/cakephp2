@@ -39,7 +39,7 @@ class RedisEngineTest extends CakeTestCase {
 		Configure::write('Cache.disable', false);
 
 		// @codingStandardsIgnoreStart
-		$socket = @fsockopen('127.0.0.1', 6379, $errno, $errstr, 1);
+		$socket = @fsockopen('localhost', 6379, $errno, $errstr, 1);
 		// @codingStandardsIgnoreEnd
 		$this->skipIf(!$socket, 'Redis is not running.');
 		fclose($socket);
@@ -78,7 +78,7 @@ class RedisEngineTest extends CakeTestCase {
 			'probability' => 100,
 			'groups' => array(),
 			'engine' => 'Redis',
-			'server' => '127.0.0.1',
+			'server' => 'localhost',
 			'port' => 6379,
 			'timeout' => 0,
 			'persistent' => true,
