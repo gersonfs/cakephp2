@@ -23,6 +23,7 @@ App::uses('DboSource', 'Model/Datasource');
 App::uses('DboTestSource', 'Model/Datasource');
 App::uses('DboSecondTestSource', 'Model/Datasource');
 App::uses('MockDataSource', 'Model/Datasource');
+App::uses('PDOStatementFake', 'Test/Case/Util');
 
 require_once dirname(dirname(__FILE__)) . DS . 'models.php';
 
@@ -37,6 +38,46 @@ class MockPDO extends PDO {
  * Constructor.
  */
 	public function __construct() {
+	}
+
+	/**
+	 * @return false|string|void
+	 */
+	public function quote($string, $type = PDO::PARAM_INT)
+	{
+		return parent::quote($string, $type);
+	}
+
+	/**
+	 * @return false|int|void
+	 */
+	public function exec($statement)
+	{
+		return parent::exec($statement);
+	}
+
+	/**
+	 * @return false|string|void
+	 */
+	public function lastInsertId($name = null)
+	{
+		return parent::lastInsertId($name);
+	}
+
+	/**
+	 * @return false|\PDOStatement|void
+	 */
+	public function prepare($query, $options = [])
+	{
+		return parent::prepare($query, $options);
+	}
+
+	/**
+	 * @return false|\PDOStatement|void
+	 */
+	public function query(string $statement, ?int $mode = PDO::ATTR_DEFAULT_FETCH_MODE, $arg3 = null, ...$fechModeArgs)
+	{
+		return parent::query($statement, $mode, $arg3, $fechModeArgs);
 	}
 
 }
@@ -1366,7 +1407,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	public function testLastError() {
-		$stmt = $this->getMock('PDOStatement');
+		$stmt = $this->getMock('PDOStatementFake');
 		$stmt->expects($this->any())
 			->method('errorInfo')
 			->will($this->returnValue(array('', 'something', 'bad')));

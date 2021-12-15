@@ -168,6 +168,11 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	public function endTest($method) {
 	}
 
+	public function isPHP81(): bool
+	{
+		return version_compare(PHP_VERSION, '8.1.0') >= 0;
+	}
+
 	public function isPHP8(): bool
 	{
 		return version_compare(PHP_VERSION, '8.0.0') >= 0;

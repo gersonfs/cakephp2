@@ -805,7 +805,7 @@ class MysqlTest extends CakeTestCase {
  */
 	public function testGetCharsetNameCaching() {
 		$db = $this->getMock('Mysql', array('connect', '_execute', 'getVersion'));
-		$queryResult = $this->getMock('PDOStatementFake');
+		$queryResult = $this->getMock($this->getPdoStatementClass());
 
 		$db->expects($this->exactly(2))->method('getVersion')->will($this->returnValue('5.1'));
 
@@ -1063,7 +1063,7 @@ SQL;
  */
 	public function testListSources() {
 		$db = $this->getMock('Mysql', array('connect', '_execute'));
-		$queryResult = $this->getMock('PDOStatement');
+		$queryResult = $this->getMock($this->getPdoStatementClass());
 		$db->expects($this->once())
 			->method('_execute')
 			->with('SHOW TABLES FROM `cake`')
@@ -1113,7 +1113,7 @@ SQL;
  */
 	public function testGetEncoding() {
 		$db = $this->getMock('Mysql', array('connect', '_execute'));
-		$queryResult = $this->getMock('PDOStatement');
+		$queryResult = $this->getMock($this->getPdoStatementClass());
 
 		$db->expects($this->once())
 			->method('_execute')
@@ -4244,5 +4244,13 @@ SQL;
 		);
 		$result = $db->insertMulti('articles', array_keys($data[0]), $data);
 		$this->assertTrue($result, 'Data was saved');
+	}
+
+	protected function getPdoStatementClass(): string {
+		if ($this->isPHP81()) {
+			return 'PDOStatementFake';
+		}
+
+		return 'PDOStatement';
 	}
 }
