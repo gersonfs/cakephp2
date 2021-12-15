@@ -117,15 +117,6 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 		parent::assertAttributeEquals($expected,  $actualAttributeName, $actualClassOrObject, $message, $delta ,$maxDepth,  $canonicalize, $ignoreCase);
 	}
 
-	public static function attributeEqualTo(string $attributeName, $value, float $delta = 0.0, int $maxDepth = 10, bool $canonicalize = false, bool $ignoreCase = false): Attribute
-	{
-		if (is_object($value)) {
-			//self::getObjectAttributeCake($value, $attributeName);
-		}
-
-		return parent::attributeEqualTo($attributeName, $value);
-	}
-
 	public static function getObjectAttributeCake($object, string $attributeName)
 	{
 		if (!is_object($object)) {
