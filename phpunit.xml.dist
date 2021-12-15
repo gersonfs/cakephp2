@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		colors="true"
+		processIsolation="false"
+		stopOnFailure="false"
+		bootstrap="test_bootstrap.php"
+		xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage>
+    <include>
+      <directory suffix=".php">src/</directory>
+      <directory suffix=".php">plugins/*/src/</directory>
+        <directory suffix=".php">plugins_clientes/*/src/</directory>
+    </include>
+    <exclude>
+      <file>src/Console/Installer.php</file>
+      <directory>plugins/cakephp-upload</directory>
+    </exclude>
+  </coverage>
+  <php>
+    <ini name="memory_limit" value="-1"/>
+    <ini name="apc.enable_cli" value="1"/>
+  </php>
+  <!-- Add any additional test suites you want to run here -->
+  <testsuites>
+    <testsuite name="app">
+      <!--<directory>lib/Cake/Test/Case/Cache</directory>-->
+		<directory>lib/Cake/Test/Case/Console/Command</directory>
+    </testsuite>
+    <!-- Add plugin test suites here. -->
+  </testsuites>
+  <!-- Setup a listener for fixtures -->
+	<!--
+  <listeners>
+    <listener class="Cake\TestSuite\Fixture\FixtureInjector">
+      <arguments>
+        <object class="Cake\TestSuite\Fixture\FixtureManager"/>
+      </arguments>
+    </listener>
+  </listeners>
+  -->
+  <!-- Ignore vendor tests in code coverage reports -->
+</phpunit>
