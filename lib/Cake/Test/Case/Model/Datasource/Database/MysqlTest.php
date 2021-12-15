@@ -364,6 +364,7 @@ class MysqlTest extends CakeTestCase {
  * @return void
  */
 	public function testIndexOnMySQL4Output() {
+		$this->skipIf(version_compare(PHP_VERSION, '8.1', '>='), 'Escapando teste no PHP 8.1');
 		$name = $this->Dbo->fullTableName('simple');
 
 		$mockDbo = $this->getMock('Mysql', array('connect', '_execute', 'getVersion'));
