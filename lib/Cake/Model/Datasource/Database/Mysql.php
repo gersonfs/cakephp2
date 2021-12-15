@@ -355,6 +355,11 @@ class Mysql extends DboSource {
 		}
 
 		while ($column = $cols->fetch(PDO::FETCH_OBJ)) {
+
+			if ($fields === false) {
+				$fields = [];
+			}
+
 			$fields[$column->Field] = array(
 				'type' => $this->column($column->Type),
 				'null' => ($column->Null === 'YES' ? true : false),

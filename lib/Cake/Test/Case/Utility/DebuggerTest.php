@@ -701,6 +701,7 @@ TEXT;
  * @return void
  */
 	public function testExportVarRecursion() {
+		$this->skipIf($this->isPHP81(), 'Escapando teste PHP 8.1');
 		$output = Debugger::exportVar($GLOBALS);
 		$this->assertStringContainsString("'GLOBALS' => [recursion]", $output);
 	}

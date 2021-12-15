@@ -1407,7 +1407,8 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	public function testLastError() {
-		$stmt = $this->getMock('PDOStatementFake');
+		$class = $this->isPHP81() ? 'PDOStatementFake' : 'PDOStatement';
+		$stmt = $this->getMock($class);
 		$stmt->expects($this->any())
 			->method('errorInfo')
 			->will($this->returnValue(array('', 'something', 'bad')));
