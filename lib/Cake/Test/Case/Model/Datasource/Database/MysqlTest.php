@@ -20,6 +20,7 @@ App::uses('Model', 'Model');
 App::uses('AppModel', 'Model');
 App::uses('Mysql', 'Model/Datasource/Database');
 App::uses('CakeSchema', 'Model');
+App::uses('PDOStatementFake', 'Test/Util');
 
 require_once dirname(dirname(dirname(__FILE__))) . DS . 'models.php';
 
@@ -214,19 +215,19 @@ class MysqlTest extends CakeTestCase {
 		$this->assertTrue((bool)$this->model->save(array('bool' => 5, 'tiny_int' => 5)));
 		$result = $this->model->find('first');
 		$this->assertTrue($result['Tinyint']['bool']);
-		$this->assertSame($result['Tinyint']['tiny_int'], '5');
+		$this->assertSame($result['Tinyint']['tiny_int'], 5);
 		$this->model->deleteAll(true);
 
 		$this->assertTrue((bool)$this->model->save(array('bool' => 0, 'tiny_int' => 100)));
 		$result = $this->model->find('first');
 		$this->assertFalse($result['Tinyint']['bool']);
-		$this->assertSame($result['Tinyint']['tiny_int'], '100');
+		$this->assertSame($result['Tinyint']['tiny_int'], 100);
 		$this->model->deleteAll(true);
 
 		$this->assertTrue((bool)$this->model->save(array('bool' => true, 'tiny_int' => 0)));
 		$result = $this->model->find('first');
 		$this->assertTrue($result['Tinyint']['bool']);
-		$this->assertSame($result['Tinyint']['tiny_int'], '0');
+		$this->assertSame($result['Tinyint']['tiny_int'], 0);
 		$this->model->deleteAll(true);
 
 		$this->Dbo->rawQuery('DROP TABLE ' . $this->Dbo->fullTableName($tableName));
@@ -804,7 +805,7 @@ class MysqlTest extends CakeTestCase {
  */
 	public function testGetCharsetNameCaching() {
 		$db = $this->getMock('Mysql', array('connect', '_execute', 'getVersion'));
-		$queryResult = $this->getMock('PDOStatement');
+		$queryResult = $this->getMock('PDOStatementFake');
 
 		$db->expects($this->exactly(2))->method('getVersion')->will($this->returnValue('5.1'));
 

@@ -286,6 +286,10 @@ class Mysql extends DboSource {
 				if ($type === 'boolean' && $row[$col] !== null) {
 					$resultRow[$table][$column] = $this->boolean($resultRow[$table][$column]);
 				}
+
+				if ($type === 'TINY' && $row[$col] !== null) {
+					$resultRow[$table][$column] = (int)$resultRow[$table][$column];
+				}
 			}
 			return $resultRow;
 		}
