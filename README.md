@@ -1,9 +1,7 @@
-# CakePHP
+# CakePHP Version 2 with PHP 7.4, 8.0 and 8.1 support
 
-[![Latest Stable Version](https://poser.pugx.org/cakephp/cakephp/v/stable.svg)](https://packagist.org/packages/cakephp/cakephp)
-[![License](https://poser.pugx.org/cakephp/cakephp/license.svg)](https://packagist.org/packages/cakephp/cakephp)
-[![Bake Status](https://secure.travis-ci.org/cakephp/cakephp.png?branch=master)](https://travis-ci.org/cakephp/cakephp)
-[![Code consistency](https://squizlabs.github.io/PHP_CodeSniffer/analysis/cakephp/cakephp/grade.svg)](https://squizlabs.github.io/PHP_CodeSniffer/analysis/cakephp/cakephp/)
+**Attention:** I have no plans to add support for features I don't use at the moment. That's why some tests are escaped.
+
 
 CakePHP is a rapid development framework for PHP which uses commonly known design patterns like Active Record, Association Data Mapping, Front Controller and MVC.
 Our primary goal is to provide a structured framework that enables PHP users at all levels to rapidly develop robust web applications, without any loss to flexibility.
@@ -46,12 +44,3 @@ Our primary goal is to provide a structured framework that enables PHP users at 
 [CONTRIBUTING.md](CONTRIBUTING.md) - Quick pointers for contributing to the CakePHP project
 
 [CookBook "Contributing" Section (2.x)](https://book.cakephp.org/2.0/en/contributing.html) [(3.x)](https://book.cakephp.org/3.0/en/contributing.html) - Version-specific details about contributing to the project
-
-
-## Comparativo dos testes
-
-PHP 8:
-Tests: 4283, Assertions: 21101, Errors: 8, Failures: 43, Warnings: 68, Skipped: 215, Risky: 11.
-PHP 5.6
-Tests: 4282, Assertions: 20839, Failures: 39, Skipped: 193, Risky: 1.
-
