@@ -1810,6 +1810,8 @@ class AuthComponentTest extends CakeTestCase {
  * @return void
  */
 	public function testStatelessFollowedByStatefulAuth() {
+		$_SERVER['PHP_AUTH_USER'] = null;
+		$_SERVER['PHP_AUTH_PW'] = null;
 		$this->Auth->authenticate = array('Basic', 'Form');
 		$this->Controller->request['action'] = 'admin_add';
 
