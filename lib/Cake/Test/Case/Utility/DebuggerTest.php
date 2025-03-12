@@ -80,7 +80,7 @@ class DebuggerTest extends CakeTestCase {
 		$result = Debugger::excerpt(__FILE__, __LINE__, 2);
 		$this->assertTrue(is_array($result));
 		$this->assertEquals(5, count($result));
-		$this->assertRegExp('/function(.+)testExcerpt/', $result[1]);
+		$this->assertMatchesRegularExpression('/function(.+)testExcerpt/', $result[1]);
 
 		$result = Debugger::excerpt(__FILE__, 2, 2);
 		$this->assertTrue(is_array($result));
@@ -90,13 +90,13 @@ class DebuggerTest extends CakeTestCase {
 		if (version_compare(PHP_VERSION, '8.2.0') >= 0) {
 			$pattern = '/<code style\="color\: \#\d+">.*?<span style\="color\: \#.{6}">.*?&lt;\?php/';
 		}
-		$this->assertRegExp($pattern, $result[0]);
+		$this->assertMatchesRegularExpression($pattern, $result[0]);
 
 		$result = Debugger::excerpt(__FILE__, 11, 2);
 		$this->assertEquals(5, count($result));
 
 		$pattern = '/<span style\="color\: \#\d{6}">\*<\/span>/';
-		$this->assertRegExp($pattern, $result[0]);
+		$this->assertMatchesRegularExpression($pattern, $result[0]);
 
 		$return = Debugger::excerpt('[internal]', 2, 2);
 		$this->assertTrue(empty($return));
@@ -119,14 +119,14 @@ class DebuggerTest extends CakeTestCase {
 		$type = $this->isPHP7() ? 'Notice' : 'Warning';
 		$this->assertEquals($type, $result[0]['error']);
 		if ($this->isPHP8()) {
-			$this->assertRegExp('/Undefined variable \$out/', $result[0]['description']);
+			$this->assertMatchesRegularExpression('/Undefined variable \$out/', $result[0]['description']);
 		}
 
 		if ($this->isPHP7()) {
-			$this->assertRegExp('/Undefined variable\:\s+out/', $result[0]['description']);
+			$this->assertMatchesRegularExpression('/Undefined variable\:\s+out/', $result[0]['description']);
 		}
 
-		$this->assertRegExp('/DebuggerTest::testOutput/i', $result[0]['trace']);
+		$this->assertMatchesRegularExpression('/DebuggerTest::testOutput/i', $result[0]['trace']);
 
 		ob_start();
 		Debugger::output('txt');
@@ -134,29 +134,29 @@ class DebuggerTest extends CakeTestCase {
 		$result = ob_get_clean();
 
 		if ($this->isPHP7()) {
-			$this->assertRegExp('/Undefined variable:\s+other/', $result);
+			$this->assertMatchesRegularExpression('/Undefined variable:\s+other/', $result);
 		}
 
 		if ($this->isPHP8()) {
-			$this->assertRegExp('/Undefined variable \$other/', $result);
+			$this->assertMatchesRegularExpression('/Undefined variable \$other/', $result);
 		}
 
-		$this->assertRegExp('/Trace:/', $result);
-		$this->assertRegExp('/DebuggerTest::testOutput/i', $result);
+		$this->assertMatchesRegularExpression('/Trace:/', $result);
+		$this->assertMatchesRegularExpression('/DebuggerTest::testOutput/i', $result);
 
 		ob_start();
 		Debugger::output('html');
 		$wrong .= '';
 		$result = ob_get_clean();
-		$this->assertRegExp('/<pre class="cake-error">.+<\/pre>/', $result);
+		$this->assertMatchesRegularExpression('/<pre class="cake-error">.+<\/pre>/', $result);
 		if ($this->isPHP7()) {
-			$this->assertRegExp('/<b>Notice<\/b>/', $result);
-			$this->assertRegExp('/variable:\s+wrong/', $result);
+			$this->assertMatchesRegularExpression('/<b>Notice<\/b>/', $result);
+			$this->assertMatchesRegularExpression('/variable:\s+wrong/', $result);
 		}
 
 		if ($this->isPHP8()) {
-			$this->assertRegExp('/<b>Warning<\/b>/', $result);
-			$this->assertRegExp('/variable \$wrong/', $result);
+			$this->assertMatchesRegularExpression('/<b>Warning<\/b>/', $result);
+			$this->assertMatchesRegularExpression('/variable \$wrong/', $result);
 		}
 
 
@@ -193,9 +193,9 @@ class DebuggerTest extends CakeTestCase {
 		if ($this->isPHP8()) {
 			$pattern = '/Undefined variable \$buzz/';
 		}
-		$this->assertRegExp($pattern, $result[1]);
-		$this->assertRegExp('/<a[^>]+>Code/', $result[1]);
-		$this->assertRegExp('/<a[^>]+>Context/', $result[2]);
+		$this->assertMatchesRegularExpression($pattern, $result[1]);
+		$this->assertMatchesRegularExpression('/<a[^>]+>Code/', $result[1]);
+		$this->assertMatchesRegularExpression('/<a[^>]+>Context/', $result[2]);
 		if (!$this->isPHP8()) {
 			$this->assertStringContainsString('$wrong = &#039;&#039;', $result[3], 'Context should be HTML escaped.');
 		}
@@ -235,7 +235,7 @@ class DebuggerTest extends CakeTestCase {
 				'&line={:line}">{:path}</a>, line {:line}'
 		));
 		$result = Debugger::trace();
-		$this->assertRegExp('/' . preg_quote('txmt://open?url=file://', '/') . '(\/|[A-Z]:\\\\)' . '/', $result);
+		$this->assertMatchesRegularExpression('/' . preg_quote('txmt://open?url=file://', '/') . '(\/|[A-Z]:\\\\)' . '/', $result);
 
 		Debugger::output('xml', array(
 			'error' => '<error><code>{:code}</code><file>{:file}</file><line>{:line}</line>' .
@@ -308,7 +308,7 @@ class DebuggerTest extends CakeTestCase {
 		Debugger::outputAs('js');
 
 		$result = Debugger::trace();
-		$this->assertRegExp('/' . preg_quote('txmt://open?url=file://', '/') . '(\/|[A-Z]:\\\\)' . '/', $result);
+		$this->assertMatchesRegularExpression('/' . preg_quote('txmt://open?url=file://', '/') . '(\/|[A-Z]:\\\\)' . '/', $result);
 
 		Debugger::addFormat('xml', array(
 			'error' => '<error><code>{:code}</code><file>{:file}</file><line>{:line}</line>' .
@@ -716,7 +716,7 @@ TEXT;
  */
 	public function testTraceExclude() {
 		$result = Debugger::trace();
-		$this->assertRegExp('/^DebuggerTest::testTraceExclude/', $result);
+		$this->assertMatchesRegularExpression('/^DebuggerTest::testTraceExclude/', $result);
 
 		$result = Debugger::trace(array(
 			'exclude' => array('DebuggerTest::testTraceExclude')
