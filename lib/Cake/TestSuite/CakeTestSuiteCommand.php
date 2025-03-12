@@ -28,6 +28,7 @@ App::uses('CakeTestSuite', 'TestSuite');
 App::uses('CakeTestCase', 'TestSuite');
 App::uses('ControllerTestCase', 'TestSuite');
 App::uses('CakeTestModel', 'TestSuite/Fixture');
+App::uses('ResolveTestFile', 'TestSuite');
 
 /**
  * Class to customize loading of test suites from CLI
@@ -72,16 +73,15 @@ class CakeTestSuiteCommand extends \PHPUnit\TextUI\Command {
         $test = $this->arguments['test'];
         $testFile = $this->arguments['testFile'];
 
-		$runner = $this->getRunner(new $loader);
-
-		$file = $runner->_resolveTestFile($test, $testFile);
+		$resolver = new ResolveTestFile();
+		$file = $resolver->resolveTestFile($test, $testFile);
 		$argv[] = $file;
         //$argv[] = '--do-not-cache-result';
 		$this->handleArguments($argv);
         $this->arguments['loader'] = new $loader;
         $this->arguments['test'] = $test;
         $this->arguments['testFile'] = $testFile;
-
+		$runner = $this->getRunner(new $loader);
 
 		if (is_object($this->arguments['test']) &&
 			$this->arguments['test'] instanceof \PHPUnit\Framework\Test) {
