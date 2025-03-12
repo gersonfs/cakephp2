@@ -79,7 +79,7 @@ class CakeTestRunner {
 			}
 		}
 
-		$return = $this->runner->doRun($suite, $arguments, [], $exit);
+		$return = $this->runner->run($suite, $arguments, [], $exit);
 		$fixture->shutdown();
 		return $return;
 	}
@@ -129,7 +129,7 @@ class CakeTestRunner {
 	public function getTest(string $suiteClassName, array $data = [], $suffixes = '') : ?Test
 	{
 		$suiteClassFile = $this->_resolveTestFile($suiteClassName, $data);
-		return $this->runner->getTest($suiteClassName, $suiteClassFile, $suffixes);
+		return $this->runner->getTest($suiteClassFile, $suffixes);
 	}
 
 	/**
@@ -139,7 +139,7 @@ class CakeTestRunner {
 	 * @param string $params Additional parameters.
 	 * @return string Converted path fragments.
 	 */
-	protected function _resolveTestFile($filePath, $params) {
+	public function _resolveTestFile($filePath, $params) {
 		$basePath = $this->_basePath($params) . DS . $filePath;
 		$ending = 'Test.php';
 		return (strpos($basePath, $ending) === (strlen($basePath) - strlen($ending))) ? $basePath : $basePath . $ending;

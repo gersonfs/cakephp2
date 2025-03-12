@@ -40,8 +40,8 @@ class CakeTestLoader implements \PHPUnit\Runner\TestSuiteLoader {
  * @param string $params Additional parameters
  * @return ReflectionClass
  */
-	public function load(string $suiteClassName, string $suiteClassFile = ''): \ReflectionClass {
-		return $this->loader->load($suiteClassName, $suiteClassFile);
+	public function load(string $suiteClassFile): \ReflectionClass {
+		return $this->loader->load($suiteClassFile);
 	}
 
 /**

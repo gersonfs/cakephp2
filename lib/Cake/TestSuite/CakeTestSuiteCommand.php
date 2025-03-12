@@ -64,9 +64,24 @@ class CakeTestSuiteCommand extends \PHPUnit\TextUI\Command {
  * @return void
  */
 	public function run(array $argv, bool $exit = true): int {
-		$this->handleArguments($argv);
 
-		$runner = $this->getRunner($this->arguments['loader']);
+        if (!defined('CAKEPHP2_TESTS_RUNNING')) {
+            define('CAKEPHP2_TESTS_RUNNING', true);
+        }
+        $loader = $this->arguments['loader'];
+        $test = $this->arguments['test'];
+        $testFile = $this->arguments['testFile'];
+
+		$runner = $this->getRunner(new $loader);
+
+		$file = $runner->_resolveTestFile($test, $testFile);
+		$argv[] = $file;
+        //$argv[] = '--do-not-cache-result';
+		$this->handleArguments($argv);
+        $this->arguments['loader'] = new $loader;
+        $this->arguments['test'] = $test;
+        $this->arguments['testFile'] = $testFile;
+
 
 		if (is_object($this->arguments['test']) &&
 			$this->arguments['test'] instanceof \PHPUnit\Framework\Test) {

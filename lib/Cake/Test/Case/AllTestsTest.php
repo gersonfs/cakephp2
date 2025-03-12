@@ -23,7 +23,7 @@
  *
  * @package       Cake.Test.Case
  */
-class AllTests extends \PHPUnit\Framework\TestSuite {
+class AllTestsTest extends \PHPUnit\Framework\TestSuite {
 
 /**
  * Suite define the tests for this suite
