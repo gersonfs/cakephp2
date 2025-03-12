@@ -91,10 +91,12 @@ class BasicAuthenticate extends BaseAuthenticate {
 		if (!strlen($username)) {
 			$httpAuthorization = $request->header('Authorization');
 			if (strlen($httpAuthorization) > 0 && strpos($httpAuthorization, 'Basic') !== false) {
-				list($username, $pass) = explode(':', base64_decode(substr($httpAuthorization, 6)));
+				[$username, $pass] = explode(':', base64_decode(substr($httpAuthorization, 6)));
 
-				echo "parametro2:\n";
-				var_dump($username, $pass);
+				if ($this->isTesteFalha()) {
+					echo "parametro2:\n";
+					var_dump($username, $pass);
+				}
 			}
 		}
 
