@@ -84,25 +84,13 @@ class BasicAuthenticate extends BaseAuthenticate {
 	public function getUser(CakeRequest $request) {
 		$username = env('PHP_AUTH_USER');
 		$pass = env('PHP_AUTH_PW');
-		if ($this->isTesteFalha()) {
-			echo "parametro1:\n";
-			var_dump($username, $pass);
-		}
 		if (!strlen($username)) {
 			$httpAuthorization = $request->header('Authorization');
 			if (strlen($httpAuthorization) > 0 && strpos($httpAuthorization, 'Basic') !== false) {
 				[$username, $pass] = explode(':', base64_decode(substr($httpAuthorization, 6)));
-
-				if ($this->isTesteFalha()) {
-					echo "parametro2:\n";
-					var_dump($username, $pass);
-				}
 			}
 		}
 
-		if ($this->isTesteFalha()) {
-			die();
-		}
 		if (!is_string($username) || $username === '' || !is_string($pass) || $pass === '') {
 			return false;
 		}
