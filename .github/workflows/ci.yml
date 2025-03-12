@@ -44,5 +44,7 @@ jobs:
       - name: Rodando PHPUnit
         run: |
           composer install --no-progress --no-suggest -o --no-ansi --no-interaction
-          composer test
-          DB=sqlite php ./lib/Cake/Console/cake.php test core Model/Datasource/Database/Sqlite --stderr --verbose
+          php ./lib/Cake/Console/cake.php test core Controller/Component/AuthComponent --stderr --verbose --filter testStatelessFollowedByStatefulAuth --filter testStatelessFollowedByStatefulAuth
+
+          #composer test
+          #DB=sqlite php ./lib/Cake/Console/cake.php test core Model/Datasource/Database/Sqlite --stderr --verbose

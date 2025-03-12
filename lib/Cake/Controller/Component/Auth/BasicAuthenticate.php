@@ -91,6 +91,8 @@ class BasicAuthenticate extends BaseAuthenticate {
 			}
 		}
 
+		var_dump($username);
+		var_dump($pass);
 		if (!is_string($username) || $username === '' || !is_string($pass) || $pass === '') {
 			return false;
 		}
