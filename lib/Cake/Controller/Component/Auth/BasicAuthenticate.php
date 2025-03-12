@@ -91,6 +91,12 @@ class BasicAuthenticate extends BaseAuthenticate {
 			}
 		}
 
+		foreach(debug_backtrace() as $data) {
+			if($data['function'] == 'testStatelessFollowedByStatefulAuth') {
+				var_dump($username, $pass);
+				die(1);
+			}
+		}
 		if (!is_string($username) || $username === '' || !is_string($pass) || $pass === '') {
 			return false;
 		}
