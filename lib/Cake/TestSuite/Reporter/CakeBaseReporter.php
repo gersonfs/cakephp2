@@ -29,7 +29,7 @@ if (!class_exists('PHPUnit_TextUI_ResultPrinter')) {
  *
  * @package       Cake.TestSuite.Reporter
  */
-class CakeBaseReporter extends \PHPUnit\TextUI\ResultPrinter {
+class CakeBaseReporter extends \PHPUnit\TextUI\DefaultResultPrinter {
 
 /**
  * Headers sent

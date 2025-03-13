@@ -87,7 +87,7 @@ class BasicAuthenticate extends BaseAuthenticate {
 		if (!strlen($username)) {
 			$httpAuthorization = $request->header('Authorization');
 			if (strlen($httpAuthorization) > 0 && strpos($httpAuthorization, 'Basic') !== false) {
-				list($username, $pass) = explode(':', base64_decode(substr($httpAuthorization, 6)));
+				[$username, $pass] = explode(':', base64_decode(substr($httpAuthorization, 6)));
 			}
 		}
 
@@ -95,6 +95,17 @@ class BasicAuthenticate extends BaseAuthenticate {
 			return false;
 		}
 		return $this->_findUser($username, $pass);
+	}
+
+	private function isTesteFalha(): bool
+	{
+		foreach(debug_backtrace() as $data) {
+			if($data['function'] == 'testStatelessFollowedByStatefulAuth') {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 /**

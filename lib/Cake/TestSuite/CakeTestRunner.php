@@ -31,6 +31,7 @@ if (class_exists('SebastianBergmann\CodeCoverage\CodeCoverage')) {
 }
 
 App::uses('CakeFixtureManager', 'TestSuite/Fixture');
+App::uses('ResolveTestFile', 'TestSuite');
 
 /**
  * A custom test runner for CakePHP's use of PHPUnit.
@@ -79,7 +80,7 @@ class CakeTestRunner {
 			}
 		}
 
-		$return = $this->runner->doRun($suite, $arguments, [], $exit);
+		$return = $this->runner->run($suite, $arguments, [], $exit);
 		$fixture->shutdown();
 		return $return;
 	}
@@ -129,7 +130,7 @@ class CakeTestRunner {
 	public function getTest(string $suiteClassName, array $data = [], $suffixes = '') : ?Test
 	{
 		$suiteClassFile = $this->_resolveTestFile($suiteClassName, $data);
-		return $this->runner->getTest($suiteClassName, $suiteClassFile, $suffixes);
+		return $this->runner->getTest($suiteClassFile, $suffixes);
 	}
 
 	/**
@@ -139,36 +140,10 @@ class CakeTestRunner {
 	 * @param string $params Additional parameters.
 	 * @return string Converted path fragments.
 	 */
-	protected function _resolveTestFile($filePath, $params) {
-		$basePath = $this->_basePath($params) . DS . $filePath;
-		$ending = 'Test.php';
-		return (strpos($basePath, $ending) === (strlen($basePath) - strlen($ending))) ? $basePath : $basePath . $ending;
-	}
-
-	/**
-	 * Generates the base path to a set of tests based on the parameters.
-	 *
-	 * @param array $params The path parameters.
-	 * @return string The base path.
-	 */
-	protected static function _basePath($params) {
-		$result = null;
-		if (!empty($params['core'])) {
-			$result = CORE_TEST_CASES;
-		} elseif (!empty($params['plugin'])) {
-			if (!CakePlugin::loaded($params['plugin'])) {
-				try {
-					CakePlugin::load($params['plugin']);
-					$result = CakePlugin::path($params['plugin']) . 'Test' . DS . 'Case';
-				} catch (MissingPluginException $e) {
-				}
-			} else {
-				$result = CakePlugin::path($params['plugin']) . 'Test' . DS . 'Case';
-			}
-		} elseif (!empty($params['app'])) {
-			$result = APP_TEST_CASES;
-		}
-		return $result;
+	protected function _resolveTestFile($filePath, $params)
+	{
+		$resolver = (new ResolveTestFile());
+		return $resolver->resolveTestFile($filePath, $params);
 	}
 
 }
