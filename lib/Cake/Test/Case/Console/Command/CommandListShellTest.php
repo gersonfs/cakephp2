@@ -21,21 +21,7 @@ App::uses('ConsoleOutput', 'Console');
 App::uses('ConsoleInput', 'Console');
 App::uses('Shell', 'Console');
 App::uses('CommandTask', 'Console/Command/Task');
-
-/**
- * TestStringOutput
- *
- * @package       Cake.Test.Case.Console.Command
- */
-class TestStringOutput extends ConsoleOutput {
-
-	public $output = '';
-
-	protected function _write($message) {
-		$this->output .= $message;
-	}
-
-}
+App::uses('TestStringOutput', 'Test/Case/Console/Command');
 
 /**
  * CommandListShellTest
@@ -62,19 +48,15 @@ class CommandListShellTest extends CakeTestCase {
 		CakePlugin::load(array('TestPlugin', 'TestPluginTwo'));
 
 		$out = new TestStringOutput();
-		$in = $this->getMock('ConsoleInput', array(), array(), '', false);
+		$in = $this->getMockBuilder('ConsoleInput')->getMock();
 
-		$this->Shell = $this->getMock(
-			'CommandListShell',
-			array('in', '_stop', 'clear'),
-			array($out, $out, $in)
-		);
+		$this->Shell = $this->getMockBuilder('CommandListShell')
+			->onlyMethods(array('in', '_stop', 'clear'))->setConstructorArgs(array($out, $out, $in))
+		->getMock();
 
-		$this->Shell->Command = $this->getMock(
-			'CommandTask',
-			array('in', '_stop', 'clear'),
-			array($out, $out, $in)
-		);
+		$this->Shell->Command = $this->getMockBuilder('CommandTask')
+			->onlyMethods(array('in', '_stop', 'clear'))
+			->setConstructorArgs(array($out, $out, $in))->getMock();
 	}
 
 /**
