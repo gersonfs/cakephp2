@@ -721,6 +721,6 @@ TEXT;
 		$result = Debugger::trace(array(
 			'exclude' => array('DebuggerTest::testTraceExclude')
 		));
-		$this->assertNotRegExp('/^DebuggerTest::testTraceExclude/', $result);
+		$this->assertDoesNotMatchRegularExpression('/^DebuggerTest::testTraceExclude/', $result);
 	}
 }

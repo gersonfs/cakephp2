@@ -28,59 +28,68 @@ App::uses("ProgressHelper", "Console/Helper");
  *
  * @package       Cake.Test.Case.Console.Command
  */
-class ShellTestShell extends Shell {
+class ShellTestShell extends Shell
+{
 
-/**
- * name property
- *
- * @var name
- */
+	/**
+	 * name property
+	 *
+	 * @var name
+	 */
 	public $name = 'ShellTestShell';
 
-/**
- * stopped property
- *
- * @var int
- */
+	/**
+	 * stopped property
+	 *
+	 * @var int
+	 */
 	public $stopped;
 
-/**
- * testMessage property
- *
- * @var string
- */
+	/**
+	 * testMessage property
+	 *
+	 * @var string
+	 */
 	public $testMessage = 'all your base are belong to us';
 
-/**
- * stop method
- *
- * @param int $status
- * @return void
- */
-	protected function _stop($status = 0) {
+	/**
+	 * stop method
+	 *
+	 * @param int $status
+	 * @return void
+	 */
+	protected function _stop($status = 0)
+	{
 		$this->stopped = $status;
 	}
 
-	protected function _secret() {
+	protected function _secret()
+	{
 	}
 
 	//@codingStandardsIgnoreStart
-	public function do_something() {
+	public function do_something()
+	{
 	}
 
-	protected function no_access() {
+	protected function no_access()
+	{
 	}
 
-	public function log_something() {
+	public function log_something()
+	{
 		$this->log($this->testMessage);
 	}
+
 	//@codingStandardsIgnoreEnd
 
-	public function mergeVars($properties, $class, $normalize = true) {
+	public function mergeVars($properties, $class, $normalize = true)
+	{
 		return $this->_mergeVars($properties, $class, $normalize);
 	}
 
-	public function useLogger($enable = true) {
+	public function useLogger($enable = true)
+	{
 		$this->_useLogger($enable);
 	}
 
@@ -91,11 +100,12 @@ class ShellTestShell extends Shell {
  *
  * @package       Cake.Test.Case.Console.Command
  */
-class TestMergeShell extends Shell {
+class TestMergeShell extends Shell
+{
 
-	public $tasks = array('DbConfig', 'Fixture');
+	public $tasks = ['DbConfig', 'Fixture'];
 
-	public $uses = array('Comment');
+	public $uses = ['Comment'];
 
 }
 
@@ -104,7 +114,8 @@ class TestMergeShell extends Shell {
  *
  * @package       Cake.Test.Case.Console.Command
  */
-class TestAppleTask extends Shell {
+class TestAppleTask extends Shell
+{
 }
 
 /**
@@ -112,7 +123,8 @@ class TestAppleTask extends Shell {
  *
  * @package       Cake.Test.Case.Console.Command
  */
-class TestBananaTask extends Shell {
+class TestBananaTask extends Shell
+{
 }
 
 /**
@@ -120,29 +132,31 @@ class TestBananaTask extends Shell {
  *
  * @package       Cake.Test.Case.Console.Command
  */
-class ShellTest extends CakeTestCase {
+class ShellTest extends CakeTestCase
+{
 
-/**
- * Fixtures used in this test case
- *
- * @var array
- */
-	public $fixtures = array(
+	/**
+	 * Fixtures used in this test case
+	 *
+	 * @var array
+	 */
+	public $fixtures = [
 		'core.post', 'core.comment', 'core.article', 'core.user',
-		'core.tag', 'core.articles_tag', 'core.attachment'
-	);
+		'core.tag', 'core.articles_tag', 'core.attachment',
+	];
 
-/**
- * setUp method
- *
- * @return void
- */
-	public function setUp(): void {
+	/**
+	 * setUp method
+	 *
+	 * @return void
+	 */
+	public function setUp(): void
+	{
 		parent::setUp();
 
-		$output = $this->getMock('ConsoleOutput', array(), array(), '', false);
-		$error = $this->getMock('ConsoleOutput', array(), array(), '', false);
-		$in = $this->getMock('ConsoleInput', array(), array(), '', false);
+		$output = $this->getMock('ConsoleOutput', [], [], '', false);
+		$error = $this->getMock('ConsoleOutput', [], [], '', false);
+		$in = $this->getMock('ConsoleInput', [], [], '', false);
 		$this->Shell = new ShellTestShell($output, $error, $in);
 
 		if (is_dir(TMP . 'shell_test')) {
@@ -151,51 +165,54 @@ class ShellTest extends CakeTestCase {
 		}
 	}
 
-/**
- * testConstruct method
- *
- * @return void
- */
-	public function testConstruct() {
+	/**
+	 * testConstruct method
+	 *
+	 * @return void
+	 */
+	public function testConstruct()
+	{
 		$this->assertEquals('ShellTestShell', $this->Shell->name);
 		$this->assertInstanceOf('ConsoleInput', $this->Shell->stdin);
 		$this->assertInstanceOf('ConsoleOutput', $this->Shell->stdout);
 		$this->assertInstanceOf('ConsoleOutput', $this->Shell->stderr);
 	}
 
-/**
- * test merging vars
- *
- * @return void
- */
-	public function testMergeVars() {
-		$this->Shell->tasks = array('DbConfig' => array('one', 'two'));
-		$this->Shell->uses = array('Posts');
-		$this->Shell->mergeVars(array('tasks'), 'TestMergeShell');
-		$this->Shell->mergeVars(array('uses'), 'TestMergeShell', false);
+	/**
+	 * test merging vars
+	 *
+	 * @return void
+	 */
+	public function testMergeVars()
+	{
+		$this->Shell->tasks = ['DbConfig' => ['one', 'two']];
+		$this->Shell->uses = ['Posts'];
+		$this->Shell->mergeVars(['tasks'], 'TestMergeShell');
+		$this->Shell->mergeVars(['uses'], 'TestMergeShell', false);
 
-		$expected = array('DbConfig' => null, 'Fixture' => null, 'DbConfig' => array('one', 'two'));
+		$expected = ['DbConfig' => null, 'Fixture' => null, 'DbConfig' => ['one', 'two']];
 		$this->assertEquals($expected, $this->Shell->tasks);
 
-		$expected = array('Fixture' => null, 'DbConfig' => array('one', 'two'));
+		$expected = ['Fixture' => null, 'DbConfig' => ['one', 'two']];
 		$this->assertEquals($expected, Hash::normalize($this->Shell->tasks), 'Normalized results are wrong.');
-		$this->assertEquals(array('Comment', 'Posts'), $this->Shell->uses, 'Merged models are wrong.');
+		$this->assertEquals(['Comment', 'Posts'], $this->Shell->uses, 'Merged models are wrong.');
 	}
 
-/**
- * testInitialize method
- *
- * @return void
- */
-	public function testInitialize() {
-		App::build(array(
-			'Plugin' => array(CAKE . 'Test' . DS . 'test_app' . DS . 'Plugin' . DS),
-			'Model' => array(CAKE . 'Test' . DS . 'test_app' . DS . 'Model' . DS)
-		), App::RESET);
+	/**
+	 * testInitialize method
+	 *
+	 * @return void
+	 */
+	public function testInitialize()
+	{
+		App::build([
+			'Plugin' => [CAKE . 'Test' . DS . 'test_app' . DS . 'Plugin' . DS],
+			'Model' => [CAKE . 'Test' . DS . 'test_app' . DS . 'Model' . DS],
+		], App::RESET);
 
 		CakePlugin::load('TestPlugin');
-		$this->Shell->tasks = array('DbConfig' => array('one', 'two'));
-		$this->Shell->uses = array('TestPlugin.TestPluginPost');
+		$this->Shell->tasks = ['DbConfig' => ['one', 'two']];
+		$this->Shell->uses = ['TestPlugin.TestPluginPost'];
 		$this->Shell->initialize();
 
 		$this->assertTrue(isset($this->Shell->TestPluginPost));
@@ -203,7 +220,7 @@ class ShellTest extends CakeTestCase {
 		$this->assertEquals('TestPluginPost', $this->Shell->modelClass);
 		CakePlugin::unload('TestPlugin');
 
-		$this->Shell->uses = array('Comment');
+		$this->Shell->uses = ['Comment'];
 		$this->Shell->initialize();
 		$this->assertTrue(isset($this->Shell->Comment));
 		$this->assertInstanceOf('Comment', $this->Shell->Comment);
@@ -213,16 +230,17 @@ class ShellTest extends CakeTestCase {
 		App::build();
 	}
 
-/**
- * testLoadModel method
- *
- * @return void
- */
-	public function testLoadModel() {
-		App::build(array(
-			'Plugin' => array(CAKE . 'Test' . DS . 'test_app' . DS . 'Plugin' . DS),
-			'Model' => array(CAKE . 'Test' . DS . 'test_app' . DS . 'Model' . DS)
-		), App::RESET);
+	/**
+	 * testLoadModel method
+	 *
+	 * @return void
+	 */
+	public function testLoadModel()
+	{
+		App::build([
+			'Plugin' => [CAKE . 'Test' . DS . 'test_app' . DS . 'Plugin' . DS],
+			'Model' => [CAKE . 'Test' . DS . 'test_app' . DS . 'Model' . DS],
+		], App::RESET);
 
 		$Shell = new TestMergeShell();
 		$this->assertEquals('Comment', $Shell->Comment->alias);
@@ -239,40 +257,21 @@ class ShellTest extends CakeTestCase {
 		App::build();
 	}
 
-/**
- * testIn method
- *
- * @return void
- */
-	public function testIn() {
-		$this->Shell->stdin->expects($this->at(0))
+	/**
+	 * testIn method
+	 *
+	 * @return void
+	 */
+	public function testIn()
+	{
+		$this->Shell->stdin
 			->method('read')
-			->will($this->returnValue('n'));
+			->willReturnOnConsecutiveCalls('n', 'Y', 'y', 'y', 'y', '0');
 
-		$this->Shell->stdin->expects($this->at(1))
-			->method('read')
-			->will($this->returnValue('Y'));
-
-		$this->Shell->stdin->expects($this->at(2))
-			->method('read')
-			->will($this->returnValue('y'));
-
-		$this->Shell->stdin->expects($this->at(3))
-			->method('read')
-			->will($this->returnValue('y'));
-
-		$this->Shell->stdin->expects($this->at(4))
-			->method('read')
-			->will($this->returnValue('y'));
-
-		$this->Shell->stdin->expects($this->at(5))
-			->method('read')
-			->will($this->returnValue('0'));
-
-		$result = $this->Shell->in('Just a test?', array('y', 'n'), 'n');
+		$result = $this->Shell->in('Just a test?', ['y', 'n'], 'n');
 		$this->assertEquals('n', $result);
 
-		$result = $this->Shell->in('Just a test?', array('y', 'n'), 'n');
+		$result = $this->Shell->in('Just a test?', ['y', 'n'], 'n');
 		$this->assertEquals('Y', $result);
 
 		$result = $this->Shell->in('Just a test?', 'y,n', 'n');
@@ -284,65 +283,64 @@ class ShellTest extends CakeTestCase {
 		$result = $this->Shell->in('Just a test?', 'y', 'y');
 		$this->assertEquals('y', $result);
 
-		$result = $this->Shell->in('Just a test?', array(0, 1, 2), '0');
+		$result = $this->Shell->in('Just a test?', [0, 1, 2], '0');
 		$this->assertEquals('0', $result);
 	}
 
-/**
- * Test in() when not interactive.
- *
- * @return void
- */
-	public function testInNonInteractive() {
+	/**
+	 * Test in() when not interactive.
+	 *
+	 * @return void
+	 */
+	public function testInNonInteractive()
+	{
 		$this->Shell->interactive = false;
 
 		$result = $this->Shell->in('Just a test?', 'y/n', 'n');
 		$this->assertEquals('n', $result);
 	}
 
-/**
- * testOut method
- *
- * @return void
- */
-	public function testOut() {
-		$this->Shell->stdout->expects($this->at(0))
+	/**
+	 * testOut method
+	 *
+	 * @return void
+	 */
+	public function testOut()
+	{
+		$this->Shell->stdout
+			->expects($this->exactly(4))
 			->method('write')
-			->with("Just a test", 1);
-
-		$this->Shell->stdout->expects($this->at(1))
-			->method('write')
-			->with(array('Just', 'a', 'test'), 1);
-
-		$this->Shell->stdout->expects($this->at(2))
-			->method('write')
-			->with(array('Just', 'a', 'test'), 2);
-
-		$this->Shell->stdout->expects($this->at(3))
-			->method('write')
-			->with('', 1);
+			->withConsecutive(
+				["Just a test", 1],
+				[['Just', 'a', 'test'], 1],
+				[['Just', 'a', 'test'], 2],
+				['', 1]
+			);
 
 		$this->Shell->out('Just a test');
 
-		$this->Shell->out(array('Just', 'a', 'test'));
+		$this->Shell->out(['Just', 'a', 'test']);
 
-		$this->Shell->out(array('Just', 'a', 'test'), 2);
+		$this->Shell->out(['Just', 'a', 'test'], 2);
 
 		$this->Shell->out();
 	}
 
-/**
- * test that verbose and quiet output levels work
- *
- * @return void
- */
-	public function testVerboseOutput() {
-		$this->Shell->stdout->expects($this->at(0))->method('write')
-			->with('Verbose', 1);
-		$this->Shell->stdout->expects($this->at(1))->method('write')
-			->with('Normal', 1);
-		$this->Shell->stdout->expects($this->at(2))->method('write')
-			->with('Quiet', 1);
+	/**
+	 * test that verbose and quiet output levels work
+	 *
+	 * @return void
+	 */
+	public function testVerboseOutput()
+	{
+		$this->Shell->stdout
+			->expects($this->exactly(3))
+			->method('write')
+			->withConsecutive(
+				['Verbose', 1],
+				['Normal', 1],
+				['Quiet', 1]
+			);
 
 		$this->Shell->params['verbose'] = true;
 		$this->Shell->params['quiet'] = false;
@@ -352,12 +350,13 @@ class ShellTest extends CakeTestCase {
 		$this->Shell->out('Quiet', 1, Shell::QUIET);
 	}
 
-/**
- * test that verbose and quiet output levels work
- *
- * @return void
- */
-	public function testQuietOutput() {
+	/**
+	 * test that verbose and quiet output levels work
+	 *
+	 * @return void
+	 */
+	public function testQuietOutput()
+	{
 		$this->Shell->stdout->expects($this->once())->method('write')
 			->with('Quiet', 1);
 
@@ -377,65 +376,53 @@ class ShellTest extends CakeTestCase {
 	public function testOverwrite() {
 		$number = strlen('Some text I want to overwrite');
 
-		$this->Shell->stdout->expects($this->at(0))
+		$this->Shell->stdout->expects($this->exactly(5))
 			->method('write')
-			->with('Some <info>text</info> I want to overwrite', 0)
-			->will($this->returnValue($number));
+			->willReturnOnConsecutiveCalls($number, null, 9, null, null)
+			->withConsecutive(
+				['Some <info>text</info> I want to overwrite', 0],
+				[str_repeat("\x08", $number), 0],
+				['Less text', 0],
+				[str_repeat(' ', $number - 9), 0],
+				["\n", 0] // Adicionando a chamada extra com '\n'
+			);
 
-		$this->Shell->stdout->expects($this->at(1))
-			->method('write')
-			->with(str_repeat("\x08", $number), 0);
-
-		$this->Shell->stdout->expects($this->at(2))
-			->method('write')
-			->with('Less text', 0)
-			->will($this->returnValue(9));
-
-		$this->Shell->stdout->expects($this->at(3))
-			->method('write')
-			->with(str_repeat(' ', $number - 9), 0);
 
 		$this->Shell->out('Some <info>text</info> I want to overwrite', 0);
 		$this->Shell->overwrite('Less text');
+
 	}
 
-/**
- * testErr method
- *
- * @return void
- */
-	public function testErr() {
-		$this->Shell->stderr->expects($this->at(0))
+	/**
+	 * testErr method
+	 *
+	 * @return void
+	 */
+	public function testErr()
+	{
+		$this->Shell->stderr
+			->expects($this->exactly(4))
 			->method('write')
-			->with("Just a test", 1);
-
-		$this->Shell->stderr->expects($this->at(1))
-			->method('write')
-			->with(array('Just', 'a', 'test'), 1);
-
-		$this->Shell->stderr->expects($this->at(2))
-			->method('write')
-			->with(array('Just', 'a', 'test'), 2);
-
-		$this->Shell->stderr->expects($this->at(3))
-			->method('write')
-			->with('', 1);
+			->withConsecutive(
+				["Just a test", 1],
+				[["Just", "a", "test"], 1],
+				[["Just", "a", "test"], 2],
+				["", 1]
+			);
 
 		$this->Shell->err('Just a test');
-
-		$this->Shell->err(array('Just', 'a', 'test'));
-
-		$this->Shell->err(array('Just', 'a', 'test'), 2);
-
+		$this->Shell->err(["Just", "a", "test"]);
+		$this->Shell->err(["Just", "a", "test"], 2);
 		$this->Shell->err();
 	}
 
-/**
- * testNl
- *
- * @return void
- */
-	public function testNl() {
+	/**
+	 * testNl
+	 *
+	 * @return void
+	 */
+	public function testNl()
+	{
 		$newLine = "\n";
 		if (DS === '\\') {
 			$newLine = "\r\n";
@@ -447,25 +434,28 @@ class ShellTest extends CakeTestCase {
 		$this->assertEquals($this->Shell->nl(1), $newLine);
 	}
 
-/**
- * testHr
- *
- * @return void
- */
-	public function testHr() {
+	/**
+	 * testHr
+	 *
+	 * @return void
+	 */
+	public function testHr()
+	{
 		$bar = '---------------------------------------------------------------';
 
-		$this->Shell->stdout->expects($this->at(0))->method('write')->with('', 0);
-		$this->Shell->stdout->expects($this->at(1))->method('write')->with($bar, 1);
-		$this->Shell->stdout->expects($this->at(2))->method('write')->with('', 0);
-
-		$this->Shell->stdout->expects($this->at(3))->method('write')->with("", true);
-		$this->Shell->stdout->expects($this->at(4))->method('write')->with($bar, 1);
-		$this->Shell->stdout->expects($this->at(5))->method('write')->with("", true);
-
-		$this->Shell->stdout->expects($this->at(6))->method('write')->with("", 2);
-		$this->Shell->stdout->expects($this->at(7))->method('write')->with($bar, 1);
-		$this->Shell->stdout->expects($this->at(8))->method('write')->with("", 2);
+		$this->Shell->stdout->expects($this->exactly(9))
+			->method('write')
+			->withConsecutive(
+				['', 0],
+				[$bar, 1],
+				['', 0],
+				["", true],
+				[$bar, 1],
+				["", true],
+				["", 2],
+				[$bar, 1],
+				["", 2]
+			);
 
 		$this->Shell->hr();
 
@@ -474,23 +464,21 @@ class ShellTest extends CakeTestCase {
 		$this->Shell->hr(2);
 	}
 
-/**
- * testError
- *
- * @return void
- */
-	public function testError() {
-		$this->Shell->stderr->expects($this->at(0))
+	/**
+	 * testError
+	 *
+	 * @return void
+	 */
+	public function testError()
+	{
+		$this->Shell->stderr->expects($this->exactly(3))
 			->method('write')
-			->with("<error>Error:</error> Foo Not Found", 1);
+			->withConsecutive(
+				["<error>Error:</error> Foo Not Found", 1],
+				["<error>Error:</error> Foo Not Found", 1],
+				["Searched all...", 1]
+			);
 
-		$this->Shell->stderr->expects($this->at(1))
-			->method('write')
-			->with("<error>Error:</error> Foo Not Found", 1);
-
-		$this->Shell->stderr->expects($this->at(2))
-			->method('write')
-			->with("Searched all...", 1);
 
 		$this->Shell->error('Foo Not Found');
 		$this->assertSame($this->Shell->stopped, 1);
@@ -501,12 +489,13 @@ class ShellTest extends CakeTestCase {
 		$this->assertSame($this->Shell->stopped, 1);
 	}
 
-/**
- * testLoadTasks method
- *
- * @return void
- */
-	public function testLoadTasks() {
+	/**
+	 * testLoadTasks method
+	 *
+	 * @return void
+	 */
+	public function testLoadTasks()
+	{
 		$this->assertTrue($this->Shell->loadTasks());
 
 		$this->Shell->tasks = null;
@@ -518,10 +507,10 @@ class ShellTest extends CakeTestCase {
 		$this->Shell->tasks = true;
 		$this->assertTrue($this->Shell->loadTasks());
 
-		$this->Shell->tasks = array();
+		$this->Shell->tasks = [];
 		$this->assertTrue($this->Shell->loadTasks());
 
-		$this->Shell->tasks = array('TestApple');
+		$this->Shell->tasks = ['TestApple'];
 		$this->assertTrue($this->Shell->loadTasks());
 		$this->assertInstanceOf('TestAppleTask', $this->Shell->TestApple);
 
@@ -532,36 +521,38 @@ class ShellTest extends CakeTestCase {
 
 		unset($this->Shell->ShellTestApple, $this->Shell->TestBanana);
 
-		$this->Shell->tasks = array('TestApple', 'TestBanana');
+		$this->Shell->tasks = ['TestApple', 'TestBanana'];
 		$this->assertTrue($this->Shell->loadTasks());
 		$this->assertInstanceOf('TestAppleTask', $this->Shell->TestApple);
 		$this->assertInstanceOf('TestBananaTask', $this->Shell->TestBanana);
 	}
 
-/**
- * test that __get() makes args and params references
- *
- * @return void
- */
-	public function testMagicGetArgAndParamReferences() {
-		$this->Shell->tasks = array('TestApple');
-		$this->Shell->args = array('one');
-		$this->Shell->params = array('help' => false);
+	/**
+	 * test that __get() makes args and params references
+	 *
+	 * @return void
+	 */
+	public function testMagicGetArgAndParamReferences()
+	{
+		$this->Shell->tasks = ['TestApple'];
+		$this->Shell->args = ['one'];
+		$this->Shell->params = ['help' => false];
 		$this->Shell->loadTasks();
 		$result = $this->Shell->TestApple;
 
-		$this->Shell->args = array('one', 'two');
+		$this->Shell->args = ['one', 'two'];
 
 		$this->assertSame($this->Shell->args, $result->args);
 		$this->assertSame($this->Shell->params, $result->params);
 	}
 
-/**
- * testShortPath method
- *
- * @return void
- */
-	public function testShortPath() {
+	/**
+	 * testShortPath method
+	 *
+	 * @return void
+	 */
+	public function testShortPath()
+	{
 		$path = $expected = DS . 'tmp' . DS . 'ab' . DS . 'cd';
 		$this->assertEquals($expected, $this->Shell->shortPath($path));
 
@@ -592,12 +583,13 @@ class ShellTest extends CakeTestCase {
 		$this->assertEquals($expected, $this->Shell->shortPath($path));
 	}
 
-/**
- * testCreateFile method
- *
- * @return void
- */
-	public function testCreateFileNonInteractive() {
+	/**
+	 * testCreateFile method
+	 *
+	 * @return void
+	 */
+	public function testCreateFileNonInteractive()
+	{
 		$eol = PHP_EOL;
 
 		$path = TMP . 'shell_test';
@@ -620,12 +612,13 @@ class ShellTest extends CakeTestCase {
 		$this->assertTextEquals(file_get_contents($file), $contents);
 	}
 
-/**
- * test createFile when the shell is interactive.
- *
- * @return void
- */
-	public function testCreateFileInteractive() {
+	/**
+	 * test createFile when the shell is interactive.
+	 *
+	 * @return void
+	 */
+	public function testCreateFileInteractive()
+	{
 		$eol = PHP_EOL;
 
 		$path = TMP . 'shell_test';
@@ -634,13 +627,9 @@ class ShellTest extends CakeTestCase {
 
 		$this->Shell->interactive = true;
 
-		$this->Shell->stdin->expects($this->at(0))
+		$this->Shell->stdin->expects($this->exactly(2))
 			->method('read')
-			->will($this->returnValue('n'));
-
-		$this->Shell->stdin->expects($this->at(1))
-			->method('read')
-			->will($this->returnValue('y'));
+			->willReturnOnConsecutiveCalls('n', 'y');
 
 		$contents = "<?php{$eol}echo 'yet another test';{$eol}\$te = 'st';{$eol}";
 		$result = $this->Shell->createFile($file, $contents);
@@ -663,12 +652,13 @@ class ShellTest extends CakeTestCase {
 		$this->assertEquals($contents, file_get_contents($file));
 	}
 
-/**
- * Test that you can't create files that aren't writable.
- *
- * @return void
- */
-	public function testCreateFileNoPermissions() {
+	/**
+	 * Test that you can't create files that aren't writable.
+	 *
+	 * @return void
+	 */
+	public function testCreateFileNoPermissions()
+	{
 		$this->skipIf(DIRECTORY_SEPARATOR === '\\', 'Cant perform operations using permissions on Windows.');
 
 		$path = TMP . 'shell_test';
@@ -686,13 +676,14 @@ class ShellTest extends CakeTestCase {
 		rmdir($path);
 	}
 
-/**
- * test hasTask method
- *
- * @return void
- */
-	public function testHasTask() {
-		$this->Shell->tasks = array('Extract', 'DbConfig');
+	/**
+	 * test hasTask method
+	 *
+	 * @return void
+	 */
+	public function testHasTask()
+	{
+		$this->Shell->tasks = ['Extract', 'DbConfig'];
 		$this->Shell->loadTasks();
 
 		$this->assertTrue($this->Shell->hasTask('extract'));
@@ -703,132 +694,140 @@ class ShellTest extends CakeTestCase {
 		$this->assertTrue($this->Shell->hasTask('DbConfig'));
 	}
 
-/**
- * test the hasMethod
- *
- * @return void
- */
-	public function testHasMethod() {
+	/**
+	 * test the hasMethod
+	 *
+	 * @return void
+	 */
+	public function testHasMethod()
+	{
 		$this->assertTrue($this->Shell->hasMethod('do_something'));
 		$this->assertFalse($this->Shell->hasMethod('hr'), 'hr is callable');
 		$this->assertFalse($this->Shell->hasMethod('_secret'), '_secret is callable');
 		$this->assertFalse($this->Shell->hasMethod('no_access'), 'no_access is callable');
 	}
 
-/**
- * test run command calling main.
- *
- * @return void
- */
-	public function testRunCommandMain() {
-		$Mock = $this->getMock('Shell', array('main', 'startup'), array(), '', false);
+	/**
+	 * test run command calling main.
+	 *
+	 * @return void
+	 */
+	public function testRunCommandMain()
+	{
+		$Mock = $this->getMock('Shell', ['main', 'startup'], [], '', false);
 
 		$Mock->expects($this->once())->method('main')->will($this->returnValue(true));
-		$result = $Mock->runCommand(null, array());
+		$result = $Mock->runCommand(null, []);
 		$this->assertTrue($result);
 	}
 
-/**
- * test run command calling a legit method.
- *
- * @return void
- */
-	public function testRunCommandWithMethod() {
-		$Mock = $this->getMock('Shell', array('hit_me', 'startup'), array(), '', false);
+	/**
+	 * test run command calling a legit method.
+	 *
+	 * @return void
+	 */
+	public function testRunCommandWithMethod()
+	{
+		$Mock = $this->getMock('Shell', ['hit_me', 'startup'], [], '', false);
 
 		$Mock->expects($this->once())->method('hit_me')->will($this->returnValue(true));
-		$result = $Mock->runCommand('hit_me', array());
+		$result = $Mock->runCommand('hit_me', []);
 		$this->assertTrue($result);
 	}
 
-/**
- * test run command causing exception on Shell method.
- *
- * @return void
- */
-	public function testRunCommandBaseclassMethod() {
-		$Mock = $this->getMock('Shell', array('startup', 'getOptionParser', 'out'), array(), '', false);
-		$Parser = $this->getMock('ConsoleOptionParser', array(), array(), '', false);
+	/**
+	 * test run command causing exception on Shell method.
+	 *
+	 * @return void
+	 */
+	public function testRunCommandBaseclassMethod()
+	{
+		$Mock = $this->getMock('Shell', ['startup', 'getOptionParser', 'out'], [], '', false);
+		$Parser = $this->getMock('ConsoleOptionParser', [], [], '', false);
 		$Parser->expects($this->once())->method('help');
 		$Mock->expects($this->once())->method('getOptionParser')
 			->will($this->returnValue($Parser));
 		$Mock->expects($this->once())->method('out');
-		$Mock->runCommand('hr', array());
+		$Mock->runCommand('hr', []);
 	}
 
-/**
- * test run command causing exception on Shell method.
- *
- * @return void
- */
-	public function testRunCommandMissingMethod() {
-		$Mock = $this->getMock('Shell', array('startup', 'getOptionParser', 'out'), array(), '', false);
-		$Parser = $this->getMock('ConsoleOptionParser', array(), array(), '', false);
+	/**
+	 * test run command causing exception on Shell method.
+	 *
+	 * @return void
+	 */
+	public function testRunCommandMissingMethod()
+	{
+		$Mock = $this->getMock('Shell', ['startup', 'getOptionParser', 'out'], [], '', false);
+		$Parser = $this->getMock('ConsoleOptionParser', [], [], '', false);
 		$Parser->expects($this->once())->method('help');
 		$Mock->expects($this->once())->method('getOptionParser')
 			->will($this->returnValue($Parser));
 		$Mock->expects($this->once())->method('out');
-		$result = $Mock->runCommand('idontexist', array());
+		$result = $Mock->runCommand('idontexist', []);
 		$this->assertFalse($result);
 	}
 
-/**
- * test unknown option causes display of error and help.
- *
- * @return void
- */
-	public function testRunCommandUnknownOption() {
-		$output = $this->getMock('ConsoleOutput', array(), array(), '', false);
-		$error = $this->getMock('ConsoleOutput', array(), array(), '', false);
-		$in = $this->getMock('ConsoleInput', array(), array(), '', false);
+	/**
+	 * test unknown option causes display of error and help.
+	 *
+	 * @return void
+	 */
+	public function testRunCommandUnknownOption()
+	{
+		$output = $this->getMock('ConsoleOutput', [], [], '', false);
+		$error = $this->getMock('ConsoleOutput', [], [], '', false);
+		$in = $this->getMock('ConsoleInput', [], [], '', false);
 
-		$Parser = $this->getMock('ConsoleOptionParser', array(), array(), '', false);
+		$Parser = $this->getMock('ConsoleOptionParser', [], [], '', false);
 		$Parser->expects($this->once())->method('parse')
-			->with(array('--unknown'))
+			->with(['--unknown'])
 			->will($this->throwException(new ConsoleException('Unknown option `unknown`')));
 		$Parser->expects($this->once())->method('help');
 
-		$Shell = $this->getMock('ShellTestShell', array('getOptionParser'), array($output, $error, $in));
+		$Shell = $this->getMock('ShellTestShell', ['getOptionParser'], [$output, $error, $in]);
 
 		$Shell->expects($this->once())->method('getOptionParser')
 			->will($this->returnValue($Parser));
 		$Shell->stderr->expects($this->once())->method('write');
 		$Shell->stdout->expects($this->once())->method('write');
 
-		$Shell->runCommand('do_something', array('do_something', '--unknown'));
+		$Shell->runCommand('do_something', ['do_something', '--unknown']);
 	}
 
-/**
- * test that a --help causes help to show.
- *
- * @return void
- */
-	public function testRunCommandTriggeringHelp() {
-		$Parser = $this->getMock('ConsoleOptionParser', array(), array(), '', false);
+	/**
+	 * test that a --help causes help to show.
+	 *
+	 * @return void
+	 */
+	public function testRunCommandTriggeringHelp()
+	{
+		$Parser = $this->getMock('ConsoleOptionParser', [], [], '', false);
 		$Parser->expects($this->once())->method('parse')
-			->with(array('--help'))
-			->will($this->returnValue(array(array('help' => true), array())));
+			->with(['--help'])
+			->will($this->returnValue([['help' => true], []]));
 		$Parser->expects($this->once())->method('help');
 
-		$Shell = $this->getMock('Shell', array('getOptionParser', 'out', 'startup', '_welcome'), array(), '', false);
+		$Shell = $this->getMock('Shell', ['getOptionParser', 'out', 'startup', '_welcome'], [], '', false);
 		$Shell->expects($this->once())->method('getOptionParser')
 			->will($this->returnValue($Parser));
 		$Shell->expects($this->once())->method('out');
 
-		$Shell->runCommand(null, array('--help'));
+		$Shell->runCommand(null, ['--help']);
 	}
 
-/**
- * test that runCommand will call runCommand on the task.
- *
- * @return void
- */
-	public function testRunCommandHittingTask() {
-		$Shell = $this->getMock('Shell', array('hasTask', 'startup'), array(), '', false);
-		$task = $this->getMock('Shell', array('execute', 'runCommand'), array(), '', false);
+	/**
+	 * test that runCommand will call runCommand on the task.
+	 *
+	 * @return void
+	 */
+	public function testRunCommandHittingTask()
+	{
+		$Shell = $this->getMock('Shell', ['hasTask', 'startup'], [], '', false);
+		$task = $this->getMock('Shell', ['execute', 'runCommand'], [], '', false);
 		$task->expects($this->any())
 			->method('runCommand')
-			->with('execute', array('one', 'value'));
+			->with('execute', ['one', 'value']);
 
 		$Shell->expects($this->once())->method('startup');
 		$Shell->expects($this->any())
@@ -837,15 +836,16 @@ class ShellTest extends CakeTestCase {
 
 		$Shell->RunCommand = $task;
 
-		$Shell->runCommand('run_command', array('run_command', 'one', 'value'));
+		$Shell->runCommand('run_command', ['run_command', 'one', 'value']);
 	}
 
-/**
- * test wrapBlock wrapping text.
- *
- * @return void
- */
-	public function testWrapText() {
+	/**
+	 * test wrapBlock wrapping text.
+	 *
+	 * @return void
+	 */
+	public function testWrapText()
+	{
 		$text = 'This is the song that never ends. This is the song that never ends. This is the song that never ends.';
 		$result = $this->Shell->wrapText($text, 33);
 		$expected = <<<TEXT
@@ -855,7 +855,7 @@ This is the song that never ends.
 TEXT;
 		$this->assertTextEquals($expected, $result, 'Text not wrapped.');
 
-		$result = $this->Shell->wrapText($text, array('indent' => '  ', 'width' => 33));
+		$result = $this->Shell->wrapText($text, ['indent' => '  ', 'width' => 33]);
 		$expected = <<<TEXT
   This is the song that never ends.
   This is the song that never ends.
@@ -864,69 +864,73 @@ TEXT;
 		$this->assertTextEquals($expected, $result, 'Text not wrapped.');
 	}
 
-/**
- * Testing camel cased naming of tasks
- *
- * @return void
- */
-	public function testShellNaming() {
-		$this->Shell->tasks = array('TestApple');
+	/**
+	 * Testing camel cased naming of tasks
+	 *
+	 * @return void
+	 */
+	public function testShellNaming()
+	{
+		$this->Shell->tasks = ['TestApple'];
 		$this->Shell->loadTasks();
 		$expected = 'TestApple';
 		$this->assertEquals($expected, $this->Shell->TestApple->name);
 	}
 
-/**
- * Test reading params
- *
- * @dataProvider paramReadingDataProvider
- */
-	public function testParamReading($toRead, $expected) {
-		$this->Shell->params = array(
+	/**
+	 * Test reading params
+	 *
+	 * @dataProvider paramReadingDataProvider
+	 */
+	public function testParamReading($toRead, $expected)
+	{
+		$this->Shell->params = [
 			'key' => 'value',
 			'help' => false,
 			'emptykey' => '',
-			'truthy' => true
-		);
+			'truthy' => true,
+		];
 		$this->assertSame($expected, $this->Shell->param($toRead));
 	}
 
-/**
- * Data provider for testing reading values with Shell::param()
- *
- * @return array
- */
-	public function paramReadingDataProvider() {
-		return array(
-			array(
+	/**
+	 * Data provider for testing reading values with Shell::param()
+	 *
+	 * @return array
+	 */
+	public function paramReadingDataProvider()
+	{
+		return [
+			[
 				'key',
 				'value',
-			),
-			array(
+			],
+			[
 				'help',
 				false,
-			),
-			array(
+			],
+			[
 				'emptykey',
 				'',
-			),
-			array(
+			],
+			[
 				'truthy',
 				true,
-			),
-			array(
+			],
+			[
 				'does_not_exist',
 				null,
-			)
-		);
+			],
+		];
 	}
 
-/**
- * Test that option parsers are created with the correct name/command.
- *
- * @return void
- */
-	public function testGetOptionParser() {
+	/**
+	 * Test that option parsers are created with the correct name/command.
+	 *
+	 * @return void
+	 */
+	public function testGetOptionParser()
+	{
 		$this->Shell->name = 'test';
 		$this->Shell->plugin = 'plugin';
 		$parser = $this->Shell->getOptionParser();
@@ -934,12 +938,13 @@ TEXT;
 		$this->assertEquals('plugin.test', $parser->command());
 	}
 
-/**
- * Test file and console and logging
- *
- * @return void
- */
-	public function testFileAndConsoleLogging() {
+	/**
+	 * Test file and console and logging
+	 *
+	 * @return void
+	 */
+	public function testFileAndConsoleLogging()
+	{
 		CakeLog::disable('stdout');
 		CakeLog::disable('stderr');
 		// file logging
@@ -951,13 +956,13 @@ TEXT;
 
 		// both file and console logging
 		require_once CORE_TEST_CASES . DS . 'Log' . DS . 'Engine' . DS . 'ConsoleLogTest.php';
-		$mock = $this->getMock('ConsoleLog', array('write'), array(
-			array('types' => 'error'),
-		));
-		TestCakeLog::config('console', array(
+		$mock = $this->getMock('ConsoleLog', ['write'], [
+			['types' => 'error'],
+		]);
+		TestCakeLog::config('console', [
 			'engine' => 'Console',
 			'stream' => 'php://stderr',
-			));
+		]);
 		TestCakeLog::replace('console', $mock);
 		$mock->expects($this->once())
 			->method('write')
@@ -971,12 +976,13 @@ TEXT;
 		CakeLog::enable('stderr');
 	}
 
-/**
- * Tests that _useLogger works properly
- *
- * @return void
- */
-	public function testProtectedUseLogger() {
+	/**
+	 * Tests that _useLogger works properly
+	 *
+	 * @return void
+	 */
+	public function testProtectedUseLogger()
+	{
 		CakeLog::drop('stdout');
 		CakeLog::drop('stderr');
 		$this->Shell->useLogger(true);
@@ -987,53 +993,57 @@ TEXT;
 		$this->assertFalse(CakeLog::stream('stderr'));
 	}
 
-/**
- * Test file and console and logging quiet output
- *
- * @return void
- */
-	public function testQuietLog() {
-		$output = $this->getMock('ConsoleOutput', array(), array(), '', false);
-		$error = $this->getMock('ConsoleOutput', array(), array(), '', false);
-		$in = $this->getMock('ConsoleInput', array(), array(), '', false);
-		$this->Shell = $this->getMock('ShellTestShell', array('_useLogger'), array($output, $error, $in));
+	/**
+	 * Test file and console and logging quiet output
+	 *
+	 * @return void
+	 */
+	public function testQuietLog()
+	{
+		$output = $this->getMock('ConsoleOutput', [], [], '', false);
+		$error = $this->getMock('ConsoleOutput', [], [], '', false);
+		$in = $this->getMock('ConsoleInput', [], [], '', false);
+		$this->Shell = $this->getMock('ShellTestShell', ['_useLogger'], [$output, $error, $in]);
 		$this->Shell->expects($this->once())->method('_useLogger')->with(false);
-		$this->Shell->runCommand('foo', array('--quiet'));
+		$this->Shell->runCommand('foo', ['--quiet']);
 	}
 
-/**
- * Test getting an instance of a helper
- *
- * @return void
- */
-	public function testGetInstanceOfHelper() {
+	/**
+	 * Test getting an instance of a helper
+	 *
+	 * @return void
+	 */
+	public function testGetInstanceOfHelper()
+	{
 		$actual = $this->Shell->helper("progress");
 		$this->assertInstanceOf("ProgressShellHelper", $actual);
 	}
 
-/**
+	/**
 	 * Test getting an invalid helper
 	 *
 	 * @return void
 	 */
-	public function testGetInvalidHelper() {
+	public function testGetInvalidHelper()
+	{
 		$this->expectException(\RunTimeException::class);
 		$this->Shell->helper("tomato");
 	}
 
-/**
- * Test that shell loggers do not get overridden in constructor if already configured
- *
- * @return void
- */
-	public function testShellLoggersDoNotGetOverridden() {
+	/**
+	 * Test that shell loggers do not get overridden in constructor if already configured
+	 *
+	 * @return void
+	 */
+	public function testShellLoggersDoNotGetOverridden()
+	{
 		$shell = $this->getMock(
-			"Shell", array(
-				"_loggerIsConfigured",
-				"_configureStdOutLogger",
-				"_configureStdErrLogger",
-			),
-			array(),
+			"Shell", [
+			"_loggerIsConfigured",
+			"_configureStdOutLogger",
+			"_configureStdErrLogger",
+		],
+			[],
 			"",
 			false
 		);
