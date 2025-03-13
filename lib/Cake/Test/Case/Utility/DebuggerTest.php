@@ -87,7 +87,7 @@ class DebuggerTest extends CakeTestCase {
 		$this->assertEquals(4, count($result));
 
 		$pattern = '/<code>.*?<span style\="color\: \#\d+">.*?&lt;\?php/';
-		if (version_compare(PHP_VERSION, '8.2.0') >= 0) {
+		if (version_compare(PHP_VERSION, '8.3.0') >= 0) {
 			$pattern = '/<code style\="color\: \#\d+">.*?<span style\="color\: \#.{6}">.*?&lt;\?php/';
 		}
 		$this->assertMatchesRegularExpression($pattern, $result[0]);
