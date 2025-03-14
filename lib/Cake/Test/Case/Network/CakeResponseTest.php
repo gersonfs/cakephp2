@@ -215,7 +215,9 @@ class CakeResponseTest extends CakeTestCase {
  * @return void
  */
 	public function testSend() {
-		$response = $this->getMock('CakeResponse', array('_sendHeader', '_sendContent', '_setCookies'));
+		$response = $this->getMockBuilder('CakeResponse')
+		->onlyMethods(array('_sendHeader', '_sendContent', '_setCookies'))
+		->getMock();
 		$response->header(array(
 			'Content-Language' => 'es',
 			'WWW-Authenticate' => 'Negotiate',
