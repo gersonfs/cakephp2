@@ -29,6 +29,7 @@ App::uses('CakeTestFixture', 'TestSuite/Fixture');
  */
 abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 
+
 /**
  * The class responsible for managing the creation, loading and removing of fixtures
  *
@@ -78,7 +79,7 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  * @return \PHPUnit\Framework\TestResult
  * @throws InvalidArgumentException
  */
-	public function run(\PHPUnit\Framework\TestResult $result = null) : \PHPUnit\Framework\TestResult {
+	/*public function run(\PHPUnit\Framework\TestResult $result = null) : \PHPUnit\Framework\TestResult {
 		$level = ob_get_level();
 
 		if (!empty($this->fixtureManager)) {
@@ -95,7 +96,7 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 		}
 
 		return $result;
-	}
+	}*/
 
 /**
  * Called when a test case method is about to start (to be overridden when needed.)
@@ -198,6 +199,10 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	protected function setUp() : void {
 		parent::setUp();
 
+		$this->fixtureManager = new CakeFixtureManager();
+		$this->fixtureManager->fixturize($this);
+		$this->fixtureManager->load($this);
+
 		if (empty($this->_configure)) {
 			$this->_configure = Configure::read();
 		}
@@ -216,6 +221,11 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  */
 	protected function tearDown() : void {
 		parent::tearDown();
+
+		$this->fixtureManager->shutDown();
+		$this->fixtureManager->unload($this);
+		unset($this->fixtureManager, $this->db);
+
 		App::build($this->_pathRestore, App::RESET);
 		if (class_exists('ClassRegistry', false)) {
 			ClassRegistry::flush();
@@ -247,20 +257,20 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  *
  * @return void
  */
-	protected function assertPreConditions() : void {
+	/*protected function assertPreConditions() : void {
 		parent::assertPreConditions();
 		$this->startTest($this->getName());
-	}
+	}*/
 
 /**
  * Announces the end of a test.
  *
  * @return void
  */
-	protected function assertPostConditions(): void {
+	/*protected function assertPostConditions(): void {
 		parent::assertPostConditions();
 		$this->endTest($this->getName());
-	}
+	}*/
 
 // @codingStandardsIgnoreEnd
 

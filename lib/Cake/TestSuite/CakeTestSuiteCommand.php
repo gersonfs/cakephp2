@@ -35,8 +35,12 @@ App::uses('ResolveTestFile', 'TestSuite');
  *
  * @package       Cake.TestSuite
  */
-class CakeTestSuiteCommand extends \PHPUnit\TextUI\Command {
+class CakeTestSuiteCommand {
 
+	private array $arguments = [];
+	private array $_params = [];
+	private array $longOptions = [];
+	private array $shortOptions = [];
 /**
  * Construct method
  *

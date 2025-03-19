@@ -25,13 +25,13 @@
  *
  * @package Cake.TestSuite
  */
-class CakeTestLoader implements \PHPUnit\Runner\TestSuiteLoader {
+class CakeTestLoader {
 
-	private \PHPUnit\Runner\StandardTestSuiteLoader $loader;
+	private \PHPUnit\Runner\TestSuiteLoader $loader;
 
 	public function __construct()
 	{
-		$this->loader = new \PHPUnit\Runner\StandardTestSuiteLoader();
+		$this->loader = new \PHPUnit\Runner\TestSuiteLoader();
 	}
 /**
  * Load a file and find the first test case / suite in that file.
