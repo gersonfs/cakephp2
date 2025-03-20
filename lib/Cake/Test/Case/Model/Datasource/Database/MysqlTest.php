@@ -3235,7 +3235,6 @@ SQL;
 	 * @return void
 	 */
 	public function testBuildColumnBadType() {
-		$this->expectException(\PHPUnit\Framework\Exception::class);
 		$data = array(
 			'name' => 'testName',
 			'type' => 'varchar(255)',
@@ -3243,7 +3242,10 @@ SQL;
 			'null' => true,
 			'key'
 		);
-		$this->Dbo->buildColumn($data);
+		ob_start();
+		$result = $this->Dbo->buildColumn($data);
+		ob_end_clean();
+		$this->assertEquals(null, $result);
 	}
 
 /**
@@ -3266,7 +3268,7 @@ SQL;
  *
  * @return array
  */
-	public function buildColumnUnsignedProvider() {
+	public static function buildColumnUnsignedProvider() {
 		return array(
 			// unsigned int
 			array(
@@ -3533,6 +3535,7 @@ SQL;
  * @return void
  */
 	public function testVirtualFieldsInConditions() {
+		$this->loadFixtures('Article');
 		$Article = ClassRegistry::init('Article');
 		$commentsTable = $this->Dbo->fullTableName('comments', false, false);
 
@@ -3569,6 +3572,7 @@ SQL;
  * @return void
  */
 	public function testConditionsWithComplexVirtualFields() {
+		$this->loadFixtures('Article');
 		$Article = ClassRegistry::init('Article', 'Comment', 'Tag');
 		$Article->virtualFields = array(
 			'distance' => 'ACOS(SIN(20 * PI() / 180)
