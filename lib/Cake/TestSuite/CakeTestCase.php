@@ -70,6 +70,19 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  */
 	protected $_pathRestore = array();
 
+    public function __construct(string $name)
+    {
+        parent::__construct($name);
+        $this->fixtureManager = new CakeFixtureManager();
+        $this->fixtureManager->fixturize($this);
+    }
+
+    public function __destruct()
+    {
+        $this->fixtureManager->shutDown();
+        unset($this->fixtureManager, $this->db);
+    }
+
 /**
  * Runs the test case and collects the results in a TestResult object.
  * If no TestResult object is passed a new one will be created.
@@ -199,8 +212,6 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	protected function setUp() : void {
 		parent::setUp();
 
-		$this->fixtureManager = new CakeFixtureManager();
-		$this->fixtureManager->fixturize($this);
 		$this->fixtureManager->load($this);
 
 		if (empty($this->_configure)) {
@@ -222,9 +233,7 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	protected function tearDown() : void {
 		parent::tearDown();
 
-		$this->fixtureManager->shutDown();
 		$this->fixtureManager->unload($this);
-		unset($this->fixtureManager, $this->db);
 
 		App::build($this->_pathRestore, App::RESET);
 		if (class_exists('ClassRegistry', false)) {
@@ -815,7 +824,7 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	) {
 		$MockBuilder = $this->getMockBuilder($originalClassName);
 		if (!empty($methods)) {
-			$MockBuilder = $MockBuilder->setMethods($methods);
+			$MockBuilder = $MockBuilder->onlyMethods($methods);
 		}
 		if (!empty($arguments)) {
 			$MockBuilder = $MockBuilder->setConstructorArgs($arguments);
