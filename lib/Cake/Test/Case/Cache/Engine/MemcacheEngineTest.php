@@ -49,6 +49,7 @@ class TestMemcacheEngine extends MemcacheEngine {
  */
 class MemcacheEngineTest extends CakeTestCase {
 
+	private ?bool $_cacheDisable;
 /**
  * setUp method
  *
