@@ -828,10 +828,6 @@ class Shell extends CakeObject {
 	protected function _checkUnitTest() {
 		if (class_exists('PHPUnit_Framework_TestCase')) {
 			return true;
-			//@codingStandardsIgnoreStart
-		} elseif (@include 'PHPUnit' . DS . 'Autoload.php') {
-			//@codingStandardsIgnoreEnd
-			return true;
 		} elseif (App::import('Vendor', 'phpunit', array('file' => 'PHPUnit' . DS . 'Autoload.php'))) {
 			return true;
 		}
