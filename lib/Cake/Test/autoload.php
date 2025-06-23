@@ -32,6 +32,7 @@ if (!defined('WWW_ROOT')) {
 }
 
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'bootstrap.php';
+restore_error_handler();
 require_once 'vendors/autoload.php';
 
 App::uses('CakeTestCase', 'TestSuite');

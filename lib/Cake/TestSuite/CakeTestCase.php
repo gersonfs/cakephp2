@@ -79,7 +79,9 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 
     public function __destruct()
     {
-        $this->fixtureManager->shutDown();
+		if (isset($this->fixtureManager)) {
+			$this->fixtureManager->shutDown();
+		}
         unset($this->fixtureManager, $this->db);
     }
 

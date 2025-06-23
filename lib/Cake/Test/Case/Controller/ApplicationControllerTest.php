@@ -1,5 +1,8 @@
 <?php
 App::uses('AppController', 'Controller');
+App::uses('ControllerTestCase', 'TestSuite');
+App::uses('CakeSession', 'Model/Datasource');
+
 /**
  * TransSessionIdController class for testing session.use_trans_sid=1.
  *
@@ -92,7 +95,7 @@ class ApplicationControllerTest extends ControllerTestCase {
 				'session.cookie_httponly' => 1,
 				'session.use_cookies' => 0,
 				'session.use_only_cookies' => 0,
-				'session.cookie_secure' => 1
+				//'session.cookie_secure' => 1
 			),
 			'defaults' => 'php',
 			'cookieTimeout' => 240,

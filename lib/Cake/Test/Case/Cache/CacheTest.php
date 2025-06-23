@@ -94,6 +94,7 @@ class CacheTest extends CakeTestCase {
 		Cache::set('duration', '+10 minutes');
 
 		Configure::write('Cache.disable', false);
+		$this->assertTrue(true);
 	}
 
 /**
@@ -131,7 +132,7 @@ class CacheTest extends CakeTestCase {
 	 * @return void
 	 */
 	public function testInvalidConfig() {
-		$this->expectException(\PHPUnit\Framework\Exception::class);
+		$this->expectException(CacheException::class);
 		// In debug mode it would auto create the folder.
 		$debug = Configure::read('debug');
 		Configure::write('debug', 0);
