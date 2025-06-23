@@ -25,6 +25,7 @@ App::uses('IniReader', 'Configure');
  */
 class IniReaderTest extends CakeTestCase {
 
+	private string $path;
 /**
  * Test data to serialize and unserialize.
  *

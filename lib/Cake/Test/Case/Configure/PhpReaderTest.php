@@ -25,6 +25,7 @@ App::uses('PhpReader', 'Configure');
  */
 class PhpReaderTest extends CakeTestCase {
 
+	private string $path;
 /**
  * Test data to serialize and unserialize.
  *

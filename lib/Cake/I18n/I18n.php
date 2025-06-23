@@ -445,6 +445,9 @@ class I18n {
 		}
 
 		if (empty($this->_domains[$domain][$this->_lang][$this->category])) {
+			if (!is_array($this->_domains[$domain][$this->_lang])) {
+				$this->_domains[$domain][$this->_lang] = [];
+			}
 			$this->_domains[$domain][$this->_lang][$this->category] = array();
 			return $domain;
 		}

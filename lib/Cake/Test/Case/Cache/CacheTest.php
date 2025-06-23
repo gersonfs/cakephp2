@@ -27,6 +27,9 @@ class CacheTest extends CakeTestCase {
 
 	protected $_count = 0;
 
+	private array $_defaultCacheConfig;
+	private bool $_cacheDisable;
+
 /**
  * setUp method
  *
