@@ -63,7 +63,6 @@ class CrudAuthorizeTest extends CakeTestCase {
 	 * @return void
 	 */
 	public function testAuthorizeNoMappedAction() {
-		$this->expectException(\PHPUnit\Framework\Exception::class);
 		$request = new CakeRequest('/posts/foobar', false);
 		$request->addParams(array(
 			'controller' => 'posts',
@@ -71,7 +70,16 @@ class CrudAuthorizeTest extends CakeTestCase {
 		));
 		$user = array('User' => array('user' => 'mark'));
 
+		$triggered = false;
+		set_error_handler(function ($errno, $errstr) use (&$triggered) {
+			$triggered = true;
+			return true;
+		}, E_USER_WARNING);
+
 		$this->auth->authorize($user, $request);
+		restore_error_handler();
+
+		$this->assertTrue($triggered, 'Expected a E_USER_WARNING to be triggered');
 	}
 
 /**

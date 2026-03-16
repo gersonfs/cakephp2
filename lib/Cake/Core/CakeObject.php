@@ -27,6 +27,7 @@ App::uses('Set', 'Utility');
  *
  * @package       Cake.Core
  */
+#[\AllowDynamicProperties]
 class CakeObject {
 
 /**
@@ -86,7 +87,8 @@ class CakeObject {
 		$data = isset($extra['data']) ? $extra['data'] : null;
 		unset($extra['data']);
 
-		if (is_string($url) && strpos($url, Router::fullBaseUrl()) === 0) {
+		$fullBaseUrl = Router::fullBaseUrl();
+		if (is_string($url) && $fullBaseUrl && strpos($url, $fullBaseUrl) === 0) {
 			$url = Router::normalize(str_replace(Router::fullBaseUrl(), '', $url));
 		}
 		if (is_string($url)) {

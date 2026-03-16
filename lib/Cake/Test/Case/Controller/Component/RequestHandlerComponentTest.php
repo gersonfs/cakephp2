@@ -133,6 +133,7 @@ class RequestHandlerComponentTest extends CakeTestCase {
 	public function tearDown(): void {
 		parent::tearDown();
 		unset($this->RequestHandler, $this->Controller);
+		unset($_SERVER['HTTP_X_REQUESTED_WITH'], $_SERVER['HTTP_X_PROTOTYPE_VERSION']);
 		if (!headers_sent()) {
 			header('Content-type: text/html'); //reset content type.
 		}
@@ -442,7 +443,9 @@ class RequestHandlerComponentTest extends CakeTestCase {
 		$this->Controller->request->expects($this->once())
 			->method('_readInput')
 			->will($this->returnValue('"A","csv","string"'));
-		$this->RequestHandler->addInputType('csv', array('str_getcsv'));
+		$this->RequestHandler->addInputType('csv', array(function ($string) {
+			return str_getcsv($string, ',', '"', '\\');
+		}));
 		$this->RequestHandler->startup($this->Controller);
 		$expected = array(
 			'A', 'csv', 'string'

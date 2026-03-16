@@ -353,7 +353,7 @@ class CakeEmail {
 		if ($this->_appCharset !== null) {
 			$this->charset = $this->_appCharset;
 		}
-		$this->_domain = preg_replace('/\:\d+$/', '', env('HTTP_HOST'));
+		$this->_domain = preg_replace('/\:\d+$/', '', (string)env('HTTP_HOST'));
 		if (empty($this->_domain)) {
 			$this->_domain = php_uname('n');
 		}
@@ -1375,7 +1375,7 @@ class CakeEmail {
  * @return array Wrapped message
  */
 	protected function _wrap($message, $wrapLength = CakeEmail::LINE_LENGTH_MUST) {
-		if (strlen($message) === 0) {
+		if (strlen((string)$message) === 0) {
 			return array('');
 		}
 		$message = str_replace(array("\r\n", "\r"), "\n", $message);

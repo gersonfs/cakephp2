@@ -19,6 +19,7 @@
 App::uses('Router', 'Routing');
 App::uses('CakeSession', 'Model/Datasource');
 App::uses('Controller', 'Controller');
+App::uses('CakeRequest', 'Network');
 App::uses('Scaffold', 'Controller');
 App::uses('ScaffoldView', 'View');
 App::uses('AppModel', 'Model');

@@ -17,6 +17,7 @@
  */
 
 App::uses('Controller', 'Controller');
+App::uses('CakeRequest', 'Network');
 App::uses('AuthComponent', 'Controller/Component');
 App::uses('AclComponent', 'Controller/Component');
 App::uses('BaseAuthenticate', 'Controller/Component/Auth');

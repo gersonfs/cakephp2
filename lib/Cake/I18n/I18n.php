@@ -196,6 +196,7 @@ class I18n {
 		$count = null, $language = null, $context = null
 	) {
 		$_this = I18n::getInstance();
+		$context = (string)$context;
 
 		if (strpos($singular, "\r\n") !== false) {
 			$singular = str_replace("\r\n", "\n", $singular);
@@ -232,7 +233,8 @@ class I18n {
 		$_this->domain = $domain . '_' . $_this->l10n->lang;
 
 		if (!isset($_this->_domains[$domain][$_this->_lang])) {
-			$_this->_domains[$domain][$_this->_lang] = Cache::read($_this->domain, '_cake_core_');
+			$cached = Cache::read($_this->domain, '_cake_core_');
+			$_this->_domains[$domain][$_this->_lang] = $cached ?: array();
 		}
 
 		if (!isset($_this->_domains[$domain][$_this->_lang][$_this->category])) {
@@ -468,8 +470,8 @@ class I18n {
 			}
 			$this->_domains = Hash::mergeDiff($this->_domains, $merge);
 
-			if (isset($this->_domains[$domain][$this->_lang][$this->category][null])) {
-				unset($this->_domains[$domain][$this->_lang][$this->category][null]);
+			if (isset($this->_domains[$domain][$this->_lang][$this->category][''])) {
+				unset($this->_domains[$domain][$this->_lang][$this->category]['']);
 			}
 		}
 
@@ -545,14 +547,14 @@ class I18n {
 		$type = 0;
 		$translations = array();
 		$translationKey = '';
-		$translationContext = null;
+		$translationContext = '';
 		$plural = 0;
 		$header = '';
 
 		do {
 			$line = trim(fgets($file));
 			if ($line === '' || $line[0] === '#') {
-				$translationContext = null;
+				$translationContext = '';
 
 				continue;
 			}
@@ -601,7 +603,7 @@ class I18n {
 				unset($translations[$translationKey][$translationContext]);
 				$type = 0;
 				$translationKey = '';
-				$translationContext = null;
+				$translationContext = '';
 				$plural = 0;
 			}
 		} while (!feof($file));

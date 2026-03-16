@@ -27,6 +27,7 @@ App::uses('CakeTestFixture', 'TestSuite/Fixture');
  *
  * @package       Cake.TestSuite
  */
+#[\AllowDynamicProperties]
 abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 
 
@@ -249,13 +250,13 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	}
 
 /**
- * See CakeTestSuiteDispatcher::date()
+ * Returns the current date/time formatted with the given format.
  *
  * @param string $format format to be used.
  * @return string
  */
 	public static function date($format = 'Y-m-d H:i:s') {
-		return CakeTestSuiteDispatcher::date($format);
+		return date($format);
 	}
 
 // @codingStandardsIgnoreStart PHPUnit overrides don't match CakePHP
@@ -826,7 +827,26 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	) {
 		$MockBuilder = $this->getMockBuilder($originalClassName);
 		if (!empty($methods)) {
-			$MockBuilder = $MockBuilder->onlyMethods($methods);
+			$existingMethods = array();
+			$addedMethods = array();
+			if (class_exists($originalClassName) || interface_exists($originalClassName)) {
+				$ref = new ReflectionClass($originalClassName);
+				foreach ($methods as $method) {
+					if ($ref->hasMethod($method)) {
+						$existingMethods[] = $method;
+					} else {
+						$addedMethods[] = $method;
+					}
+				}
+			} else {
+				$existingMethods = $methods;
+			}
+			if (!empty($existingMethods)) {
+				$MockBuilder = $MockBuilder->onlyMethods($existingMethods);
+			}
+			if (!empty($addedMethods)) {
+				$MockBuilder = $MockBuilder->addMethods($addedMethods);
+			}
 		}
 		if (!empty($arguments)) {
 			$MockBuilder = $MockBuilder->setConstructorArgs($arguments);
@@ -912,6 +932,39 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 			$callOriginalClone,
 			$callAutoload
 		);
+	}
+
+/**
+ * Compatibility shim for PHPUnit's removed at() method.
+ * Returns a matcher that matches the n-th invocation of a method.
+ *
+ * @param int $index The invocation index to match.
+ * @return \PHPUnit\Framework\MockObject\Rule\InvocationOrder
+ */
+	public static function at($index) {
+		return new class($index) extends \PHPUnit\Framework\MockObject\Rule\InvocationOrder {
+			private int $_index;
+			private int $_currentIndex = -1;
+
+			public function __construct(int $index) {
+				$this->_index = $index;
+			}
+
+			public function toString(): string {
+				return 'invoked at sequence index ' . $this->_index;
+			}
+
+			public function matches(\PHPUnit\Framework\MockObject\Invocation $invocation): bool {
+				$this->_currentIndex++;
+				return $this->_currentIndex === $this->_index;
+			}
+
+			protected function invokedDo(\PHPUnit\Framework\MockObject\Invocation $invocation): void {
+			}
+
+			public function verify(): void {
+			}
+		};
 	}
 
 /**

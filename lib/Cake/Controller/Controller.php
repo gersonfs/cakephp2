@@ -62,6 +62,7 @@ App::uses('CakeEventManager', 'Event');
  * @property      string $webroot Webroot path segment for the request.
  * @link          https://book.cakephp.org/2.0/en/controllers.html
  */
+#[\AllowDynamicProperties]
 class Controller extends CakeObject implements CakeEventListener {
 
 /**

@@ -54,6 +54,7 @@ App::uses('CakeEvent', 'Event');
  *
  * @package       Cake.Error
  */
+#[\AllowDynamicProperties]
 class ExceptionRenderer {
 
 /**

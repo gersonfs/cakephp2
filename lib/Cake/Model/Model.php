@@ -1227,6 +1227,9 @@ class Model extends CakeObject implements CakeEventListener {
 				continue;
 			}
 
+			if (!is_array($this->data)) {
+				$this->data = array();
+			}
 			if (!isset($this->data[$modelName])) {
 				$this->data[$modelName] = array();
 			}
@@ -3912,7 +3915,7 @@ class Model extends CakeObject implements CakeEventListener {
  *  If null a new ModelValidator instance will be made using current model object
  * @return ModelValidator
  */
-	public function validator(ModelValidator $instance = null) {
+	public function validator(?ModelValidator $instance = null) {
 		if ($instance) {
 			$this->_validator = $instance;
 		} elseif (!$this->_validator) {

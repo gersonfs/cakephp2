@@ -32,6 +32,7 @@ App::uses('Hash', 'Utility');
  * @property array $pass        Array of passed arguments parsed from the URL.
  * @package       Cake.Network
  */
+#[\AllowDynamicProperties]
 class CakeRequest implements ArrayAccess {
 
 /**
@@ -750,7 +751,7 @@ class CakeRequest implements ArrayAccess {
 	public function here($base = true) {
 		$url = $this->here;
 		if (!empty($this->query)) {
-			$url .= '?' . http_build_query($this->query, null, '&');
+			$url .= '?' . http_build_query($this->query, '', '&');
 		}
 		if (!$base) {
 			$url = preg_replace('/^' . preg_quote($this->base, '/') . '/', '', $url, 1);
@@ -1030,7 +1031,7 @@ class CakeRequest implements ArrayAccess {
 		$args = func_get_args();
 		if (!empty($args)) {
 			$callback = array_shift($args);
-			array_unshift($args, $input);
+			array_unshift($args, (string)$input);
 			return call_user_func_array($callback, $args);
 		}
 		return $input;

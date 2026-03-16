@@ -29,6 +29,7 @@ App::uses('CakeText', 'Utility');
  * @package       Cake.Utility
  * @link          https://book.cakephp.org/2.0/en/development/debugging.html#debugger-class
  */
+#[\AllowDynamicProperties]
 class Debugger {
 
 /**
@@ -592,7 +593,6 @@ class Debugger {
 				foreach ($filters as $filter => $visibility) {
 					$reflectionProperties = $ref->getProperties($filter);
 					foreach ($reflectionProperties as $reflectionProperty) {
-						$reflectionProperty->setAccessible(true);
 						$property = $reflectionProperty->getValue($var);
 
 						$value = static::_export($property, $depth - 1, $indent);

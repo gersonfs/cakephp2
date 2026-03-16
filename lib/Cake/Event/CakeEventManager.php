@@ -25,6 +25,7 @@ App::uses('CakeEvent', 'Event');
  *
  * @package Cake.Event
  */
+#[\AllowDynamicProperties]
 class CakeEventManager {
 
 /**

@@ -323,7 +323,7 @@ if (!function_exists('env')) {
 			if (isset($_SERVER['HTTPS'])) {
 				return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
 			}
-			return (strpos(env('SCRIPT_URI'), 'https://') === 0);
+			return (strpos((string)env('SCRIPT_URI'), 'https://') === 0);
 		}
 
 		if ($key === 'SCRIPT_NAME') {
@@ -488,7 +488,7 @@ if (!function_exists('clearCache')) {
  */
 	function clearCache($params = null, $type = 'views', $ext = '.php') {
 		if (is_string($params) || $params === null) {
-			$params = preg_replace('/\/\//', '/', $params);
+			$params = preg_replace('/\/\//', '/', (string)$params);
 			$cache = CACHE . $type . DS . $params;
 
 			if (is_file($cache . $ext)) {

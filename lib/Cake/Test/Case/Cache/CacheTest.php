@@ -140,17 +140,26 @@ class CacheTest extends CakeTestCase {
 		$debug = Configure::read('debug');
 		Configure::write('debug', 0);
 
-		Cache::config('invalid', array(
-			'engine' => 'File',
-			'duration' => '+1 year',
-			'prefix' => 'testing_invalid_',
-			'path' => 'data/',
-			'serialize' => true,
-			'random' => 'wii'
-		));
-		Cache::read('Test', 'invalid');
+		// Suppress E_USER_WARNING from FileEngine about path not being writable,
+		// since this test is about the CacheException being thrown.
+		set_error_handler(function ($errno, $errstr) {
+			return true;
+		}, E_USER_WARNING);
 
-		Configure::write('debug', $debug);
+		try {
+			Cache::config('invalid', array(
+				'engine' => 'File',
+				'duration' => '+1 year',
+				'prefix' => 'testing_invalid_',
+				'path' => 'data/',
+				'serialize' => true,
+				'random' => 'wii'
+			));
+			Cache::read('Test', 'invalid');
+		} finally {
+			restore_error_handler();
+			Configure::write('debug', $debug);
+		}
 	}
 
 /**
@@ -411,12 +420,18 @@ class CacheTest extends CakeTestCase {
 		), App::RESET);
 
 		Cache::config('test_trigger', array('engine' => 'TestAppCache', 'prefix' => ''));
-		try {
-			Cache::write('fail', 'value', 'test_trigger');
-			$this->fail('No exception thrown');
-		} catch (\PHPUnit\Framework\Exception $e) {
-			$this->assertTrue(true);
-		}
+
+		$triggered = false;
+		set_error_handler(function ($errno, $errstr) use (&$triggered) {
+			$triggered = true;
+			return true;
+		}, E_USER_WARNING);
+
+		Cache::write('fail', 'value', 'test_trigger');
+		restore_error_handler();
+
+		$this->assertTrue($triggered, 'Expected a E_USER_WARNING to be triggered');
+
 		Cache::drop('test_trigger');
 		App::build();
 	}

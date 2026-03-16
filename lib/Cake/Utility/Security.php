@@ -109,7 +109,7 @@ class Security {
 		if (empty($type)) {
 			$type = static::$hashType;
 		}
-		$type = strtolower($type);
+		$type = strtolower((string)$type);
 
 		if ($type === 'blowfish') {
 			return static::_crypt($string, $salt);
@@ -223,10 +223,11 @@ class Security {
 			return '';
 		}
 
-		srand((int)(float)Configure::read('Security.cipherSeed'));
+		$seed = Configure::read('Security.cipherSeed');
+		srand((int)fmod((float)$seed, PHP_INT_MAX));
 		$out = '';
-		$keyLength = strlen($key);
-		for ($i = 0, $textLength = strlen($text); $i < $textLength; $i++) {
+		$keyLength = strlen((string)$key);
+		for ($i = 0, $textLength = strlen((string)$text); $i < $textLength; $i++) {
 			$j = ord(substr($key, $i % $keyLength, 1));
 			while ($j--) {
 				rand(0, 255);

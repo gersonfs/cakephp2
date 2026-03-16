@@ -18,6 +18,7 @@
 
 App::uses('Controller', 'Controller');
 App::uses('SessionComponent', 'Controller/Component');
+App::uses('CakeSession', 'Model/Datasource');
 
 /**
  * SessionTestController class

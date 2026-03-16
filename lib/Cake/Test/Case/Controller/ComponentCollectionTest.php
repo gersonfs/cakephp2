@@ -17,6 +17,7 @@
  */
 
 App::uses('CakeResponse', 'Network');
+App::uses('Controller', 'Controller');
 App::uses('CookieComponent', 'Controller/Component');
 App::uses('SecurityComponent', 'Controller/Component');
 App::uses('ComponentCollection', 'Controller');
@@ -168,7 +169,7 @@ class ComponentCollectionTest extends CakeTestCase {
  * @return void
  */
 	public function testGetController() {
-		$controller = $this->getMock('Controller');
+		$controller = new Controller();
 		$controller->components = array('Security');
 		$this->Components->init($controller);
 		$result = $this->Components->getController();

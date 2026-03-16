@@ -531,7 +531,7 @@ class RequestHandlerComponent extends Component {
 			return false;
 		}
 
-		list($contentType) = explode(';', env('CONTENT_TYPE'));
+		list($contentType) = explode(';', (string)env('CONTENT_TYPE'));
 		if ($contentType === '') {
 			list($contentType) = explode(';', CakeRequest::header('CONTENT_TYPE'));
 		}
@@ -686,7 +686,7 @@ class RequestHandlerComponent extends Component {
 			$cType = $this->response->getMimeType($type);
 		}
 		if (is_array($cType)) {
-			if (isset($cType[$options['index']])) {
+			if ($options['index'] !== null && isset($cType[$options['index']])) {
 				$cType = $cType[$options['index']];
 			}
 

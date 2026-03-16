@@ -29,6 +29,7 @@
  * @package Cake.Controller
  * @deprecated 3.0.0 Dynamic scaffolding will be removed and replaced in 3.0
  */
+#[\AllowDynamicProperties]
 class Scaffold {
 
 /**
