@@ -110,6 +110,8 @@ class CakeRequestTest extends CakeTestCase {
 			$_SERVER['QUERY_STRING'],
 			$_SERVER['HTTP_REFERER']
 		);
+		$_POST = array();
+		$_FILES = array();
 	}
 
 /**
