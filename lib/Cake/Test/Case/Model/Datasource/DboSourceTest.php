@@ -228,6 +228,11 @@ class DboSourceTest extends CakeTestCase {
 	public function setUp(): void {
 		parent::setUp();
 
+		// DboSource::__construct reads Configure('debug') to set fullDebug;
+		// many tests here assert on the query log, which requires debug > 1.
+		$this->_oldDebug = Configure::read('debug');
+		Configure::write('debug', 2);
+
 		$this->testDb = new DboTestSource();
 		$this->testDb->cacheSources = false;
 		$this->testDb->startQuote = '`';
@@ -244,7 +249,10 @@ class DboSourceTest extends CakeTestCase {
 	public function tearDown(): void {
 		parent::tearDown();
 		unset($this->Model);
+		Configure::write('debug', $this->_oldDebug);
 	}
+
+	protected $_oldDebug = null;
 
 /**
  * test that booleans and null make logical condition strings.

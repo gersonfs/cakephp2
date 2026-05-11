@@ -57,6 +57,13 @@ class MysqlTest extends CakeTestCase {
 	public $Dbo = null;
 
 /**
+ * Saved debug level (restored in tearDown even when setUp early-exits via skip).
+ *
+ * @var mixed
+ */
+	protected $_debug = null;
+
+/**
  * Sets up a Dbo class instance for testing
  *
  * @return void
