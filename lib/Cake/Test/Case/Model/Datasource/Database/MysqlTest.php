@@ -67,6 +67,10 @@ class MysqlTest extends CakeTestCase {
 		if (!($this->Dbo instanceof Mysql)) {
 			$this->markTestSkipped('The MySQL extension is not available.');
 		}
+		// Restore quote chars in case a previous test on the shared
+		// connection swapped them (e.g. testGetEncoding sets [ ]).
+		$this->Dbo->startQuote = '`';
+		$this->Dbo->endQuote = '`';
 		$this->_debug = Configure::read('debug');
 		Configure::write('debug', 1);
 		$this->model = ClassRegistry::init('MysqlTestModel');
@@ -3620,6 +3624,7 @@ SQL;
  * @return void
  */
 	public function testReadVirtualFieldsWithNewLines() {
+		$this->loadFixtures('Article', 'User', 'Comment', 'Tag', 'ArticlesTag', 'Attachment');
 		$Article = new Article();
 		$Article->recursive = 1;
 		$Article->virtualFields = array(
@@ -3682,6 +3687,7 @@ SQL;
  * @return void
  */
 	public function testExecute() {
+		$this->loadFixtures('Article');
 		$query = 'SELECT * FROM ' . $this->Dbo->fullTableName('articles') . ' WHERE 1 = 1';
 		$this->Dbo->took = null;
 		$this->Dbo->affected = null;
