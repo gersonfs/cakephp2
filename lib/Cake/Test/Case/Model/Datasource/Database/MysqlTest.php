@@ -3246,9 +3246,12 @@ SQL;
 			'null' => true,
 			'key'
 		);
-		ob_start();
-		$result = $this->Dbo->buildColumn($data);
-		ob_end_clean();
+		set_error_handler(function () { return true; });
+		try {
+			$result = $this->Dbo->buildColumn($data);
+		} finally {
+			restore_error_handler();
+		}
 		$this->assertEquals(null, $result);
 	}
 

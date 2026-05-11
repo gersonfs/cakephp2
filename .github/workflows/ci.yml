@@ -24,7 +24,8 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
-          extensions: mbstring, intl, mysql, zlib, dom, openssl, soap, json, simplexml, libxml, mcrypt, sqlite3
+          extensions: mbstring, intl, mysql, zlib, dom, openssl, soap, json, simplexml, libxml, sqlite3
+          coverage: none
 
       - name: checkout
         uses: actions/checkout@v2

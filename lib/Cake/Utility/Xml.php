@@ -229,7 +229,17 @@ class Xml {
 
 		$options['return'] = strtolower($options['return']);
 		if ($options['return'] === 'simplexml' || $options['return'] === 'simplexmlelement') {
-			return new SimpleXMLElement($dom->saveXML());
+			$previous = libxml_use_internal_errors(true);
+			try {
+				$element = new SimpleXMLElement($dom->saveXML());
+			} catch (Exception $e) {
+				libxml_clear_errors();
+				libxml_use_internal_errors($previous);
+				throw $e;
+			}
+			libxml_clear_errors();
+			libxml_use_internal_errors($previous);
+			return $element;
 		}
 		return $dom;
 	}

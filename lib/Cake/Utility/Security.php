@@ -360,6 +360,7 @@ class Security {
 			$method = 'AES-256-CBC';
 			$ivSize = openssl_cipher_iv_length($method);
 			$iv = openssl_random_pseudo_bytes($ivSize);
+			$plain = (string)$plain;
 			$padLength = (int)ceil((strlen($plain) ?: 1) / $ivSize) * $ivSize;
 			$ciphertext = openssl_encrypt(str_pad($plain, $padLength, "\0"), $method, $key, true, $iv);
 			// Remove the PKCS#7 padding block for compatibility with mcrypt.

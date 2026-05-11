@@ -849,7 +849,11 @@ class AppTest extends CakeTestCase {
 		$this->skipIf(!function_exists('ini_set'));
 
 		$originalMemoryLimit = ini_get('memory_limit');
-		$this->skipIf(ini_set('memory_limit', $memoryLimit) === false, 'Cannot lower memory_limit on this PHP build.');
+		$unit = strtolower(substr($memoryLimit, -1));
+		$num = (int)$memoryLimit;
+		$targetBytes = $num * ($unit === 'g' ? 1024 * 1024 * 1024 : ($unit === 'm' ? 1024 * 1024 : ($unit === 'k' ? 1024 : 1)));
+		$this->skipIf($targetBytes > 0 && memory_get_usage(true) > $targetBytes, 'Cannot lower memory_limit below current usage on this runtime.');
+		$this->skipIf(@ini_set('memory_limit', $memoryLimit) === false, 'Cannot lower memory_limit on this PHP build.');
 		$this->skipIf(ini_get('memory_limit') !== $memoryLimit, 'memory_limit was not lowered to ' . $memoryLimit);
 
 		App::increaseMemoryLimit($additionalKb);

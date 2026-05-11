@@ -248,6 +248,9 @@ class CakeSession {
 		if (!static::_hasSession() || !static::start()) {
 			return false;
 		}
+		if ($name === null) {
+			return false;
+		}
 		if (isset($_SESSION[$name])) {
 			return true;
 		}
@@ -590,22 +593,12 @@ class CakeSession {
 		if (!empty($sessionConfig['handler']['engine']) && !headers_sent()) {
 			$handler = static::_getHandler($sessionConfig['handler']['engine']);
 			if (!function_exists('session_status') || session_status() !== PHP_SESSION_ACTIVE) {
+				if (!($handler instanceof \SessionHandlerInterface) && $handler instanceof CakeSessionHandlerInterface) {
+					App::uses('CakeSessionHandlerAdapter', 'Model/Datasource/Session');
+					$handler = new CakeSessionHandlerAdapter($handler);
+				}
 				if ($handler instanceof \SessionHandlerInterface) {
 					session_set_save_handler($handler, false);
-				} else {
-					// Legacy fallback for user-supplied handlers that only
-					// implement CakeSessionHandlerInterface (emits "individual
-					// callbacks deprecated" on PHP 8.1+). The built-in
-					// CacheSession/DatabaseSession implement \SessionHandlerInterface
-					// and use the path above instead.
-					session_set_save_handler(
-						array($handler, 'open'),
-						array($handler, 'close'),
-						array($handler, 'read'),
-						array($handler, 'write'),
-						array($handler, 'destroy'),
-						array($handler, 'gc')
-					);
 				}
 			}
 		}

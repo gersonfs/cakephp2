@@ -165,7 +165,7 @@ class CakeTestFixture {
 				ClassRegistry::flush();
 			}
 
-			if (!empty($db->config['prefix']) && strpos($this->table, $db->config['prefix']) === 0) {
+			if (!empty($db->config['prefix']) && strpos((string)$this->table, $db->config['prefix']) === 0) {
 				$this->table = str_replace($db->config['prefix'], '', $this->table);
 			}
 
