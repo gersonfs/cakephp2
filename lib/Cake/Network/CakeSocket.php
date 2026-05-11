@@ -234,7 +234,9 @@ class CakeSocket {
 
 		$this->connected = is_resource($this->connection);
 		if ($this->connected) {
-			stream_set_timeout($this->connection, $this->config['timeout']);
+			$timeoutSeconds = (int)$this->config['timeout'];
+			$timeoutMicroseconds = (int)round(($this->config['timeout'] - $timeoutSeconds) * 1000000);
+			stream_set_timeout($this->connection, $timeoutSeconds, $timeoutMicroseconds);
 
 			if (!empty($this->config['request']) &&
 				$this->config['request']['uri']['scheme'] === 'https' &&

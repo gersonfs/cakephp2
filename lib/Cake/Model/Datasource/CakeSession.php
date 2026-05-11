@@ -590,14 +590,46 @@ class CakeSession {
 		if (!empty($sessionConfig['handler']['engine']) && !headers_sent()) {
 			$handler = static::_getHandler($sessionConfig['handler']['engine']);
 			if (!function_exists('session_status') || session_status() !== PHP_SESSION_ACTIVE) {
-				session_set_save_handler(
-					array($handler, 'open'),
-					array($handler, 'close'),
-					array($handler, 'read'),
-					array($handler, 'write'),
-					array($handler, 'destroy'),
-					array($handler, 'gc')
-				);
+				if ($handler instanceof \SessionHandlerInterface) {
+					session_set_save_handler($handler, false);
+				} else {
+					// CakeSessionHandlerInterface predates PHP's SessionHandlerInterface.
+					// Wrap the callbacks into a native handler so we can register without
+					// triggering the "individual callbacks deprecated" warning in PHP 8.1+.
+					$wrapper = new class($handler) implements \SessionHandlerInterface {
+						private $cakeHandler;
+						public function __construct($cakeHandler) {
+							$this->cakeHandler = $cakeHandler;
+						}
+						#[\ReturnTypeWillChange]
+						public function open($savePath, $sessionName) {
+							return (bool)$this->cakeHandler->open($savePath, $sessionName);
+						}
+						#[\ReturnTypeWillChange]
+						public function close() {
+							return (bool)$this->cakeHandler->close();
+						}
+						#[\ReturnTypeWillChange]
+						public function read($id) {
+							$value = $this->cakeHandler->read($id);
+							return $value === false ? '' : (string)$value;
+						}
+						#[\ReturnTypeWillChange]
+						public function write($id, $data) {
+							return (bool)$this->cakeHandler->write($id, $data);
+						}
+						#[\ReturnTypeWillChange]
+						public function destroy($id) {
+							return (bool)$this->cakeHandler->destroy($id);
+						}
+						#[\ReturnTypeWillChange]
+						public function gc($max_lifetime) {
+							$result = $this->cakeHandler->gc($max_lifetime);
+							return is_int($result) ? $result : 0;
+						}
+					};
+					session_set_save_handler($wrapper, false);
+				}
 			}
 		}
 		Configure::write('Session', $sessionConfig);

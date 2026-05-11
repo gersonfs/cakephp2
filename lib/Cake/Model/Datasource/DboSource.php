@@ -3269,7 +3269,7 @@ class DboSource extends DataSource {
 		$sign = isset($result[3]);
 
 		$isFloat = in_array($type, array('dec', 'decimal', 'float', 'numeric', 'double'));
-		if ($isFloat && strpos($length, ',') !== false) {
+		if ($isFloat && $length !== null && strpos((string)$length, ',') !== false) {
 			return $length;
 		}
 

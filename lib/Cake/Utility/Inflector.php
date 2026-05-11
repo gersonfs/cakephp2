@@ -576,7 +576,7 @@ class Inflector {
 		);
 
 		$map = static::$_transliteration + $merge;
-		return preg_replace(array_keys($map), array_values($map), $string);
+		return preg_replace(array_keys($map), array_values($map), (string)$string);
 	}
 
 }

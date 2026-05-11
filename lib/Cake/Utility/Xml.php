@@ -221,7 +221,7 @@ class Xml {
 		);
 		$options += $defaults;
 
-		$dom = new DOMDocument($options['version'], $options['encoding']);
+		$dom = new DOMDocument($options['version'], (string)$options['encoding']);
 		if ($options['pretty']) {
 			$dom->formatOutput = true;
 		}

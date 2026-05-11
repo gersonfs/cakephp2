@@ -9376,7 +9376,11 @@ class FormHelperTest extends CakeTestCase {
  */
 	public function testCreateUrlImpliedController() {
 		$this->loadFixtures('Comment', 'Article', 'User');
-		$restore = error_reporting(E_ALL ^ E_USER_DEPRECATED);
+		// PHPUnit 10 catches E_USER_DEPRECATED regardless of error_reporting()
+		// so we install a per-test handler that swallows it for this case.
+		set_error_handler(function () {
+			return true;
+		}, E_USER_DEPRECATED);
 		$this->Form->request['controller'] = 'posts';
 		$result = $this->Form->create('Comment', array(
 			'action' => 'addComment',
@@ -9395,7 +9399,7 @@ class FormHelperTest extends CakeTestCase {
 			'/div'
 		);
 		$this->assertTags($result, $expected);
-		error_reporting($restore);
+		restore_error_handler();
 	}
 
 /**

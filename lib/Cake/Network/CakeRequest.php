@@ -175,7 +175,7 @@ class CakeRequest implements ArrayAccess {
 			strpos((string)$this->contentType(), 'application/x-www-form-urlencoded') === 0
 		) {
 				$data = $this->_readInput();
-				parse_str($data, $this->data);
+				parse_str((string)$data, $this->data);
 		}
 		if (ini_get('magic_quotes_gpc') === '1') {
 			$this->data = stripslashes_deep($this->data);

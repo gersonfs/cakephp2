@@ -24,6 +24,9 @@ App::uses('CakeEvent', 'Event');
  */
 class GenericObject {
 
+	public $_Collection;
+	public $settings;
+
 /**
  * Constructor
  *

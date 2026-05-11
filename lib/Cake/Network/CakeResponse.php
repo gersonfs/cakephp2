@@ -591,7 +591,7 @@ class CakeResponse {
 			if ($value === null && strpos($header, ':') !== false) {
 				list($header, $value) = explode(':', $header, 2);
 			}
-			$this->_headers[$header] = is_array($value) ? array_map('trim', $value) : trim($value);
+			$this->_headers[$header] = is_array($value) ? array_map('trim', $value) : trim((string)$value);
 		}
 		return $this->_headers;
 	}

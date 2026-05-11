@@ -1381,6 +1381,9 @@ class ModelWriteTest extends BaseModelTest {
 		$this->assertFalse(empty($result));
 		$this->assertTrue($User->id > 0);
 
+		if (!is_array($User->data)) {
+			$User->data = array();
+		}
 		$User->data['User'] = array('password' => 'something');
 		$result = $User->save();
 		$this->assertFalse(empty($result));

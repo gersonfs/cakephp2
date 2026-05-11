@@ -177,7 +177,7 @@ class ConnectionManager {
 		if (!class_exists($conn['classname'])) {
 			throw new MissingDatasourceException(array(
 				'class' => $conn['classname'],
-				'plugin' => substr($plugin, 0, -1)
+				'plugin' => substr((string)$plugin, 0, -1)
 			));
 		}
 		return true;
