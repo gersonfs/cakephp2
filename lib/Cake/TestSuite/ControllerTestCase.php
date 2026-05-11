@@ -372,9 +372,9 @@ abstract class ControllerTestCase extends CakeTestCase {
 		/** @var Controller|PHPUnit_Framework_MockObject_MockObject $controllerObj */
 		$controllerObj = $this->getMockBuilder($name . 'Controller')
             ->onlyMethods($mocks['methods'])
+            ->disableOriginalConstructor()
             ->getMock();
 
-        //, $mocks['methods'], array(), '', false);
 		$controllerObj->name = $name;
 		/** @var CakeRequest|PHPUnit_Framework_MockObject_MockObject $request */
 		$request = $this->getMockBuilder('CakeRequest')->getMock();

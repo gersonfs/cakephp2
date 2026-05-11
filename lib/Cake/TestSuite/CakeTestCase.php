@@ -71,7 +71,7 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  */
 	protected $_pathRestore = array();
 
-    public function __construct(string $name)
+    public function __construct(string $name = 'unnamed')
     {
         parent::__construct($name);
         $this->fixtureManager = new CakeFixtureManager();
@@ -247,6 +247,35 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 			$this->markTestSkipped($message);
 		}
 		return $shouldSkip;
+	}
+
+/**
+ * PHPUnit 10 no longer promotes PHP warnings/notices to exceptions.
+ * This helper registers an error handler that converts user-level
+ * errors into PHPUnit\Framework\Exception, then calls the callback
+ * with expectException already set, restoring the previous handler
+ * at the end (even on exception).
+ *
+ * Useful for tests that previously relied on `@expectedException
+ * PHPUnit_Framework_Error_Warning` style assertions.
+ *
+ * @param callable $callback The test body to execute.
+ * @param int $levels Bitmask of error levels to catch (default: user warnings + notices + deprecated).
+ * @return void
+ */
+	public function expectWarningException(callable $callback, $levels = null) {
+		if ($levels === null) {
+			$levels = E_USER_WARNING | E_USER_NOTICE | E_USER_DEPRECATED;
+		}
+		set_error_handler(static function ($errno, $errstr) {
+			throw new \PHPUnit\Framework\Exception($errstr, $errno);
+		}, $levels);
+		try {
+			$this->expectException(\PHPUnit\Framework\Exception::class);
+			$callback();
+		} finally {
+			restore_error_handler();
+		}
 	}
 
 /**

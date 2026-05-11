@@ -132,7 +132,7 @@ class CakeTimeTest extends CakeTestCase {
  *
  * @return void
  */
-	public function timeAgoEndProvider() {
+	public static function timeAgoEndProvider() {
 		return array(
 			array(
 				'+4 months +2 weeks +3 days',
@@ -473,7 +473,8 @@ class CakeTimeTest extends CakeTestCase {
  */
 	public function testNiceShortI18n() {
 		$restore = setlocale(LC_ALL, 0);
-		setlocale(LC_ALL, 'es_ES');
+		$set = setlocale(LC_ALL, 'es_ES');
+		$this->skipIf($set === false, 'es_ES locale is not available on this system.');
 		$time = strtotime('2015-01-07 03:05:00');
 		$this->assertEquals('ene 7th 2015, 03:05', $this->Time->niceShort($time));
 		setlocale(LC_ALL, $restore);

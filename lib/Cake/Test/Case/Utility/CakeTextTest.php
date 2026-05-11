@@ -363,7 +363,7 @@ class CakeTextTest extends CakeTestCase {
  *
  * @return array
  */
-	public function wordWrapProvider() {
+	public static function wordWrapProvider() {
 		return array(
 			array(
 				'The quick brown fox jumped over the lazy dog.',

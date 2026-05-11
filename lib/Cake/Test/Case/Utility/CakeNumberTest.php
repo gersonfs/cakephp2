@@ -765,7 +765,7 @@ class CakeNumberTest extends CakeTestCase {
  *
  * @return array
  */
-	public function filesizes() {
+	public static function filesizes() {
 		return array(
 			array(array('size' => '512B', 'default' => false), 512),
 			array(array('size' => '1KB', 'default' => false), 1024),

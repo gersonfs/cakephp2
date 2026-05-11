@@ -1375,7 +1375,7 @@ class CakeResponse {
 
 		$fileSize = $file->size();
 		if ($download) {
-			$agent = env('HTTP_USER_AGENT');
+			$agent = (string)env('HTTP_USER_AGENT');
 
 			if (preg_match('%Opera(/| )([0-9].[0-9]{1,2})%', $agent)) {
 				$contentType = 'application/octet-stream';

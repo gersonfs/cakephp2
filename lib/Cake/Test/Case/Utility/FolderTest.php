@@ -172,7 +172,7 @@ class FolderTest extends CakeTestCase {
  *
  * @return array
  */
-	public function inPathInvalidPathArgumentDataProvider() {
+	public static function inPathInvalidPathArgumentDataProvider() {
 		return array(
 			array(''),
 			array('relative/path/'),
