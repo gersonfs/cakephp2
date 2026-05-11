@@ -340,6 +340,27 @@ class MemcachedEngineTest extends CakeTestCase {
 	}
 
 /**
+ * test using authentication without memcached installed with SASL support
+ * throw an exception
+ *
+ * @return void
+ */
+	public function testSaslAuthException() {
+		$this->skipIf(version_compare(PHP_VERSION, '7.0.0', '>='));
+		$Memcached = new TestMemcachedEngine();
+		$settings = array(
+			'engine' => 'Memcached',
+			'servers' => array('127.0.0.1:11211'),
+			'persistent' => false,
+			'login' => 'test',
+			'password' => 'password'
+		);
+
+		$this->setExpectedException('\PHPUnit\Framework\Exception');
+		$Memcached->init($settings);
+	}
+
+/**
  * testSettings method
  *
  * @return void
