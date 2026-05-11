@@ -529,6 +529,7 @@ class FormHelperTest extends CakeTestCase {
 		parent::setUp();
 
 		$this->_oldDebug = Configure::read('debug');
+		Configure::write('debug', 2);
 		Configure::write('Config.language', 'eng');
 		Configure::write('App.base', '');
 		Configure::delete('Asset');

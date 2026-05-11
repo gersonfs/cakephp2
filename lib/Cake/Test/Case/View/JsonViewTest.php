@@ -35,8 +35,16 @@ class JsonViewTest extends CakeTestCase {
  **/
 	public function setUp(): void {
 		parent::setUp();
+		$this->_oldDebug = Configure::read('debug');
 		Configure::write('debug', 0);
 	}
+
+	public function tearDown(): void {
+		parent::tearDown();
+		Configure::write('debug', $this->_oldDebug);
+	}
+
+	protected $_oldDebug = null;
 
 /**
  * Generates testRenderWithoutView data.

@@ -146,6 +146,7 @@ class ExceptionRendererTest extends CakeTestCase {
  */
 	public function setUp(): void {
 		parent::setUp();
+		$this->_oldDebug = Configure::read('debug');
 		Configure::write('Config.language', 'eng');
 		// Reset session to filesystem defaults so previous DB-backed
 		// session config from Model tests doesn't try to query a
@@ -180,7 +181,10 @@ class ExceptionRendererTest extends CakeTestCase {
 		if ($this->_restoreError) {
 			restore_error_handler();
 		}
+		Configure::write('debug', $this->_oldDebug);
 	}
+
+	protected $_oldDebug = null;
 
 /**
  * Mocks out the response on the ExceptionRenderer object so headers aren't modified.

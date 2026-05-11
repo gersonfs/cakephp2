@@ -204,6 +204,7 @@ class HelperTest extends CakeTestCase {
 	public function setUp(): void {
 		parent::setUp();
 
+		$this->_oldDebug = Configure::read('debug');
 		ClassRegistry::flush();
 		Router::reload();
 		$null = null;
@@ -228,10 +229,13 @@ class HelperTest extends CakeTestCase {
 	public function tearDown(): void {
 		parent::tearDown();
 		Configure::delete('Asset');
+		Configure::write('debug', $this->_oldDebug);
 
 		CakePlugin::unload();
 		unset($this->Helper, $this->View);
 	}
+
+	protected $_oldDebug = null;
 
 /**
  * Provider for setEntity test.
