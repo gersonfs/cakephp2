@@ -133,7 +133,12 @@ class RequestHandlerComponentTest extends CakeTestCase {
 	public function tearDown(): void {
 		parent::tearDown();
 		unset($this->RequestHandler, $this->Controller);
-		unset($_SERVER['HTTP_X_REQUESTED_WITH'], $_SERVER['HTTP_X_PROTOTYPE_VERSION']);
+		unset(
+			$_SERVER['HTTP_X_REQUESTED_WITH'],
+			$_SERVER['HTTP_X_PROTOTYPE_VERSION'],
+			$_SERVER['HTTP_IF_NONE_MATCH'],
+			$_SERVER['HTTP_IF_MODIFIED_SINCE']
+		);
 		if (!headers_sent()) {
 			header('Content-type: text/html'); //reset content type.
 		}

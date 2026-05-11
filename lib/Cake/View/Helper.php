@@ -374,7 +374,7 @@ class Helper extends CakeObject {
 		$path = $this->_encodeUrl($this->assetTimestamp($this->webroot($path)));
 
 		if (!empty($options['fullBase'])) {
-			$path = rtrim(Router::fullBaseUrl(), '/') . '/' . ltrim($path, '/');
+			$path = rtrim((string)Router::fullBaseUrl(), '/') . '/' . ltrim($path, '/');
 		}
 		return $path;
 	}

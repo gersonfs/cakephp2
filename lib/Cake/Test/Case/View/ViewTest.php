@@ -19,6 +19,7 @@
 App::uses('View', 'View');
 App::uses('Helper', 'View');
 App::uses('Controller', 'Controller');
+App::uses('CakeRequest', 'Network');
 App::uses('CacheHelper', 'View/Helper');
 App::uses('HtmlHelper', 'View/Helper');
 App::uses('ErrorHandler', 'Error');
@@ -770,8 +771,15 @@ class ViewTest extends CakeTestCase {
 	 * @return void
 	 */
 	public function testElementInexistent() {
-		$this->expectException('PHPUnit\Framework\Exception');
-		$this->View->element('non_existent_element');
+		set_error_handler(static function ($errno, $errstr) {
+			throw new \PHPUnit\Framework\Exception($errstr, $errno);
+		}, E_USER_WARNING | E_USER_NOTICE);
+		try {
+			$this->expectException('PHPUnit\Framework\Exception');
+			$this->View->element('non_existent_element');
+		} finally {
+			restore_error_handler();
+		}
 	}
 
 /**
@@ -780,8 +788,15 @@ class ViewTest extends CakeTestCase {
 	 * @return void
 	 */
 	public function testElementInexistent2() {
-		$this->expectException('PHPUnit\Framework\Exception');
-		$this->View->element('TestPlugin.plugin_element', array(), array('plugin' => 'test_plugin'));
+		set_error_handler(static function ($errno, $errstr) {
+			throw new \PHPUnit\Framework\Exception($errstr, $errno);
+		}, E_USER_WARNING | E_USER_NOTICE);
+		try {
+			$this->expectException('PHPUnit\Framework\Exception');
+			$this->View->element('TestPlugin.plugin_element', array(), array('plugin' => 'test_plugin'));
+		} finally {
+			restore_error_handler();
+		}
 	}
 
 /**
@@ -790,8 +805,15 @@ class ViewTest extends CakeTestCase {
 	 * @return void
 	 */
 	public function testElementInexistent3() {
-		$this->expectException('PHPUnit\Framework\Exception');
-		$this->View->element('test_plugin.plugin_element');
+		set_error_handler(static function ($errno, $errstr) {
+			throw new \PHPUnit\Framework\Exception($errstr, $errno);
+		}, E_USER_WARNING | E_USER_NOTICE);
+		try {
+			$this->expectException('PHPUnit\Framework\Exception');
+			$this->View->element('test_plugin.plugin_element');
+		} finally {
+			restore_error_handler();
+		}
 	}
 
 /**

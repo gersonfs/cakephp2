@@ -511,7 +511,7 @@ class FormHelperTest extends CakeTestCase {
  *
  * @var array
  */
-	public $fixtures = array('core.post');
+	public $fixtures = array('core.post', 'core.comment', 'core.article', 'core.user', 'core.tag', 'core.articles_tag', 'core.attachment', 'core.author');
 
 /**
  * Do not load the fixtures by default
@@ -8747,6 +8747,7 @@ class FormHelperTest extends CakeTestCase {
  * @return void
  */
 	public function testPostLinkSecurityHashInline() {
+		$this->loadFixtures('Post');
 		$hash = Security::hash(
 			'/basedir/posts/delete/1' .
 			serialize(array()) .
@@ -9374,6 +9375,7 @@ class FormHelperTest extends CakeTestCase {
  * @return void
  */
 	public function testCreateUrlImpliedController() {
+		$this->loadFixtures('Comment', 'Article', 'User');
 		$restore = error_reporting(E_ALL ^ E_USER_DEPRECATED);
 		$this->Form->request['controller'] = 'posts';
 		$result = $this->Form->create('Comment', array(
@@ -11183,6 +11185,7 @@ class FormHelperTest extends CakeTestCase {
  * @return void
  */
 	public function testLastActionWithNamedNumeric() {
+		$this->loadFixtures('User');
 		$here = '/users/index/page:1';
 
 		$this->Form->request->here = $here;

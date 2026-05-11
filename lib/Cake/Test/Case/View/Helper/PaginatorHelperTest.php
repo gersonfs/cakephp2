@@ -2434,7 +2434,7 @@ class PaginatorHelperTest extends CakeTestCase {
 		$expected = array(
 			'<span',
 			array('a' => array(
-				'href' => FULL_BASE_URL . '/index/sort:Article.title/direction:DESC', 'rel' => 'first'
+				'href' => Configure::read('App.fullBaseUrl') . '/index/sort:Article.title/direction:DESC', 'rel' => 'first'
 			)),
 			'&lt;&lt; first',
 			'/a',

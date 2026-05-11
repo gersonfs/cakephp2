@@ -410,7 +410,7 @@ class TextHelperTest extends CakeTestCase {
  *
  * @return void
  */
-	public function autoLinkEmailProvider() {
+	public static function autoLinkEmailProvider() {
 		return array(
 			array(
 				'This is a test text',

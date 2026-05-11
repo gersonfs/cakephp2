@@ -125,13 +125,8 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 
 	public static function assertAttributeEquals($expected, string $actualAttributeName, $actualClassOrObject, string $message = '', float $delta = 0.0, int $maxDepth = 10, bool $canonicalize = false, bool $ignoreCase = false): void
 	{
-		if (is_object($actualClassOrObject)) {
-			$value = self::getObjectAttributeCake($actualClassOrObject, $actualAttributeName);
-			self::assertEquals($expected, $value, $message);
-			return;
-		}
-
-		parent::assertAttributeEquals($expected,  $actualAttributeName, $actualClassOrObject, $message, $delta ,$maxDepth,  $canonicalize, $ignoreCase);
+		$value = self::getObjectAttributeCake($actualClassOrObject, $actualAttributeName);
+		self::assertEquals($expected, $value, $message);
 	}
 
 	public static function getObjectAttributeCake($object, string $attributeName)
@@ -713,7 +708,7 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  * @return void
  */
 	protected static function assertPattern($pattern, $string, $message = '') {
-		return static::assertRegExp($pattern, $string, $message);
+		return static::assertMatchesRegularExpression($pattern, $string, $message);
 	}
 
 /**
