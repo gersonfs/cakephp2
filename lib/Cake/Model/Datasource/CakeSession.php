@@ -200,7 +200,7 @@ class CakeSession {
  */
 	protected static function _setHost($host) {
 		static::$host = $host;
-		if (strpos(static::$host, ':') !== false) {
+		if (static::$host !== null && strpos(static::$host, ':') !== false) {
 			static::$host = substr(static::$host, 0, strpos(static::$host, ':'));
 		}
 	}
@@ -246,6 +246,9 @@ class CakeSession {
  */
 	public static function check($name) {
 		if (!static::_hasSession() || !static::start()) {
+			return false;
+		}
+		if ($name === null) {
 			return false;
 		}
 		if (isset($_SESSION[$name])) {
@@ -551,13 +554,9 @@ class CakeSession {
 		static::$_cookieName = $sessionConfig['ini']['session.name'];
 
 		if (!empty($sessionConfig['handler'])) {
-			$sessionConfig['ini']['session.save_handler'] = 'user';
-
-			// In PHP7.2.0+ session.save_handler can't be set to 'user' by the user.
-			// https://github.com/php/php-src/commit/a93a51c3bf4ea1638ce0adc4a899cb93531b9f0d
-			if (version_compare(PHP_VERSION, '7.2.0', '>=')) {
-				unset($sessionConfig['ini']['session.save_handler']);
-			}
+			// PHP 7.2+ does not allow setting session.save_handler via ini_set;
+			// the handler is registered programmatically further below.
+			unset($sessionConfig['ini']['session.save_handler']);
 		} elseif (!empty($sessionConfig['session.save_path']) && Configure::read('debug')) {
 			if (!is_dir($sessionConfig['session.save_path'])) {
 				mkdir($sessionConfig['session.save_path'], 0775, true);
@@ -578,7 +577,7 @@ class CakeSession {
 		if (empty($_SESSION) && !headers_sent() && (!function_exists('session_status') || session_status() !== PHP_SESSION_ACTIVE)) {
 			if (!empty($sessionConfig['ini']) && is_array($sessionConfig['ini'])) {
 				foreach ($sessionConfig['ini'] as $setting => $value) {
-					if (ini_set($setting, $value) === false) {
+					if (@ini_set($setting, $value) === false) {
 						throw new CakeSessionException(__d('cake_dev', 'Unable to configure the session, setting %s failed.', $setting));
 					}
 				}
@@ -590,14 +589,13 @@ class CakeSession {
 		if (!empty($sessionConfig['handler']['engine']) && !headers_sent()) {
 			$handler = static::_getHandler($sessionConfig['handler']['engine']);
 			if (!function_exists('session_status') || session_status() !== PHP_SESSION_ACTIVE) {
-				session_set_save_handler(
-					array($handler, 'open'),
-					array($handler, 'close'),
-					array($handler, 'read'),
-					array($handler, 'write'),
-					array($handler, 'destroy'),
-					array($handler, 'gc')
-				);
+				if (!($handler instanceof \SessionHandlerInterface) && $handler instanceof CakeSessionHandlerInterface) {
+					App::uses('CakeSessionHandlerAdapter', 'Model/Datasource/Session');
+					$handler = new CakeSessionHandlerAdapter($handler);
+				}
+				if ($handler instanceof \SessionHandlerInterface) {
+					session_set_save_handler($handler, false);
+				}
 			}
 		}
 		Configure::write('Session', $sessionConfig);

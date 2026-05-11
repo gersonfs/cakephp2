@@ -390,7 +390,7 @@ class Set {
 						if (!is_numeric($key)) {
 							$ctext[] = $token;
 							$tok = array_shift($tokens);
-							if (isset($items[$tok])) {
+							if ($tok !== null && isset($items[$tok])) {
 								$ctext[] = $tok;
 								$item = $items[$tok];
 								$matches[] = array(
@@ -501,7 +501,7 @@ class Set {
 			$val = $data[$key];
 
 			if ($op === '=' && $expected && $expected[0] === '/') {
-				return preg_match($expected, $val);
+				return preg_match($expected, (string)$val);
 			}
 			if ($op === '=' && $val != $expected) {
 				return false;

@@ -43,6 +43,13 @@ class BasicAuthenticateTest extends CakeTestCase {
  */
 	public function setUp(): void {
 		parent::setUp();
+		// Clear any HTTP auth headers carried over from previous test cases.
+		unset(
+			$_SERVER['PHP_AUTH_USER'],
+			$_SERVER['PHP_AUTH_PW'],
+			$_SERVER['HTTP_AUTHORIZATION'],
+			$_SERVER['REDIRECT_HTTP_AUTHORIZATION']
+		);
 		$this->Collection = $this->getMock('ComponentCollection');
 		$this->auth = new BasicAuthenticate($this->Collection, array(
 			'fields' => array('username' => 'user', 'password' => 'password'),

@@ -53,7 +53,7 @@ abstract class BaseModelTest extends CakeTestCase {
 		'core.article', 'core.featured', 'core.article_featureds_tags', 'core.article_featured',
 		'core.numeric_article', 'core.tag', 'core.articles_tag', 'core.comment',
 		'core.attachment', 'core.apple', 'core.sample', 'core.another_article', 'core.item',
-		'core.advertisement', 'core.home', 'core.post', 'core.author', 'core.bid', 'core.portfolio',
+		'core.advertisement', 'core.ad', 'core.campaign', 'core.home', 'core.post', 'core.author', 'core.bid', 'core.portfolio',
 		'core.product', 'core.project', 'core.thread', 'core.message', 'core.items_portfolio',
 		'core.syfile', 'core.image', 'core.device_type', 'core.device_type_category',
 		'core.feature_set', 'core.exterior_type_category', 'core.document', 'core.device',

@@ -53,18 +53,32 @@ class CakeFixtureManagerTest extends CakeTestCase {
  * @return void
  */
 	public function testLoadTruncatesTable() {
-		$MockFixture = $this->getMock('UuidFixture', array('truncate'));
+		$MockFixture = $this->getMock('UuidFixture', array('truncate', 'insert'));
 		$MockFixture
 			->expects($this->once())
 			->method('truncate')
 			->will($this->returnValue(true));
+		$MockFixture
+			->expects($this->any())
+			->method('insert')
+			->will($this->returnValue(true));
+		$MockFixture->created = array('test');
 
 		$fixtureManager = $this->fixtureManager;
 		$fixtureManagerReflection = new ReflectionClass($fixtureManager);
 
 		$loadedProperty = $fixtureManagerReflection->getProperty('_loaded');
-		$loadedProperty->setAccessible(true);
 		$loadedProperty->setValue($fixtureManager, array('core.uuid' => $MockFixture));
+
+		// Force the test fixture's table to be visible to listSources so the
+		// optional $cacheInstances "table missing" guard doesn't kick in.
+		if (CakeFixtureManager::$cacheInstances) {
+			$db = ConnectionManager::getDataSource('test');
+			$db->execute(sprintf(
+				'CREATE TABLE IF NOT EXISTS %s (id INTEGER PRIMARY KEY)',
+				$db->config['prefix'] . $MockFixture->table
+			));
+		}
 
 		$TestCase = $this->getMock('CakeTestCase');
 		$TestCase->fixtures = array('core.uuid');
@@ -72,6 +86,11 @@ class CakeFixtureManagerTest extends CakeTestCase {
 		$TestCase->dropTables = false;
 
 		$fixtureManager->load($TestCase);
+
+		if (CakeFixtureManager::$cacheInstances) {
+			$db = ConnectionManager::getDataSource('test');
+			$db->execute('DROP TABLE IF EXISTS ' . $db->config['prefix'] . $MockFixture->table);
+		}
 	}
 
 /**
@@ -90,13 +109,17 @@ class CakeFixtureManagerTest extends CakeTestCase {
 		$fixtureManagerReflection = new ReflectionClass($fixtureManager);
 
 		$fixtureMapProperty = $fixtureManagerReflection->getProperty('_fixtureMap');
-		$fixtureMapProperty->setAccessible(true);
 		$fixtureMapProperty->setValue($fixtureManager, array('UuidFixture' => $MockFixture));
 
 		$dboMethods = array_diff(get_class_methods('DboSource'), array('enabled'));
-		$dboMethods[] = 'connect';
+		if (!in_array('connect', $dboMethods, true)) {
+			$dboMethods[] = 'connect';
+		}
 		$db = $this->getMock('DboSource', $dboMethods);
 		$db->config['prefix'] = '';
+		$db->expects($this->any())
+			->method('listSources')
+			->will($this->returnValue(array($MockFixture->table)));
 
 		$fixtureManager->loadSingle('Uuid', $db, false);
 	}

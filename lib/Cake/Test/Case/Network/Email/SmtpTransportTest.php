@@ -285,6 +285,7 @@ class SmtpTransportTest extends CakeTestCase {
 
 		$this->SmtpTransport->config(array('username' => null, 'password' => null));
 		$this->SmtpTransport->auth();
+		$this->assertTrue(true);
 	}
 
 /**

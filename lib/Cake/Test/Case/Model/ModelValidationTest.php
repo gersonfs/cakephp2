@@ -775,18 +775,25 @@ class ModelValidationTest extends BaseModelTest {
 	 * @return void
 	 */
 	public function testMissingValidationErrorTriggering() {
-		$this->expectException(\PHPUnit\Framework\Exception::class);
-		Configure::write('debug', 2);
+		set_error_handler(static function ($errno, $errstr) {
+			throw new \PHPUnit\Framework\Exception($errstr, $errno);
+		}, E_USER_WARNING);
+		try {
+			$this->expectException(\PHPUnit\Framework\Exception::class);
+			Configure::write('debug', 2);
 
-		$TestModel = new ValidationTest1();
-		$TestModel->create(array('title' => 'foo'));
-		$TestModel->validate = array(
-			'title' => array(
-				'rule' => array('thisOneBringsThePain'),
-				'required' => true
-			)
-		);
-		$TestModel->invalidFields(array('fieldList' => array('title')));
+			$TestModel = new ValidationTest1();
+			$TestModel->create(array('title' => 'foo'));
+			$TestModel->validate = array(
+				'title' => array(
+					'rule' => array('thisOneBringsThePain'),
+					'required' => true
+				)
+			);
+			$TestModel->invalidFields(array('fieldList' => array('title')));
+		} finally {
+			restore_error_handler();
+		}
 	}
 
 /**
@@ -1719,6 +1726,7 @@ class ModelValidationTest extends BaseModelTest {
  * @return void
  */
 	public function testValidateMany() {
+		$this->loadFixtures('Article', 'User', 'Comment', 'Tag', 'ArticlesTag', 'Attachment');
 		$TestModel = new Article();
 		$TestModel->validate = array('title' => 'notBlank');
 		$data = array(
@@ -2018,6 +2026,7 @@ class ModelValidationTest extends BaseModelTest {
  * @return void
  */
 	public function testValidateCallbacks() {
+		$this->loadFixtures('Article', 'User', 'Comment', 'Tag', 'ArticlesTag', 'Attachment');
 		$TestModel = $this->getMock('Article', array('beforeValidate', 'afterValidate'));
 		$TestModel->expects($this->once())->method('beforeValidate');
 		$TestModel->expects($this->once())->method('afterValidate');

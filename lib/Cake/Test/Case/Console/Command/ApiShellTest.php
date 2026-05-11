@@ -21,6 +21,9 @@ App::uses('ConsoleInput', 'Console');
 App::uses('ShellDispatcher', 'Console');
 App::uses('Shell', 'Console');
 App::uses('ApiShell', 'Console/Command');
+App::uses('ConsoleOutputFake', 'Test/Case/Console');
+App::uses('ConsoleInputFake', 'Test/Case/Console');
+
 
 /**
  * ApiShellTest class
@@ -29,6 +32,11 @@ App::uses('ApiShell', 'Console/Command');
  */
 class ApiShellTest extends CakeTestCase {
 
+	private ApiShell $Shell;
+
+	private ConsoleOutputFake $out;
+	private ConsoleInputFake $in;
+
 /**
  * setUp method
  *
@@ -36,14 +44,12 @@ class ApiShellTest extends CakeTestCase {
  */
 	public function setUp(): void {
 		parent::setUp();
-		$out = $this->getMock('ConsoleOutput', array(), array(), '', false);
-		$in = $this->getMock('ConsoleInput', array(), array(), '', false);
+		$this->out = new ConsoleOutputFake();
+		$this->in = new ConsoleInputFake();
 
-		$this->Shell = $this->getMock(
-			'ApiShell',
-			array('in', 'out', 'createFile', 'hr', '_stop'),
-			array($out, $out, $in)
-		);
+		$this->Shell = new class($this->out, null, $this->in) extends ApiShell {
+			protected function _stop($status = 0){}
+		};
 	}
 
 /**
@@ -52,8 +58,9 @@ class ApiShellTest extends CakeTestCase {
  * @return void
  */
 	public function testMethodNameDetection() {
-		$this->Shell->expects($this->any())->method('in')->will($this->returnValue('q'));
-		$this->Shell->expects($this->at(0))->method('out')->with('Controller');
+		$this->in->addReturnValue('q');
+		//$this->Shell->expects($this->any())->method('in')->will($this->returnValue('q'));
+		//$this->Shell->expects($this->at(0))->method('out')->with('Controller');
 
 		$expected = array(
 			'1. afterFilter()',
@@ -84,12 +91,13 @@ class ApiShellTest extends CakeTestCase {
 			'26. shutdownProcess()',
 			'27. startupProcess()',
 			'28. validate()',
-			'29. validateErrors()'
+			'29. validateErrors()',
+			 ''
 		);
-		$this->Shell->expects($this->at(2))->method('out')->with($expected);
 
 		$this->Shell->args = array('controller');
 		$this->Shell->paths['controller'] = CAKE . 'Controller' . DS;
 		$this->Shell->main();
+		$this->assertEquals(implode("\n", $expected), $this->out->outputs[4]);
 	}
 }

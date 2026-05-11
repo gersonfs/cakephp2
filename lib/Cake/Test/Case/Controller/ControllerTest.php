@@ -506,6 +506,12 @@ class ControllerTest extends CakeTestCase {
  * @return void
  */
 	public function testConstructClassesWithComponents() {
+		App::build(array(
+			'Plugin' => array(CAKE . 'Test' . DS . 'test_app' . DS . 'Plugin' . DS),
+		));
+		CakePlugin::load('TestPlugin');
+		App::uses('TestPluginAppController', 'TestPlugin.Controller');
+		App::uses('TestPluginController', 'TestPlugin.Controller');
 		$Controller = new TestPluginController(new CakeRequest(), new CakeResponse());
 		$Controller->uses = array('NameTest');
 		$Controller->components[] = 'Test2';
@@ -1182,7 +1188,7 @@ class ControllerTest extends CakeTestCase {
  *
  * @return array
  */
-	public function dangerousPostConditionsProvider() {
+	public static function dangerousPostConditionsProvider() {
 		return array(
 			array(
 				array('Model' => array('field !=' => 1))

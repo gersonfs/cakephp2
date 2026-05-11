@@ -1,5 +1,6 @@
 <?php
 
+#[\AllowDynamicProperties]
 class DATABASE_CONFIG
 {
 	private $identities = array(

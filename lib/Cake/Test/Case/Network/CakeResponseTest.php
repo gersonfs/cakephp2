@@ -1134,14 +1134,17 @@ class CakeResponseTest extends CakeTestCase {
  *
  * @return array
  */
-	public function corsData() {
+	public static function corsData() {
 		$fooRequest = new CakeRequest();
 
-		$secureRequest = $this->getMock('CakeRequest', array('is'));
-		$secureRequest->expects($this->any())
-			->method('is')
-			->with('ssl')
-			->will($this->returnValue(true));
+		$secureRequest = new class extends CakeRequest {
+			public function is($type, ...$args) {
+				if ($type === 'ssl' || $type === array('ssl')) {
+					return true;
+				}
+				return parent::is($type, ...$args);
+			}
+		};
 
 		return array(
 			array($fooRequest, null, '*', '', '', false, false),
@@ -1722,7 +1725,7 @@ class CakeResponseTest extends CakeTestCase {
  *
  * @return array
  */
-	public function invalidFileRangeProvider() {
+	public static function invalidFileRangeProvider() {
 		return array(
 			// malformed range
 			array(

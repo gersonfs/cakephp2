@@ -810,12 +810,8 @@ class Sqlserver extends DboSource {
 			}
 			return true;
 		} catch (PDOException $e) {
-			if (isset($query->queryString)) {
-				$e->queryString = $query->queryString;
-			} else {
-				$e->queryString = $sql;
-			}
-			throw $e;
+			$queryString = isset($query->queryString) ? $query->queryString : $sql;
+			throw new CakePDOException($e, $queryString);
 		}
 	}
 

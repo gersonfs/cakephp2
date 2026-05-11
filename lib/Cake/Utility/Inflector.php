@@ -483,7 +483,7 @@ class Inflector {
  */
 	public static function underscore($camelCasedWord) {
 		if (!($result = static::_cache(__FUNCTION__, $camelCasedWord))) {
-			$underscoredWord = preg_replace('/(?<=\\w)([A-Z])/', '_\\1', $camelCasedWord);
+			$underscoredWord = preg_replace('/(?<=\\w)([A-Z])/', '_\\1', (string)$camelCasedWord);
 			$result = mb_strtolower($underscoredWord);
 			static::_cache(__FUNCTION__, $camelCasedWord, $result);
 		}
@@ -500,7 +500,7 @@ class Inflector {
  */
 	public static function humanize($lowerCaseAndUnderscoredWord) {
 		if (!($result = static::_cache(__FUNCTION__, $lowerCaseAndUnderscoredWord))) {
-			$result = explode(' ', str_replace('_', ' ', $lowerCaseAndUnderscoredWord));
+			$result = explode(' ', str_replace('_', ' ', (string)$lowerCaseAndUnderscoredWord));
 			foreach ($result as &$word) {
 				$word = mb_strtoupper(mb_substr($word, 0, 1)) . mb_substr($word, 1);
 			}
@@ -576,7 +576,7 @@ class Inflector {
 		);
 
 		$map = static::$_transliteration + $merge;
-		return preg_replace(array_keys($map), array_values($map), $string);
+		return preg_replace(array_keys($map), array_values($map), (string)$string);
 	}
 
 }

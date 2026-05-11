@@ -34,6 +34,8 @@ class CakeNumberTest extends CakeTestCase {
 	public function setUp(): void {
 		parent::setUp();
 		$this->Number = new CakeNumber();
+		$this->_savedLocale = setlocale(LC_NUMERIC, 0);
+		setlocale(LC_NUMERIC, 'C');
 	}
 
 /**
@@ -44,7 +46,10 @@ class CakeNumberTest extends CakeTestCase {
 	public function tearDown(): void {
 		parent::tearDown();
 		unset($this->Number);
+		setlocale(LC_NUMERIC, $this->_savedLocale);
 	}
+
+	protected $_savedLocale = null;
 
 /**
  * testFormatAndCurrency method
@@ -765,7 +770,7 @@ class CakeNumberTest extends CakeTestCase {
  *
  * @return array
  */
-	public function filesizes() {
+	public static function filesizes() {
 		return array(
 			array(array('size' => '512B', 'default' => false), 512),
 			array(array('size' => '1KB', 'default' => false), 1024),

@@ -279,7 +279,7 @@ class ObjectTestModel extends CakeTestModel {
  *
  * @package       Cake.Test.Case.Core
  */
-class ObjectTest extends CakeTestCase {
+class CakeObjectTest extends CakeTestCase {
 
 /**
  * fixtures
@@ -690,14 +690,4 @@ class ObjectTest extends CakeTestCase {
 		$this->assertEquals($data, $result);
 	}
 
-/**
- * Test backward compatibility
- *
- * @return voind
- */
-	public function testBackwardCompatibility() {
-		$this->skipIf(version_compare(PHP_VERSION, '7.0.0', '>='));
-
-		$this->assertInstanceOf('Object', new ObjectTestModel);
-	}
 }

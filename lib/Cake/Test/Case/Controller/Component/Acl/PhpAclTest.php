@@ -346,9 +346,19 @@ class PhpAclTest extends CakeTestCase {
 			),
 		);
 
-		$this->expectException('\PHPUnit\Framework\Exception');
-		$this->expectErrorMessage('cycle detected');
+		$triggered = false;
+		$errorMessage = '';
+		set_error_handler(function ($errno, $errstr) use (&$triggered, &$errorMessage) {
+			$triggered = true;
+			$errorMessage = $errstr;
+			return true;
+		});
+
 		$this->PhpAcl->build($config);
+		restore_error_handler();
+
+		$this->assertTrue($triggered, 'Expected a E_USER_WARNING to be triggered');
+		$this->assertStringContainsString('cycle detected', $errorMessage);
 	}
 
 /**

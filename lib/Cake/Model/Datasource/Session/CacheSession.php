@@ -25,14 +25,20 @@ App::uses('CakeSessionHandlerInterface', 'Model/Datasource/Session');
  * @package       Cake.Model.Datasource.Session
  * @see CakeSession for configuration information.
  */
-class CacheSession implements CakeSessionHandlerInterface {
+class CacheSession implements CakeSessionHandlerInterface, \SessionHandlerInterface {
 
 /**
  * Method called on open of a database session.
  *
+ * Compatible with both CakeSessionHandlerInterface (no args) and
+ * SessionHandlerInterface (savePath, sessionName) — extra args are
+ * ignored. #[\ReturnTypeWillChange] keeps PHP 7.4 quiet about the
+ * native interface's stricter signature.
+ *
  * @return bool Success
  */
-	public function open() {
+	#[\ReturnTypeWillChange]
+	public function open($savePath = null, $name = null) {
 		return true;
 	}
 
@@ -41,6 +47,7 @@ class CacheSession implements CakeSessionHandlerInterface {
  *
  * @return bool Success
  */
+	#[\ReturnTypeWillChange]
 	public function close() {
 		return true;
 	}
@@ -49,15 +56,16 @@ class CacheSession implements CakeSessionHandlerInterface {
  * Method used to read from a database session.
  *
  * @param string $id The key of the value to read
- * @return mixed The value of the key or false if it does not exist
+ * @return string The value of the key or '' if it does not exist
  */
+	#[\ReturnTypeWillChange]
 	public function read($id) {
 		$data = Cache::read($id, Configure::read('Session.handler.config'));
 
 		if (!is_numeric($data) && empty($data)) {
 			return '';
 		}
-		return $data;
+		return (string)$data;
 	}
 
 /**
@@ -67,6 +75,7 @@ class CacheSession implements CakeSessionHandlerInterface {
  * @param mixed $data The value of the data to be saved.
  * @return bool True for successful write, false otherwise.
  */
+	#[\ReturnTypeWillChange]
 	public function write($id, $data) {
 		return (bool)Cache::write($id, $data, Configure::read('Session.handler.config'));
 	}
@@ -77,6 +86,7 @@ class CacheSession implements CakeSessionHandlerInterface {
  * @param int $id ID that uniquely identifies session in cache
  * @return bool True for successful delete, false otherwise.
  */
+	#[\ReturnTypeWillChange]
 	public function destroy($id) {
 		return (bool)Cache::delete($id, Configure::read('Session.handler.config'));
 	}
@@ -85,10 +95,12 @@ class CacheSession implements CakeSessionHandlerInterface {
  * Helper function called on gc for cache sessions.
  *
  * @param int $expires Timestamp (defaults to current time)
- * @return bool Success
+ * @return int|false Number of deleted sessions, or false on failure
  */
+	#[\ReturnTypeWillChange]
 	public function gc($expires = null) {
-		return (bool)Cache::gc(Configure::read('Session.handler.config'), $expires);
+		Cache::gc(Configure::read('Session.handler.config'), $expires);
+		return 0;
 	}
 
 }

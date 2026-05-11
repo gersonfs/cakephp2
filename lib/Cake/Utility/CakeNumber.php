@@ -269,7 +269,7 @@ class CakeNumber {
 			static::$_numberFormatSupport = version_compare(PHP_VERSION, '5.4.0', '>=');
 		}
 		if (static::$_numberFormatSupport) {
-			return number_format($value, $places, $decimals, $thousands);
+			return number_format((float)$value, (int)$places, (string)$decimals, (string)$thousands);
 		}
 		$value = number_format($value, $places, '.', '');
 		$after = '';

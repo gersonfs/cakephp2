@@ -68,7 +68,7 @@ class PluginTaskTest extends CakeTestCase {
  * @return void
  */
 	public function tearDown(): void {
-		if (file_exists($this->Task->bootstrap)) {
+		if ($this->Task->bootstrap !== null && file_exists($this->Task->bootstrap)) {
 			unlink($this->Task->bootstrap);
 		}
 		parent::tearDown();

@@ -1845,6 +1845,7 @@ class HttpSocketTest extends CakeTestCase {
 		} catch (SocketException $e) {
 			$message = $e->getMessage();
 			$this->skipIf(strpos($message, 'Invalid HTTP') !== false, 'Invalid HTTP Response received, skipping.');
+			$this->skipIf(strpos($message, 'getaddrinfo') !== false, 'DNS lookup failed, skipping.');
 			$this->assertStringContainsString('Failed to enable crypto', $message);
 		}
 	}
@@ -1854,7 +1855,7 @@ class HttpSocketTest extends CakeTestCase {
  *
  * @return array
  */
-	public function statusProvider() {
+	public static function statusProvider() {
 		return array(
 			array('HTTP/1.1 200 ', '200'),
 			array('HTTP/1.1 200    ', '200'),

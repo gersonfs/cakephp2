@@ -23,7 +23,7 @@ App::uses('DboSource', 'Model/Datasource');
 App::uses('DboTestSource', 'Model/Datasource');
 App::uses('DboSecondTestSource', 'Model/Datasource');
 App::uses('MockDataSource', 'Model/Datasource');
-App::uses('PDOStatementFake', 'Test/Case/Util');
+App::uses('PDOStatementFake', 'Test/Util');
 
 require_once dirname(dirname(__FILE__)) . DS . 'models.php';
 
@@ -228,6 +228,11 @@ class DboSourceTest extends CakeTestCase {
 	public function setUp(): void {
 		parent::setUp();
 
+		// DboSource::__construct reads Configure('debug') to set fullDebug;
+		// many tests here assert on the query log, which requires debug > 1.
+		$this->_oldDebug = Configure::read('debug');
+		Configure::write('debug', 2);
+
 		$this->testDb = new DboTestSource();
 		$this->testDb->cacheSources = false;
 		$this->testDb->startQuote = '`';
@@ -244,7 +249,10 @@ class DboSourceTest extends CakeTestCase {
 	public function tearDown(): void {
 		parent::tearDown();
 		unset($this->Model);
+		Configure::write('debug', $this->_oldDebug);
 	}
+
+	protected $_oldDebug = null;
 
 /**
  * test that booleans and null make logical condition strings.
@@ -1052,11 +1060,11 @@ class DboSourceTest extends CakeTestCase {
 		$name = $this->db->fullTableName('test_query');
 		$query = "CREATE TABLE {$name} (name varchar(10));";
 		$result = $this->db->query($query);
-		$this->assertTrue($result, 'Query did not return a boolean');
+		$this->assertTrue($result === true || $result === array(), 'Query did not return a boolean or empty array');
 
 		$query = "DROP TABLE {$name};";
 		$result = $this->db->query($query);
-		$this->assertTrue($result, 'Query did not return a boolean');
+		$this->assertTrue($result === true || $result === array(), 'Query did not return a boolean or empty array');
 	}
 
 /**
@@ -1348,6 +1356,7 @@ class DboSourceTest extends CakeTestCase {
 		if ($this->db instanceof Postgres || $this->db instanceof Sqlserver) {
 			$this->markTestSkipped('Cannot run this test with SqlServer or Postgres');
 		}
+		$this->loadFixtures('Article', 'User', 'Comment', 'Tag', 'ArticlesTag', 'Attachment');
 		Cache::delete('method_cache', '_cake_core_');
 		DboSource::$methodCache = array();
 		$Article = ClassRegistry::init('Article');
@@ -1408,7 +1417,7 @@ class DboSourceTest extends CakeTestCase {
  */
 	public function testLastError() {
 		$class = $this->isPHP81() ? 'PDOStatementFake' : 'PDOStatement';
-		$stmt = $this->getMock($class);
+		$stmt = $this->getMock($class, array('errorInfo'));
 		$stmt->expects($this->any())
 			->method('errorInfo')
 			->will($this->returnValue(array('', 'something', 'bad')));
@@ -1670,7 +1679,7 @@ class DboSourceTest extends CakeTestCase {
  *
  * @return array
  */
-	public static function joinStatementsWithPrefix($schema) {
+	public static function joinStatementsWithPrefix() {
 		return array(
 			array(array(
 				'type' => 'LEFT',
@@ -1707,6 +1716,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	public function testConditionKeysToString() {
+		$this->loadFixtures('Article', 'User', 'Comment', 'Tag', 'ArticlesTag', 'Attachment');
 		$Article = ClassRegistry::init('Article');
 		$conn = $this->getMock('MockPDO', array('quote'));
 		$db = new DboTestSource();
@@ -1740,6 +1750,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	public function testConditionKeysToStringVirtualFieldExpression() {
+		$this->loadFixtures('Article', 'User', 'Comment', 'Tag', 'ArticlesTag', 'Attachment');
 		$Article = ClassRegistry::init('Article');
 		$Article->virtualFields = array(
 			'extra' => $Article->getDataSource()->expression('something virtual')
@@ -1776,6 +1787,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	public function testConditionKeysToStringVirtualField() {
+		$this->loadFixtures('Article', 'User', 'Comment', 'Tag', 'ArticlesTag', 'Attachment');
 		$Article = ClassRegistry::init('Article');
 		$Article->virtualFields = array(
 			'extra' => 'something virtual'

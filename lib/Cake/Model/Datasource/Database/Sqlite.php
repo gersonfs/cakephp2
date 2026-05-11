@@ -179,7 +179,7 @@ class Sqlite extends DboSource {
 		);
 
 		foreach ($result as $column) {
-			$default = ($column['dflt_value'] === 'NULL') ? null : trim($column['dflt_value'], "'");
+			$default = ($column['dflt_value'] === null || $column['dflt_value'] === 'NULL') ? null : trim($column['dflt_value'], "'");
 
 			$fields[$column['name']] = array(
 				'type' => $this->column($column['type']),
@@ -187,7 +187,7 @@ class Sqlite extends DboSource {
 				'default' => $default,
 				'length' => $this->length($column['type'])
 			);
-			if (in_array($fields[$column['name']]['type'], array('timestamp', 'datetime')) && strtoupper($fields[$column['name']]['default']) === 'CURRENT_TIMESTAMP') {
+			if (in_array($fields[$column['name']]['type'], array('timestamp', 'datetime')) && strtoupper((string)$fields[$column['name']]['default']) === 'CURRENT_TIMESTAMP') {
 				$fields[$column['name']]['default'] = null;
 			}
 			if ($column['pk'] == 1) {
@@ -393,9 +393,9 @@ class Sqlite extends DboSource {
  */
 	public function limit($limit, $offset = null) {
 		if ($limit) {
-			$rt = sprintf(' LIMIT %u', $limit);
+			$rt = ' LIMIT ' . static::_intString($limit);
 			if ($offset) {
-				$rt .= sprintf(' OFFSET %u', $offset);
+				$rt .= ' OFFSET ' . static::_intString($offset);
 			}
 			return $rt;
 		}

@@ -133,6 +133,13 @@ class ConsoleOptionParser {
 	protected $_command = '';
 
 /**
+ * Tokens being parsed.
+ *
+ * @var array
+ */
+	protected $_tokens = array();
+
+/**
  * Construct an OptionParser so you can define its behavior
  *
  * @param string $command The command name this parser is for. The command name is used for generating help.
@@ -473,7 +480,7 @@ class ConsoleOptionParser {
  * @throws ConsoleException When an invalid parameter is encountered.
  */
 	public function parse($argv, $command = null) {
-		if (isset($this->_subcommands[$command]) && $this->_subcommands[$command]->parser()) {
+		if ($command !== null && isset($this->_subcommands[$command]) && $this->_subcommands[$command]->parser()) {
 			return $this->_subcommands[$command]->parser()->parse($argv);
 		}
 		$params = $args = array();
@@ -521,7 +528,7 @@ class ConsoleOptionParser {
  * @return string Generated help.
  */
 	public function help($subcommand = null, $format = 'text', $width = 72) {
-		if (isset($this->_subcommands[$subcommand]) &&
+		if ($subcommand !== null && isset($this->_subcommands[$subcommand]) &&
 			$this->_subcommands[$subcommand]->parser() instanceof self
 		) {
 			$subparser = $this->_subcommands[$subcommand]->parser();

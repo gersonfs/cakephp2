@@ -24,7 +24,7 @@ App::uses('ClassRegistry', 'Utility');
  *
  * @package       Cake.Model.Datasource.Session
  */
-class DatabaseSession implements CakeSessionHandlerInterface {
+class DatabaseSession implements CakeSessionHandlerInterface, \SessionHandlerInterface {
 
 /**
  * Reference to the model handling the session data
@@ -66,9 +66,13 @@ class DatabaseSession implements CakeSessionHandlerInterface {
 /**
  * Method called on open of a database session.
  *
+ * Compatible with both CakeSessionHandlerInterface (no args) and
+ * SessionHandlerInterface (savePath, sessionName).
+ *
  * @return bool Success
  */
-	public function open() {
+	#[\ReturnTypeWillChange]
+	public function open($savePath = null, $name = null) {
 		return true;
 	}
 
@@ -77,6 +81,7 @@ class DatabaseSession implements CakeSessionHandlerInterface {
  *
  * @return bool Success
  */
+	#[\ReturnTypeWillChange]
 	public function close() {
 		return true;
 	}
@@ -85,8 +90,9 @@ class DatabaseSession implements CakeSessionHandlerInterface {
  * Method used to read from a database session.
  *
  * @param int|string $id The key of the value to read
- * @return mixed The value of the key or false if it does not exist
+ * @return string The value of the key or '' if it does not exist
  */
+	#[\ReturnTypeWillChange]
 	public function read($id) {
 		$row = $this->_model->find('first', array(
 			'conditions' => array($this->_model->alias . '.' . $this->_model->primaryKey => $id)
@@ -113,6 +119,7 @@ class DatabaseSession implements CakeSessionHandlerInterface {
  * @param mixed $data The value of the data to be saved.
  * @return bool True for successful write, false otherwise.
  */
+	#[\ReturnTypeWillChange]
 	public function write($id, $data) {
 		if (!$id) {
 			return false;
@@ -139,6 +146,7 @@ class DatabaseSession implements CakeSessionHandlerInterface {
  * @param int $id ID that uniquely identifies session in database
  * @return bool True for successful delete, false otherwise.
  */
+	#[\ReturnTypeWillChange]
 	public function destroy($id) {
 		return (bool)$this->_model->delete($id);
 	}
@@ -149,6 +157,7 @@ class DatabaseSession implements CakeSessionHandlerInterface {
  * @param int $expires Timestamp (defaults to current time)
  * @return bool Success
  */
+	#[\ReturnTypeWillChange]
 	public function gc($expires = null) {
 		if (!$expires) {
 			$expires = time();
@@ -156,7 +165,7 @@ class DatabaseSession implements CakeSessionHandlerInterface {
 			$expires = time() - $expires;
 		}
 		$this->_model->deleteAll(array($this->_model->alias . ".expires <" => $expires), false, false);
-		return true;
+		return 0;
 	}
 
 }

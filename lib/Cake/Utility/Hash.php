@@ -230,7 +230,7 @@ class Hash {
 
 			// Pattern matches and other operators.
 			if ($op === '=' && $val && $val[0] === '/') {
-				if (!preg_match($val, $prop)) {
+				if (!preg_match($val, (string)$prop)) {
 					return false;
 				}
 			} elseif (($op === '=' && $prop != $val) ||
@@ -561,7 +561,10 @@ class Hash {
  * @return array Filtered array
  * @link https://book.cakephp.org/2.0/en/core-utility-libraries/hash.html#Hash::filter
  */
-	public static function filter(array $data, $callback = array('self', '_filter')) {
+	public static function filter(array $data, $callback = null) {
+		if ($callback === null) {
+			$callback = array(static::class, '_filter');
+		}
 		foreach ($data as $k => $v) {
 			if (is_array($v)) {
 				$data[$k] = static::filter($v, $callback);

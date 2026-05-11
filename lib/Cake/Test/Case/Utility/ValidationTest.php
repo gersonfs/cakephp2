@@ -125,7 +125,10 @@ class ValidationTest extends CakeTestCase {
 		$this->_appLocale = array();
 		foreach (array(LC_MONETARY, LC_NUMERIC, LC_TIME) as $category) {
 			$this->_appLocale[$category] = setlocale($category, 0);
-			setlocale($category, 'en_US');
+			$applied = setlocale($category, 'en_US.UTF-8', 'en_US.utf8', 'en_US', 'C');
+			if ($applied === false) {
+				setlocale($category, 'C');
+			}
 		}
 	}
 
@@ -175,7 +178,7 @@ class ValidationTest extends CakeTestCase {
 		$this->assertTrue(Validation::notBlank('fooo' . chr(243) . 'blabla'));
 		$this->assertTrue(Validation::notBlank('abçďĕʑʘπй'));
 		$this->assertTrue(Validation::notBlank('José'));
-		$this->assertTrue(Validation::notBlank(utf8_decode('José')));
+		$this->assertTrue(Validation::notBlank(mb_convert_encoding('José', 'ISO-8859-1', 'UTF-8')));
 		$this->assertFalse(Validation::notBlank("\t "));
 		$this->assertFalse(Validation::notBlank(""));
 	}
@@ -2297,8 +2300,9 @@ class ValidationTest extends CakeTestCase {
 	 * @return void
 	 */
 	public function testPassThroughMethodFailure() {
-		$this->expectException(\PHPUnit\Framework\Exception::class);
-		Validation::phone('text', null, 'testNl');
+		$this->expectWarningException(function () {
+			Validation::phone('text', null, 'testNl');
+		});
 	}
 
 /**
@@ -2307,8 +2311,9 @@ class ValidationTest extends CakeTestCase {
 	 * @return void
 	 */
 	public function testPassThroughClassFailure() {
-		$this->expectException(\PHPUnit\Framework\Exception::class);
-		Validation::postal('text', null, 'AUTOFAIL');
+		$this->expectWarningException(function () {
+			Validation::postal('text', null, 'AUTOFAIL');
+		});
 	}
 
 /**

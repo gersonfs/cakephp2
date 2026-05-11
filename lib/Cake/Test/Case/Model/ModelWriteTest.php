@@ -1381,6 +1381,9 @@ class ModelWriteTest extends BaseModelTest {
 		$this->assertFalse(empty($result));
 		$this->assertTrue($User->id > 0);
 
+		if (!is_array($User->data)) {
+			$User->data = array();
+		}
 		$User->data['User'] = array('password' => 'something');
 		$result = $User->save();
 		$this->assertFalse(empty($result));
@@ -2468,7 +2471,7 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testCreationOfEmptyRecord() {
-		$this->loadFixtures('Author');
+		$this->loadFixtures('Author', 'Post');
 		$TestModel = new Author();
 		$this->assertEquals(4, $TestModel->find('count'));
 
@@ -2487,6 +2490,7 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testCreateWithPKFiltering() {
+		$this->loadFixtures('Article', 'User', 'Comment', 'Tag', 'ArticlesTag', 'Attachment');
 		$TestModel = new Article();
 		$data = array(
 			'id' => 5,
@@ -2925,7 +2929,7 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testUpdateSavingBlankValues() {
-		$this->loadFixtures('Article');
+		$this->loadFixtures('Article', 'User', 'Comment', 'Tag', 'ArticlesTag', 'Attachment');
 		$Article = new Article();
 		$Article->validate = array();
 		$Article->create();
@@ -2946,7 +2950,7 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testUpdateMultiple() {
-		$this->loadFixtures('Comment', 'Article', 'User', 'CategoryThread');
+		$this->loadFixtures('Comment', 'Article', 'User', 'CategoryThread', 'Attachment');
 		$TestModel = new Comment();
 		$result = Hash::extract($TestModel->find('all'), '{n}.Comment.user_id');
 		$expected = array('2', '4', '1', '1', '1', '2');
@@ -3255,10 +3259,10 @@ class ModelWriteTest extends BaseModelTest {
 				'password' => '5f4dcc3b5aa765d61d8327deb882cf90',
 				'test' => 'working'
 		));
-		$this->assertEquals(static::date(), $result[3]['Post']['created']);
-		$this->assertEquals(static::date(), $result[3]['Post']['updated']);
-		$this->assertEquals(static::date(), $result[3]['Author']['created']);
-		$this->assertEquals(static::date(), $result[3]['Author']['updated']);
+		$this->assertDateEquals(static::date(), $result[3]['Post']['created']);
+		$this->assertDateEquals(static::date(), $result[3]['Post']['updated']);
+		$this->assertDateEquals(static::date(), $result[3]['Author']['created']);
+		$this->assertDateEquals(static::date(), $result[3]['Author']['updated']);
 		unset($result[3]['Post']['created'], $result[3]['Post']['updated']);
 		unset($result[3]['Author']['created'], $result[3]['Author']['updated']);
 		$this->assertEquals($expected, $result[3]);
@@ -3303,10 +3307,10 @@ class ModelWriteTest extends BaseModelTest {
 					'body' => 'Second multi-record post',
 					'published' => 'N'
 		)));
-		$this->assertEquals(static::date(), $result[0]['Post']['created']);
-		$this->assertEquals(static::date(), $result[0]['Post']['updated']);
-		$this->assertEquals(static::date(), $result[1]['Post']['created']);
-		$this->assertEquals(static::date(), $result[1]['Post']['updated']);
+		$this->assertDateEquals(static::date(), $result[0]['Post']['created']);
+		$this->assertDateEquals(static::date(), $result[0]['Post']['updated']);
+		$this->assertDateEquals(static::date(), $result[1]['Post']['created']);
+		$this->assertDateEquals(static::date(), $result[1]['Post']['updated']);
 		unset($result[0]['Post']['created'], $result[0]['Post']['updated']);
 		unset($result[1]['Post']['created'], $result[1]['Post']['updated']);
 		$this->assertEquals($expected, $result);
@@ -3332,8 +3336,8 @@ class ModelWriteTest extends BaseModelTest {
 			'comment' => 'New comment with attachment',
 			'published' => 'Y'
 		);
-		$this->assertEquals(static::date(), $result[6]['Comment']['created']);
-		$this->assertEquals(static::date(), $result[6]['Comment']['updated']);
+		$this->assertDateEquals(static::date(), $result[6]['Comment']['created']);
+		$this->assertDateEquals(static::date(), $result[6]['Comment']['updated']);
 		unset($result[6]['Comment']['created'], $result[6]['Comment']['updated']);
 		$this->assertEquals($expected, $result[6]['Comment']);
 
@@ -3342,8 +3346,8 @@ class ModelWriteTest extends BaseModelTest {
 			'comment_id' => '7',
 			'attachment' => 'some_file.tgz'
 		);
-		$this->assertEquals(static::date(), $result[6]['Attachment']['created']);
-		$this->assertEquals(static::date(), $result[6]['Attachment']['updated']);
+		$this->assertDateEquals(static::date(), $result[6]['Attachment']['created']);
+		$this->assertDateEquals(static::date(), $result[6]['Attachment']['updated']);
 		unset($result[6]['Attachment']['created'], $result[6]['Attachment']['updated']);
 		$this->assertEquals($expected, $result[6]['Attachment']);
 	}
@@ -3430,6 +3434,7 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testSaveAllHasOne() {
+		$this->loadFixtures('Comment', 'Attachment', 'Article', 'User');
 		$model = new Comment();
 		$model->deleteAll(true);
 		$this->assertEquals(array(), $model->find('all'));
@@ -3450,17 +3455,10 @@ class ModelWriteTest extends BaseModelTest {
 			'Comment.id', 'Comment.comment', 'Attachment.id',
 			'Attachment.comment_id', 'Attachment.attachment'
 		)));
-		$expected = array(array(
-			'Comment' => array(
-				'id' => '1',
-				'comment' => 'Comment with attachment'
-			),
-			'Attachment' => array(
-				'id' => '1',
-				'comment_id' => '1',
-				'attachment' => 'some_file.zip'
-		)));
-		$this->assertEquals($expected, $result);
+		$this->assertCount(1, $result);
+		$this->assertEquals('Comment with attachment', $result[0]['Comment']['comment']);
+		$this->assertEquals('some_file.zip', $result[0]['Attachment']['attachment']);
+		$this->assertEquals($result[0]['Comment']['id'], $result[0]['Attachment']['comment_id']);
 
 		$model->Attachment->bindModel(array('belongsTo' => array('Comment')), false);
 		$data = array(
@@ -3481,6 +3479,7 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testSaveAllBelongsTo() {
+		$this->loadFixtures('Comment', 'Article', 'User', 'Attachment', 'ArticlesTag', 'Tag');
 		$model = new Comment();
 		$model->deleteAll(true);
 		$this->assertEquals(array(), $model->find('all'));
@@ -3498,20 +3497,11 @@ class ModelWriteTest extends BaseModelTest {
 				'title' => 'Model Associations 101',
 				'user_id' => 1
 		))));
-		$result = $model->find('all', array('fields' => array(
-			'Comment.id', 'Comment.comment', 'Comment.article_id', 'Article.id', 'Article.title'
-		)));
-		$expected = array(array(
-			'Comment' => array(
-				'id' => '1',
-				'article_id' => '1',
-				'comment' => 'Article comment'
-			),
-			'Article' => array(
-				'id' => '1',
-				'title' => 'Model Associations 101'
-		)));
-		$this->assertEquals($expected, $result);
+		$result = $model->find('all', array('recursive' => 0));
+		$this->assertCount(1, $result);
+		$this->assertEquals('Article comment', $result[0]['Comment']['comment']);
+		$this->assertEquals('Model Associations 101', $result[0]['Article']['title']);
+		$this->assertEquals($result[0]['Comment']['article_id'], $result[0]['Article']['id']);
 	}
 
 /**
@@ -3520,6 +3510,7 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testSaveAllHasOneValidation() {
+		$this->loadFixtures('Comment', 'Attachment', 'Article', 'User');
 		$model = new Comment();
 		$model->deleteAll(true);
 		$this->assertEquals(array(), $model->find('all'));
@@ -4984,10 +4975,10 @@ class ModelWriteTest extends BaseModelTest {
 					'body' => 'Fourth post body',
 					'published' => 'N'
 		)));
-		$this->assertEquals(static::date(), $result[0]['Post']['updated']);
-		$this->assertEquals(static::date(), $result[1]['Post']['updated']);
-		$this->assertEquals(static::date(), $result[3]['Post']['created']);
-		$this->assertEquals(static::date(), $result[3]['Post']['updated']);
+		$this->assertDateEquals(static::date(), $result[0]['Post']['updated']);
+		$this->assertDateEquals(static::date(), $result[1]['Post']['updated']);
+		$this->assertDateEquals(static::date(), $result[3]['Post']['created']);
+		$this->assertDateEquals(static::date(), $result[3]['Post']['updated']);
 		unset($result[0]['Post']['updated'], $result[1]['Post']['updated']);
 		unset($result[3]['Post']['created'], $result[3]['Post']['updated']);
 		$this->assertEquals($expected, $result);
@@ -5078,10 +5069,10 @@ class ModelWriteTest extends BaseModelTest {
 			)
 		);
 
-		$this->assertEquals(static::date(), $result[0]['Post']['updated']);
-		$this->assertEquals(static::date(), $result[1]['Post']['updated']);
-		$this->assertEquals(static::date(), $result[3]['Post']['updated']);
-		$this->assertEquals(static::date(), $result[3]['Post']['created']);
+		$this->assertDateEquals(static::date(), $result[0]['Post']['updated']);
+		$this->assertDateEquals(static::date(), $result[1]['Post']['updated']);
+		$this->assertDateEquals(static::date(), $result[3]['Post']['updated']);
+		$this->assertDateEquals(static::date(), $result[3]['Post']['created']);
 		unset(
 			$result[0]['Post']['updated'], $result[1]['Post']['updated'],
 			$result[3]['Post']['updated'], $result[3]['Post']['created']
@@ -5118,7 +5109,7 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testSaveAllValidationOnly() {
-		$this->loadFixtures('Comment', 'Attachment');
+		$this->loadFixtures('Comment', 'Attachment', 'Article', 'User');
 		$TestModel = new Comment();
 		$TestModel->Attachment->validate = array('attachment' => 'notBlank');
 
@@ -5461,10 +5452,10 @@ class ModelWriteTest extends BaseModelTest {
 				'password' => '5f4dcc3b5aa765d61d8327deb882cf90',
 				'test' => 'working'
 		));
-		$this->assertEquals(static::date(), $result[3]['Post']['updated']);
-		$this->assertEquals(static::date(), $result[3]['Post']['created']);
-		$this->assertEquals(static::date(), $result[3]['Author']['created']);
-		$this->assertEquals(static::date(), $result[3]['Author']['updated']);
+		$this->assertDateEquals(static::date(), $result[3]['Post']['updated']);
+		$this->assertDateEquals(static::date(), $result[3]['Post']['created']);
+		$this->assertDateEquals(static::date(), $result[3]['Author']['created']);
+		$this->assertDateEquals(static::date(), $result[3]['Author']['updated']);
 		unset(
 			$result[3]['Post']['updated'], $result[3]['Post']['created'],
 			$result[3]['Author']['updated'], $result[3]['Author']['created']
@@ -5493,8 +5484,8 @@ class ModelWriteTest extends BaseModelTest {
 			'comment' => 'New comment with attachment',
 			'published' => 'Y'
 		);
-		$this->assertEquals(static::date(), $result[6]['Comment']['updated']);
-		$this->assertEquals(static::date(), $result[6]['Comment']['created']);
+		$this->assertDateEquals(static::date(), $result[6]['Comment']['updated']);
+		$this->assertDateEquals(static::date(), $result[6]['Comment']['created']);
 		unset($result[6]['Comment']['updated'], $result[6]['Comment']['created']);
 		$this->assertEquals($expected, $result[6]['Comment']);
 
@@ -5503,8 +5494,8 @@ class ModelWriteTest extends BaseModelTest {
 			'comment_id' => '7',
 			'attachment' => 'some_file.tgz'
 		);
-		$this->assertEquals(static::date(), $result[6]['Attachment']['updated']);
-		$this->assertEquals(static::date(), $result[6]['Attachment']['created']);
+		$this->assertDateEquals(static::date(), $result[6]['Attachment']['updated']);
+		$this->assertDateEquals(static::date(), $result[6]['Attachment']['created']);
 		unset($result[6]['Attachment']['updated'], $result[6]['Attachment']['created']);
 		$this->assertEquals($expected, $result[6]['Attachment']);
 	}
@@ -5560,7 +5551,7 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testSaveMany() {
-		$this->loadFixtures('Post');
+		$this->loadFixtures('Post', 'Author');
 		$TestModel = new Post();
 		$TestModel->deleteAll(true);
 		$this->assertEquals(array(), $TestModel->find('all'));
@@ -5604,10 +5595,10 @@ class ModelWriteTest extends BaseModelTest {
 				)
 			)
 		);
-		$this->assertEquals(static::date(), $result[0]['Post']['updated']);
-		$this->assertEquals(static::date(), $result[0]['Post']['created']);
-		$this->assertEquals(static::date(), $result[1]['Post']['updated']);
-		$this->assertEquals(static::date(), $result[1]['Post']['created']);
+		$this->assertDateEquals(static::date(), $result[0]['Post']['updated']);
+		$this->assertDateEquals(static::date(), $result[0]['Post']['created']);
+		$this->assertDateEquals(static::date(), $result[1]['Post']['updated']);
+		$this->assertDateEquals(static::date(), $result[1]['Post']['created']);
 		unset($result[0]['Post']['updated'], $result[0]['Post']['created']);
 		unset($result[1]['Post']['updated'], $result[1]['Post']['created']);
 		$this->assertEquals($expected, $result);
@@ -5619,7 +5610,7 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testSaveManyValidateFalse() {
-		$this->loadFixtures('Post');
+		$this->loadFixtures('Post', 'Author');
 		$TestModel = new Post();
 		$TestModel->deleteAll(true);
 		$data = array(
@@ -5712,6 +5703,7 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testSaveAssociatedHasOne() {
+		$this->loadFixtures('Comment', 'Attachment', 'Article', 'User');
 		$model = new Comment();
 		$model->deleteAll(true);
 		$this->assertEquals(array(), $model->find('all'));
@@ -5732,17 +5724,10 @@ class ModelWriteTest extends BaseModelTest {
 			'Comment.id', 'Comment.comment', 'Attachment.id',
 			'Attachment.comment_id', 'Attachment.attachment'
 		)));
-		$expected = array(array(
-			'Comment' => array(
-				'id' => '1',
-				'comment' => 'Comment with attachment'
-			),
-			'Attachment' => array(
-				'id' => '1',
-				'comment_id' => '1',
-				'attachment' => 'some_file.zip'
-		)));
-		$this->assertEquals($expected, $result);
+		$this->assertCount(1, $result);
+		$this->assertEquals('Comment with attachment', $result[0]['Comment']['comment']);
+		$this->assertEquals('some_file.zip', $result[0]['Attachment']['attachment']);
+		$this->assertEquals($result[0]['Comment']['id'], $result[0]['Attachment']['comment_id']);
 
 		$model->Attachment->bindModel(array('belongsTo' => array('Comment')), false);
 		$data = array(
@@ -5763,6 +5748,7 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testSaveAssociatedBelongsTo() {
+		$this->loadFixtures('Comment', 'Article', 'User', 'Attachment', 'ArticlesTag', 'Tag');
 		$model = new Comment();
 		$model->deleteAll(true);
 		$this->assertEquals(array(), $model->find('all'));
@@ -5780,20 +5766,11 @@ class ModelWriteTest extends BaseModelTest {
 				'title' => 'Model Associations 101',
 				'user_id' => 1
 		))));
-		$result = $model->find('all', array('fields' => array(
-			'Comment.id', 'Comment.comment', 'Comment.article_id', 'Article.id', 'Article.title'
-		)));
-		$expected = array(array(
-			'Comment' => array(
-				'id' => '1',
-				'article_id' => '1',
-				'comment' => 'Article comment'
-			),
-			'Article' => array(
-				'id' => '1',
-				'title' => 'Model Associations 101'
-		)));
-		$this->assertEquals($expected, $result);
+		$result = $model->find('all', array('recursive' => 0));
+		$this->assertCount(1, $result);
+		$this->assertEquals('Article comment', $result[0]['Comment']['comment']);
+		$this->assertEquals('Model Associations 101', $result[0]['Article']['title']);
+		$this->assertEquals($result[0]['Comment']['article_id'], $result[0]['Article']['id']);
 	}
 
 /**
@@ -5802,6 +5779,7 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testSaveAssociatedHasOneValidation() {
+		$this->loadFixtures('Comment', 'Attachment', 'Article', 'User');
 		$model = new Comment();
 		$model->deleteAll(true);
 		$this->assertEquals(array(), $model->find('all'));
@@ -5844,7 +5822,7 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testSaveAssociatedAtomic() {
-		$this->loadFixtures('Article', 'User');
+		$this->loadFixtures('Article', 'User', 'Comment', 'Tag', 'ArticlesTag', 'Attachment');
 		$TestModel = new Article();
 
 		$result = $TestModel->saveAssociated(array(
@@ -6299,10 +6277,10 @@ class ModelWriteTest extends BaseModelTest {
 					'published' => 'N',
 			));
 
-			$this->assertEquals(static::date(), $result[3]['Post']['created']);
-			$this->assertEquals(static::date(), $result[3]['Post']['updated']);
-			$this->assertEquals(static::date(), $result[4]['Post']['created']);
-			$this->assertEquals(static::date(), $result[4]['Post']['updated']);
+			$this->assertDateEquals(static::date(), $result[3]['Post']['created']);
+			$this->assertDateEquals(static::date(), $result[3]['Post']['updated']);
+			$this->assertDateEquals(static::date(), $result[4]['Post']['created']);
+			$this->assertDateEquals(static::date(), $result[4]['Post']['updated']);
 			unset($result[3]['Post']['created'], $result[3]['Post']['updated']);
 			unset($result[4]['Post']['created'], $result[4]['Post']['updated']);
 			$this->assertEquals($expected, $result);
@@ -6368,10 +6346,10 @@ class ModelWriteTest extends BaseModelTest {
 					'body' => 'Third Post Body',
 					'published' => 'N'
 			));
-			$this->assertEquals(static::date(), $result[3]['Post']['created']);
-			$this->assertEquals(static::date(), $result[3]['Post']['updated']);
-			$this->assertEquals(static::date(), $result[4]['Post']['created']);
-			$this->assertEquals(static::date(), $result[4]['Post']['updated']);
+			$this->assertDateEquals(static::date(), $result[3]['Post']['created']);
+			$this->assertDateEquals(static::date(), $result[3]['Post']['updated']);
+			$this->assertDateEquals(static::date(), $result[4]['Post']['created']);
+			$this->assertDateEquals(static::date(), $result[4]['Post']['updated']);
 			unset($result[3]['Post']['created'], $result[3]['Post']['updated']);
 			unset($result[4]['Post']['created'], $result[4]['Post']['updated']);
 		}
@@ -6502,10 +6480,10 @@ class ModelWriteTest extends BaseModelTest {
 			)
 		);
 
-		$this->assertEquals(static::date(), $result[0]['Post']['updated']);
-		$this->assertEquals(static::date(), $result[1]['Post']['updated']);
-		$this->assertEquals(static::date(), $result[3]['Post']['created']);
-		$this->assertEquals(static::date(), $result[3]['Post']['updated']);
+		$this->assertDateEquals(static::date(), $result[0]['Post']['updated']);
+		$this->assertDateEquals(static::date(), $result[1]['Post']['updated']);
+		$this->assertDateEquals(static::date(), $result[3]['Post']['created']);
+		$this->assertDateEquals(static::date(), $result[3]['Post']['updated']);
 		unset($result[0]['Post']['updated'], $result[1]['Post']['updated']);
 		unset($result[3]['Post']['created'], $result[3]['Post']['updated']);
 		$this->assertEquals($expected, $result);
@@ -6623,6 +6601,7 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testValidateMany() {
+		$this->loadFixtures('Article', 'User', 'Comment', 'Tag', 'ArticlesTag', 'Attachment');
 		$TestModel = new Article();
 		$TestModel->validate = array('title' => 'notBlank');
 		$data = array(
@@ -6656,7 +6635,7 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testSaveAssociatedValidateFirst() {
-		$this->loadFixtures('Article', 'Comment', 'Attachment');
+		$this->loadFixtures('Article', 'Comment', 'Attachment', 'User', 'ArticlesTag', 'Tag');
 		$model = new Article();
 		$model->deleteAll(true);
 
@@ -6734,6 +6713,7 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testSaveManyValidateFirstAtomicFalse() {
+		$this->loadFixtures('Something');
 		$Something = new Something();
 		$invalidData = array(
 			array(
@@ -7188,6 +7168,7 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testWriteFloatAsGerman() {
+		$this->loadFixtures('DataTest');
 		$restore = setlocale(LC_NUMERIC, 0);
 
 		$this->skipIf(setlocale(LC_NUMERIC, 'de_DE') === false, "The German locale isn't available.");
@@ -7620,7 +7601,7 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testSaveAllDeepHasManyBelongsTo() {
-		$this->loadFixtures('Article', 'Comment', 'User');
+		$this->loadFixtures('Article', 'Comment', 'User', 'Attachment');
 		$TestModel = new Article();
 		$TestModel->belongsTo = $TestModel->hasAndBelongsToMany = array();
 

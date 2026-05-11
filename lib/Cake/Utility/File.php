@@ -394,7 +394,7 @@ class File {
 	public function pwd() {
 		if ($this->path === null) {
 			$dir = $this->Folder->pwd();
-			if (is_dir($dir)) {
+			if ($dir !== null && is_dir($dir)) {
 				$this->path = $this->Folder->slashTerm($dir) . $this->name;
 			}
 		}
@@ -409,7 +409,7 @@ class File {
  */
 	public function exists() {
 		$this->clearStatCache();
-		return (file_exists($this->path) && is_file($this->path));
+		return ($this->path !== null && file_exists($this->path) && is_file($this->path));
 	}
 
 /**
@@ -580,7 +580,7 @@ class File {
  * @return void
  */
 	public function clearStatCache($all = false) {
-		if ($all === false && version_compare(PHP_VERSION, '5.3.0') >= 0) {
+		if ($all === false && version_compare(PHP_VERSION, '5.3.0') >= 0 && $this->path !== null) {
 			return clearstatcache(true, $this->path);
 		}
 

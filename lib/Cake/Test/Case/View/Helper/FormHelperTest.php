@@ -511,7 +511,7 @@ class FormHelperTest extends CakeTestCase {
  *
  * @var array
  */
-	public $fixtures = array('core.post');
+	public $fixtures = array('core.post', 'core.comment', 'core.article', 'core.user', 'core.tag', 'core.articles_tag', 'core.attachment', 'core.author');
 
 /**
  * Do not load the fixtures by default
@@ -528,6 +528,8 @@ class FormHelperTest extends CakeTestCase {
 	public function setUp(): void {
 		parent::setUp();
 
+		$this->_oldDebug = Configure::read('debug');
+		Configure::write('debug', 2);
 		Configure::write('Config.language', 'eng');
 		Configure::write('App.base', '');
 		Configure::delete('Asset');
@@ -574,6 +576,7 @@ class FormHelperTest extends CakeTestCase {
 		parent::tearDown();
 		unset($this->Form->Html, $this->Form, $this->Controller, $this->View);
 		Configure::write('Security.salt', $this->oldSalt);
+		Configure::write('debug', $this->_oldDebug);
 	}
 
 /**
@@ -8747,6 +8750,7 @@ class FormHelperTest extends CakeTestCase {
  * @return void
  */
 	public function testPostLinkSecurityHashInline() {
+		$this->loadFixtures('Post');
 		$hash = Security::hash(
 			'/basedir/posts/delete/1' .
 			serialize(array()) .
@@ -9374,7 +9378,12 @@ class FormHelperTest extends CakeTestCase {
  * @return void
  */
 	public function testCreateUrlImpliedController() {
-		$restore = error_reporting(E_ALL ^ E_USER_DEPRECATED);
+		$this->loadFixtures('Comment', 'Article', 'User');
+		// PHPUnit 10 catches E_USER_DEPRECATED regardless of error_reporting()
+		// so we install a per-test handler that swallows it for this case.
+		set_error_handler(function () {
+			return true;
+		}, E_USER_DEPRECATED);
 		$this->Form->request['controller'] = 'posts';
 		$result = $this->Form->create('Comment', array(
 			'action' => 'addComment',
@@ -9393,7 +9402,7 @@ class FormHelperTest extends CakeTestCase {
 			'/div'
 		);
 		$this->assertTags($result, $expected);
-		error_reporting($restore);
+		restore_error_handler();
 	}
 
 /**
@@ -11183,6 +11192,7 @@ class FormHelperTest extends CakeTestCase {
  * @return void
  */
 	public function testLastActionWithNamedNumeric() {
+		$this->loadFixtures('User');
 		$here = '/users/index/page:1';
 
 		$this->Form->request->here = $here;

@@ -37,6 +37,7 @@ App::uses('CakeEventListener', 'Event');
  *
  * @package       Cake.Routing
  */
+#[\AllowDynamicProperties]
 class Dispatcher implements CakeEventListener {
 
 /**

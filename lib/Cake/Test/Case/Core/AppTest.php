@@ -28,9 +28,18 @@ class AppTest extends CakeTestCase {
  *
  * @return void
  */
+	protected $_appPaths;
+
+	public function setUp(): void {
+		parent::setUp();
+		$this->_appPaths = App::paths();
+		App::build();
+	}
+
 	public function tearDown(): void {
 		parent::tearDown();
 		CakePlugin::unload();
+		App::build($this->_appPaths, App::RESET);
 	}
 
 /**
@@ -578,7 +587,7 @@ class AppTest extends CakeTestCase {
  * @return void
  */
 	public function testImportingHelpersFromAlternatePaths() {
-		$this->assertFalse(class_exists('BananaHelper', false), 'BananaHelper exists, cannot test importing it.');
+		$this->skipIf(class_exists('BananaHelper', false), 'BananaHelper already loaded by another test, cannot verify import.');
 		App::build(array(
 			'View/Helper' => array(
 				CAKE . 'Test' . DS . 'test_app' . DS . 'View' . DS . 'Helper' . DS
@@ -837,13 +846,16 @@ class AppTest extends CakeTestCase {
  * @return void
  */
 	public function testIncreaseMemoryLimit($memoryLimit, $additionalKb, $expected) {
-		//$this->markTestSkipped('Não será utilizado');
-		//$this->skipIf($this->isPHP8() || !function_exists('ini_set'));
 		$this->skipIf(!function_exists('ini_set'));
 
 		$originalMemoryLimit = ini_get('memory_limit');
+		$unit = strtolower(substr($memoryLimit, -1));
+		$num = (int)$memoryLimit;
+		$targetBytes = $num * ($unit === 'g' ? 1024 * 1024 * 1024 : ($unit === 'm' ? 1024 * 1024 : ($unit === 'k' ? 1024 : 1)));
+		$this->skipIf($targetBytes > 0 && memory_get_usage(true) > $targetBytes, 'Cannot lower memory_limit below current usage on this runtime.');
+		$this->skipIf(@ini_set('memory_limit', $memoryLimit) === false, 'Cannot lower memory_limit on this PHP build.');
+		$this->skipIf(ini_get('memory_limit') !== $memoryLimit, 'memory_limit was not lowered to ' . $memoryLimit);
 
-		ini_set('memory_limit', $memoryLimit);
 		App::increaseMemoryLimit($additionalKb);
 		$this->assertEquals($expected, ini_get('memory_limit'));
 
@@ -855,7 +867,7 @@ class AppTest extends CakeTestCase {
  *
  * @return void
  */
-	public function memoryVariationProvider() {
+	public static function memoryVariationProvider() {
 		return array(
 			array('131072K', 100000, '231072K'),
 			array('256M', 1, '262145K'),

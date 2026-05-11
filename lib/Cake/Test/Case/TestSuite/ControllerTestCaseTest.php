@@ -22,6 +22,7 @@ App::uses('Controller', 'Controller');
 App::uses('Model', 'Model');
 App::uses('AppModel', 'Model');
 App::uses('CakeHtmlReporter', 'TestSuite/Reporter');
+App::uses('ControllerTestCase', 'TestSuite');
 
 require_once dirname(dirname(__FILE__)) . DS . 'Model' . DS . 'models.php';
 

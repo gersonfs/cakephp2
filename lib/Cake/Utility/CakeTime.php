@@ -1167,7 +1167,16 @@ class CakeTime {
  * @return string formatted string with correct encoding.
  */
 	protected static function _strftime($format, $timestamp) {
-		$format = strftime($format, $timestamp);
+		// strftime() is deprecated since PHP 8.1 but still available. We
+		// silence the deprecation locally because there is no perfect
+		// IntlDateFormatter equivalent for arbitrary strftime locale-aware
+		// formats. Callers may pre-format with IntlDateFormatter if needed.
+		$prevHandler = set_error_handler(function () { return true; }, E_DEPRECATED);
+		try {
+			$format = strftime($format, $timestamp);
+		} finally {
+			restore_error_handler();
+		}
 		$encoding = Configure::read('App.encoding');
 		if (!empty($encoding) && $encoding === 'UTF-8') {
 			if (function_exists('mb_check_encoding')) {
@@ -1176,7 +1185,11 @@ class CakeTime {
 				$valid = Multibyte::checkMultibyte($format);
 			}
 			if (!$valid) {
-				$format = utf8_encode($format);
+				if (function_exists('mb_convert_encoding')) {
+					$format = mb_convert_encoding($format, 'UTF-8', 'ISO-8859-1');
+				} elseif (function_exists('iconv')) {
+					$format = iconv('ISO-8859-1', 'UTF-8', $format);
+				}
 			}
 		}
 		return $format;

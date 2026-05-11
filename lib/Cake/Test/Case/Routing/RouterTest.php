@@ -38,6 +38,8 @@ class RouterTest extends CakeTestCase {
 	public function setUp(): void {
 		parent::setUp();
 		Configure::write('Routing', array('admin' => null, 'prefixes' => array()));
+		Router::fullBaseUrl(FULL_BASE_URL);
+		Configure::write('App.fullBaseUrl', FULL_BASE_URL);
 	}
 
 /**
@@ -49,7 +51,7 @@ class RouterTest extends CakeTestCase {
 		parent::tearDown();
 		CakePlugin::unload();
 		Router::fullBaseUrl('');
-		Configure::write('App.fullBaseUrl', 'http://localhost');
+		Configure::write('App.fullBaseUrl', FULL_BASE_URL);
 	}
 
 /**
@@ -1267,7 +1269,7 @@ class RouterTest extends CakeTestCase {
  *
  * @return array
  */
-	public function parseReverseSymmetryData() {
+	public static function parseReverseSymmetryData() {
 		return array(
 			array('/'),
 			array('/controller/action'),
@@ -2817,7 +2819,9 @@ class RouterTest extends CakeTestCase {
  * @return void
  */
 	public function testDefaultRouteClass() {
-		$this->getMock('CakeRoute', array(), array('/test'), 'TestDefaultRouteClass');
+		if (!class_exists('TestDefaultRouteClass', false)) {
+			$this->getMock('CakeRoute', array(), array('/test'), 'TestDefaultRouteClass');
+		}
 		Router::defaultRouteClass('TestDefaultRouteClass');
 
 		$result = Router::connect('/', array('controller' => 'pages', 'action' => 'display', 'home'));
@@ -2831,6 +2835,9 @@ class RouterTest extends CakeTestCase {
  */
 	public function testDefaultRouteClassGetter() {
 		$routeClass = 'TestDefaultRouteClass';
+		if (!class_exists($routeClass, false)) {
+			$this->getMock('CakeRoute', array(), array('/test'), $routeClass);
+		}
 		Router::defaultRouteClass($routeClass);
 
 		$this->assertEquals($routeClass, Router::defaultRouteClass());

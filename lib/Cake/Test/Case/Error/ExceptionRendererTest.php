@@ -146,7 +146,18 @@ class ExceptionRendererTest extends CakeTestCase {
  */
 	public function setUp(): void {
 		parent::setUp();
+		$this->_oldDebug = Configure::read('debug');
 		Configure::write('Config.language', 'eng');
+		// Reset session to filesystem defaults so previous DB-backed
+		// session config from Model tests doesn't try to query a
+		// missing 'sessions' table during ExceptionRenderer flow.
+		if (session_status() === PHP_SESSION_ACTIVE) {
+			session_write_close();
+		}
+		session_set_save_handler(new \SessionHandler());
+		Configure::write('Session', array(
+			'defaults' => 'php',
+		));
 		App::build(array(
 			'View' => array(
 				CAKE . 'Test' . DS . 'test_app' . DS . 'View' . DS
@@ -170,7 +181,10 @@ class ExceptionRendererTest extends CakeTestCase {
 		if ($this->_restoreError) {
 			restore_error_handler();
 		}
+		Configure::write('debug', $this->_oldDebug);
 	}
+
+	protected $_oldDebug = null;
 
 /**
  * Mocks out the response on the ExceptionRenderer object so headers aren't modified.
@@ -862,9 +876,11 @@ class ExceptionRendererTest extends CakeTestCase {
  * @return void
  */
 	public function testPDOException() {
-		$exception = new PDOException('There was an error in the SQL query');
-		$exception->queryString = 'SELECT * from poo_query < 5 and :seven';
-		$exception->params = array('seven' => 7);
+		$exception = new CakePDOException(
+			new PDOException('There was an error in the SQL query'),
+			'SELECT * from poo_query < 5 and :seven',
+			array('seven' => 7)
+		);
 		$ExceptionRenderer = new ExceptionRenderer($exception);
 		$ExceptionRenderer->controller->response = $this->getMock('CakeResponse', array('statusCode', '_sendHeader'));
 		$ExceptionRenderer->controller->response->expects($this->once())->method('statusCode')->with(500);

@@ -161,9 +161,12 @@ class Mysql extends DboSource {
 		$config = $this->config;
 		$this->connected = false;
 
+		$bufferedQueryAttr = defined('Pdo\\Mysql::ATTR_USE_BUFFERED_QUERY')
+			? constant('Pdo\\Mysql::ATTR_USE_BUFFERED_QUERY')
+			: PDO::MYSQL_ATTR_USE_BUFFERED_QUERY;
 		$flags = $config['flags'] + array(
 			PDO::ATTR_PERSISTENT => $config['persistent'],
-			PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
+			$bufferedQueryAttr => true,
 			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
 		);
 
@@ -840,7 +843,7 @@ class Mysql extends DboSource {
  */
 	public function value($data, $column = null, $null = true) {
 		$value = parent::value($data, $column, $null);
-		if (is_numeric($value) && substr($column, 0, 3) === 'set') {
+		if (is_numeric($value) && $column !== null && substr($column, 0, 3) === 'set') {
 			return $this->_connection->quote($value);
 		}
 		return $value;

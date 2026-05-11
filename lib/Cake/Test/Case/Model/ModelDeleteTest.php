@@ -188,7 +188,7 @@ class ModelDeleteTest extends BaseModelTest {
  * @return void
  */
 	public function testDelete() {
-		$this->loadFixtures('Article', 'Comment', 'Attachment');
+		$this->loadFixtures('Article', 'Comment', 'Attachment', 'User', 'Tag', 'ArticlesTag');
 		$TestModel = new Article();
 
 		$result = $TestModel->delete(2);
@@ -283,7 +283,7 @@ class ModelDeleteTest extends BaseModelTest {
  * @return void
  */
 	public function testDeleteAll() {
-		$this->loadFixtures('Article');
+		$this->loadFixtures('Article', 'User', 'Tag', 'ArticlesTag', 'Comment', 'Attachment');
 		$TestModel = new Article();
 
 		$data = array('Article' => array(
@@ -427,7 +427,7 @@ class ModelDeleteTest extends BaseModelTest {
  * @return void
  */
 	public function testDeleteAllDiamondOperator() {
-		$this->loadFixtures('Article');
+		$this->loadFixtures('Article', 'User', 'Tag', 'ArticlesTag', 'Comment', 'Attachment');
 		$article = new Article();
 
 		$result = $article->deleteAll(array('Article.id <>' => 1));
@@ -536,7 +536,7 @@ class ModelDeleteTest extends BaseModelTest {
  * @return void
  */
 	public function testRecursiveDel() {
-		$this->loadFixtures('Article', 'Comment', 'Attachment');
+		$this->loadFixtures('Article', 'Comment', 'Attachment', 'User', 'Tag', 'ArticlesTag');
 		$TestModel = new Article();
 
 		$result = $TestModel->delete(2);
@@ -571,7 +571,7 @@ class ModelDeleteTest extends BaseModelTest {
  * @return void
  */
 	public function testDependentExclusiveDelete() {
-		$this->loadFixtures('Article', 'Comment');
+		$this->loadFixtures('Article', 'Comment', 'User', 'Attachment');
 		$TestModel = new Article10();
 
 		$result = $TestModel->find('all');
@@ -589,7 +589,7 @@ class ModelDeleteTest extends BaseModelTest {
  * @return void
  */
 	public function testDeleteLinks() {
-		$this->loadFixtures('Article', 'ArticlesTag', 'Tag');
+		$this->loadFixtures('Article', 'ArticlesTag', 'Tag', 'User', 'Comment', 'Attachment');
 		$TestModel = new Article();
 
 		$result = $TestModel->ArticlesTag->find('all');
@@ -636,7 +636,7 @@ class ModelDeleteTest extends BaseModelTest {
  * @return void
  */
 	public function testDeleteLinksWithPLuginJoinModel() {
-		$this->loadFixtures('Article', 'ArticlesTag', 'Tag');
+		$this->loadFixtures('Article', 'ArticlesTag', 'Tag', 'User', 'Comment', 'Attachment');
 		$Article = new Article();
 		$Article->unbindModel(array('hasAndBelongsToMany' => array('Tag')), false);
 		unset($Article->Tag, $Article->ArticleTags);
@@ -867,7 +867,7 @@ class ModelDeleteTest extends BaseModelTest {
  * @return void
  */
 	public function testDeleteHabtmPostgresFailure() {
-		$this->loadFixtures('Article', 'Tag', 'ArticlesTag');
+		$this->loadFixtures('Article', 'Tag', 'ArticlesTag', 'User', 'Comment');
 
 		$Article = ClassRegistry::init('Article');
 		$Article->hasAndBelongsToMany['Tag']['unique'] = true;

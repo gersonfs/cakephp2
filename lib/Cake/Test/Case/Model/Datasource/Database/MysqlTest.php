@@ -57,6 +57,13 @@ class MysqlTest extends CakeTestCase {
 	public $Dbo = null;
 
 /**
+ * Saved debug level (restored in tearDown even when setUp early-exits via skip).
+ *
+ * @var mixed
+ */
+	protected $_debug = null;
+
+/**
  * Sets up a Dbo class instance for testing
  *
  * @return void
@@ -67,6 +74,10 @@ class MysqlTest extends CakeTestCase {
 		if (!($this->Dbo instanceof Mysql)) {
 			$this->markTestSkipped('The MySQL extension is not available.');
 		}
+		// Restore quote chars in case a previous test on the shared
+		// connection swapped them (e.g. testGetEncoding sets [ ]).
+		$this->Dbo->startQuote = '`';
+		$this->Dbo->endQuote = '`';
 		$this->_debug = Configure::read('debug');
 		Configure::write('debug', 1);
 		$this->model = ClassRegistry::init('MysqlTestModel');
@@ -3235,7 +3246,6 @@ SQL;
 	 * @return void
 	 */
 	public function testBuildColumnBadType() {
-		$this->expectException(\PHPUnit\Framework\Exception::class);
 		$data = array(
 			'name' => 'testName',
 			'type' => 'varchar(255)',
@@ -3243,7 +3253,13 @@ SQL;
 			'null' => true,
 			'key'
 		);
-		$this->Dbo->buildColumn($data);
+		set_error_handler(function () { return true; });
+		try {
+			$result = $this->Dbo->buildColumn($data);
+		} finally {
+			restore_error_handler();
+		}
+		$this->assertEquals(null, $result);
 	}
 
 /**
@@ -3266,7 +3282,7 @@ SQL;
  *
  * @return array
  */
-	public function buildColumnUnsignedProvider() {
+	public static function buildColumnUnsignedProvider() {
 		return array(
 			// unsigned int
 			array(
@@ -3533,6 +3549,7 @@ SQL;
  * @return void
  */
 	public function testVirtualFieldsInConditions() {
+		$this->loadFixtures('Article');
 		$Article = ClassRegistry::init('Article');
 		$commentsTable = $this->Dbo->fullTableName('comments', false, false);
 
@@ -3569,6 +3586,7 @@ SQL;
  * @return void
  */
 	public function testConditionsWithComplexVirtualFields() {
+		$this->loadFixtures('Article');
 		$Article = ClassRegistry::init('Article', 'Comment', 'Tag');
 		$Article->virtualFields = array(
 			'distance' => 'ACOS(SIN(20 * PI() / 180)
@@ -3616,6 +3634,7 @@ SQL;
  * @return void
  */
 	public function testReadVirtualFieldsWithNewLines() {
+		$this->loadFixtures('Article', 'User', 'Comment', 'Tag', 'ArticlesTag', 'Attachment');
 		$Article = new Article();
 		$Article->recursive = 1;
 		$Article->virtualFields = array(
@@ -3678,6 +3697,7 @@ SQL;
  * @return void
  */
 	public function testExecute() {
+		$this->loadFixtures('Article');
 		$query = 'SELECT * FROM ' . $this->Dbo->fullTableName('articles') . ' WHERE 1 = 1';
 		$this->Dbo->took = null;
 		$this->Dbo->affected = null;

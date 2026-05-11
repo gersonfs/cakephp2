@@ -161,7 +161,6 @@ class ConsoleErrorHandlerTest extends CakeTestCase {
 
 		$class = new ReflectionClass('Exception');
 		$property = $class->getProperty('code');
-		$property->setAccessible(true);
 		$property->setValue($exception, '42S22');
 
 		ConsoleErrorHandler::$stderr->expects($this->once())->method('write')

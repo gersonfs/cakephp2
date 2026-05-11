@@ -22,6 +22,7 @@ App::uses('CakeSchema', 'Model');
  *
  * @package       Cake.TestSuite.Fixture
  */
+#[\AllowDynamicProperties]
 class CakeTestFixture {
 
 /**
@@ -164,7 +165,7 @@ class CakeTestFixture {
 				ClassRegistry::flush();
 			}
 
-			if (!empty($db->config['prefix']) && strpos($this->table, $db->config['prefix']) === 0) {
+			if (!empty($db->config['prefix']) && strpos((string)$this->table, $db->config['prefix']) === 0) {
 				$this->table = str_replace($db->config['prefix'], '', $this->table);
 			}
 
@@ -328,7 +329,11 @@ class CakeTestFixture {
 	public function truncate($db) {
 		$fullDebug = $db->fullDebug;
 		$db->fullDebug = false;
-		$return = $db->truncate($this->table);
+		try {
+			$return = $db->truncate($this->table);
+		} catch (PDOException $e) {
+			$return = false;
+		}
 		$db->fullDebug = $fullDebug;
 		return $return;
 	}

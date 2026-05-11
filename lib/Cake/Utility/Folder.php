@@ -579,7 +579,7 @@ class Folder {
 		if ($this->create($nextPathname, $mode)) {
 			if (!file_exists($pathname)) {
 				$old = umask(0);
-				if (mkdir($pathname, $mode)) {
+				if (@mkdir($pathname, $mode)) {
 					umask($old);
 					$this->_messages[] = __d('cake_dev', '%s created', $pathname);
 					return true;

@@ -173,7 +173,7 @@ class RedisEngine extends CacheEngine {
  * @return bool True if the value was successfully deleted, false if it didn't exist or couldn't be removed
  */
 	public function delete($key) {
-		return $this->_Redis->delete($key) > 0;
+		return $this->_Redis->del($key) > 0;
 	}
 
 /**

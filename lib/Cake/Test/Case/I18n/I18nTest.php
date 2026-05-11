@@ -34,6 +34,15 @@ class I18nTest extends CakeTestCase {
 	public function setUp(): void {
 		parent::setUp();
 
+		if (session_status() === PHP_SESSION_ACTIVE) {
+			@session_destroy();
+		}
+		$_SESSION = array();
+		session_set_save_handler(new \SessionHandler());
+		Configure::delete('Session');
+		Configure::write('Session', array('defaults' => 'php'));
+		CakeSession::destroy();
+
 		Cache::delete('object_map', '_cake_core_');
 		App::build(array(
 			'Locale' => array(CAKE . 'Test' . DS . 'test_app' . DS . 'Locale' . DS),

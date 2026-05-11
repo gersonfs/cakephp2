@@ -19,7 +19,14 @@
  *
  * @package       Cake.Test.Case.TestSuite
  */
+App::uses('Folder', 'Utility');
+
 class CakeTestSuiteTest extends CakeTestCase {
+
+	public function setUp(): void {
+		parent::setUp();
+		$this->skipIf(!class_exists('CakeTestSuite'), 'CakeTestSuite is not available in this PHPUnit version.');
+	}
 
 /**
  * testAddTestDirectory
@@ -27,7 +34,7 @@ class CakeTestSuiteTest extends CakeTestCase {
  * @return void
  */
 	public function testAddTestDirectory() {
-		$testFolder = CORE_TEST_CASES . DS . 'TestSuite';
+		$testFolder = CAKE . 'Test' . DS . 'Case' . DS . 'TestSuite';
 		$count = count(glob($testFolder . DS . '*Test.php'));
 
 		$suite = $this->getMock('CakeTestSuite', array('addTestFile'));
@@ -44,7 +51,7 @@ class CakeTestSuiteTest extends CakeTestCase {
  * @return void
  */
 	public function testAddTestDirectoryRecursive() {
-		$testFolder = CORE_TEST_CASES . DS . 'Cache';
+		$testFolder = CAKE . 'Test' . DS . 'Case' . DS . 'Cache';
 		$count = count(glob($testFolder . DS . '*Test.php'));
 		$count += count(glob($testFolder . DS . 'Engine' . DS . '*Test.php'));
 

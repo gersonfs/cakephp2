@@ -191,7 +191,7 @@ class ModelIntegrationTest extends BaseModelTest {
 		$this->assertEquals('iContentAccountsId', $TestModel->ContentAccount->primaryKey);
 
 		//test conformant models with no PK in the join table
-		$this->loadFixtures('Article', 'Tag');
+		$this->loadFixtures('Article', 'Tag', 'ArticlesTag');
 		$TestModel = new Article();
 		$this->assertEquals('article_id', $TestModel->ArticlesTag->primaryKey);
 
@@ -921,6 +921,7 @@ class ModelIntegrationTest extends BaseModelTest {
  * @return void
  */
 	public function testSchema() {
+		$this->loadFixtures('Post');
 		$Post = new Post();
 
 		$result = $Post->schema();
@@ -1297,7 +1298,7 @@ class ModelIntegrationTest extends BaseModelTest {
  * @return void
  */
 	public function testResetOfExistsOnCreate() {
-		$this->loadFixtures('Article');
+		$this->loadFixtures('Article', 'Comment', 'User', 'Tag', 'ArticlesTag', 'Attachment');
 		$Article = new Article();
 		$Article->id = 1;
 		$Article->saveField('title', 'Reset me');
@@ -1670,6 +1671,7 @@ class ModelIntegrationTest extends BaseModelTest {
  * @return void
  */
 	public function testColumnTypeFetching() {
+		$this->loadFixtures('Article', 'User', 'Tag', 'ArticlesTag', 'Comment', 'Attachment');
 		$model = new Test();
 		$this->assertEquals('integer', $model->getColumnType('id'));
 		$this->assertEquals('text', $model->getColumnType('notes'));
@@ -1996,7 +1998,7 @@ class ModelIntegrationTest extends BaseModelTest {
 					'afterFind' => 'Successfully added by AfterFind'
 				)
 			));
-		$this->assertEquals(static::date(), $result['Something']['updated']);
+		$this->assertDateEquals(static::date(), $result['Something']['updated']);
 		unset($result['Something']['updated']);
 		$this->assertEquals($expected, $result);
 	}

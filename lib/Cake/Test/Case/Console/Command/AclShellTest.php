@@ -22,7 +22,7 @@ App::uses('ShellDispatcher', 'Console');
 App::uses('Shell', 'Console');
 App::uses('AclShell', 'Console/Command');
 App::uses('ComponentCollection', 'Controller');
-App::uses('TestStringOutput', 'Test/Case/Console/Command');
+App::uses('ConsoleOutputFake', 'Test/Case/Console');
 
 class AclShellNoExit extends AclShell {
 
@@ -55,7 +55,7 @@ class AclShellTest extends CakeTestCase {
 	 */
 	private $Task;
 
-	private TestStringOutput $output;
+	private ConsoleOutputFake $output;
 
 /**
  * setUp method
@@ -67,8 +67,8 @@ class AclShellTest extends CakeTestCase {
 		Configure::write('Acl.database', 'test');
 		Configure::write('Acl.classname', 'DbAcl');
 
-		$this->output = new TestStringOutput();
-		$this->input = new TestStringOutput();
+		$this->output = new ConsoleOutputFake();
+		$this->input = new ConsoleOutputFake();
 
 		$this->Task = new AclShellNoExit($this->output, $this->output, $this->input);
 

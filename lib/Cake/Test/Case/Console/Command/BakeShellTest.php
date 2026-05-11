@@ -25,6 +25,8 @@ App::uses('ModelTask', 'Console/Command/Task');
 App::uses('ControllerTask', 'Console/Command/Task');
 App::uses('DbConfigTask', 'Console/Command/Task');
 App::uses('Controller', 'Controller');
+App::uses('ConsoleOutputFake', 'Test/Case/Console');
+App::uses('ConsoleInputFake', 'Test/Case/Console');
 
 if (!class_exists('UsersController')) {
 	class UsersController extends Controller {
@@ -40,6 +42,11 @@ class BakeShellTest extends CakeTestCase {
  */
 	public $fixtures = array('core.user');
 
+	private BakeShell $Shell;
+
+	private ConsoleOutputFake $out;
+	private ConsoleInputFake $input;
+
 /**
  * setup test
  *
@@ -47,14 +54,12 @@ class BakeShellTest extends CakeTestCase {
  */
 	public function setUp(): void {
 		parent::setUp();
-		$out = $this->getMock('ConsoleOutput', array(), array(), '', false);
-		$in = $this->getMock('ConsoleInput', array(), array(), '', false);
+		$this->out = new ConsoleOutputFake();
+		$this->in = new ConsoleInputFake();
 
-		$this->Shell = $this->getMock(
-			'BakeShell',
-			array('in', 'out', 'hr', 'err', 'createFile', '_stop', '_checkUnitTest'),
-			array($out, $out, $in)
-		);
+		$this->Shell = new class ($this->out, $this->out, $this->in) extends BakeShell {
+			protected function _stop($status = 0){}
+		};
 	}
 
 /**
@@ -100,19 +105,14 @@ class BakeShellTest extends CakeTestCase {
 		$this->Shell->View->expects($this->once())
 			->method('execute');
 
-		$this->Shell->expects($this->once())->method('_stop');
-		$this->Shell->expects($this->at(0))
-			->method('out')
-			->with('Bake All');
-
-		$this->Shell->expects($this->at(5))
-			->method('out')
-			->with('<success>Bake All complete</success>');
-
 		$this->Shell->connection = '';
 		$this->Shell->params = array();
 		$this->Shell->args = array('User');
 		$this->Shell->all();
+
+		$this->assertEquals("Bake All\n", $this->out->outputs[0]);
+
+		$this->assertStringContainsString("Bake All complete", $this->out->outputs[11]);
 
 		$this->assertEquals('User', $this->Shell->View->args[0]);
 	}

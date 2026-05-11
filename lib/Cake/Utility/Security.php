@@ -109,7 +109,7 @@ class Security {
 		if (empty($type)) {
 			$type = static::$hashType;
 		}
-		$type = strtolower($type);
+		$type = strtolower((string)$type);
 
 		if ($type === 'blowfish') {
 			return static::_crypt($string, $salt);
@@ -128,6 +128,9 @@ class Security {
 			$type = 'sha256';
 		}
 
+		if ($type === 'sha256' && function_exists('hash')) {
+			return hash('sha256', $string);
+		}
 		if ($type === 'sha256' && function_exists('mhash')) {
 			return bin2hex(mhash(MHASH_SHA256, $string));
 		}
@@ -184,12 +187,9 @@ class Security {
 		if (function_exists('openssl_random_pseudo_bytes')) {
 			return openssl_random_pseudo_bytes($length);
 		}
-		if (function_exists('mcrypt_create_iv')) {
-			return mcrypt_create_iv($length, MCRYPT_DEV_URANDOM);
-		}
 		trigger_error(
 			'You do not have a safe source of random data available. ' .
-			'Install either the openssl extension, the mcrypt extension, or paragonie/random_compat. ' .
+			'Install the openssl extension or use PHP 7+ (random_bytes). ' .
 			'Falling back to an insecure random source.',
 			E_USER_WARNING
 		);
@@ -223,10 +223,11 @@ class Security {
 			return '';
 		}
 
-		srand((int)(float)Configure::read('Security.cipherSeed'));
+		$seed = Configure::read('Security.cipherSeed');
+		srand((int)fmod((float)$seed, PHP_INT_MAX));
 		$out = '';
-		$keyLength = strlen($key);
-		for ($i = 0, $textLength = strlen($text); $i < $textLength; $i++) {
+		$keyLength = strlen((string)$key);
+		for ($i = 0, $textLength = strlen((string)$text); $i < $textLength; $i++) {
 			$j = ord(substr($key, $i % $keyLength, 1));
 			while ($j--) {
 				rand(0, 255);
@@ -236,51 +237,6 @@ class Security {
 		}
 		srand();
 		return $out;
-	}
-
-/**
- * Encrypts/Decrypts a text using the given key using rijndael method.
- *
- * Prior to 2.3.1, a fixed initialization vector was used. This was not
- * secure. This method now uses a random iv, and will silently upgrade values when
- * they are re-encrypted.
- *
- * @param string $text Encrypted string to decrypt, normal string to encrypt
- * @param string $key Key to use as the encryption key for encrypted data.
- * @param string $operation Operation to perform, encrypt or decrypt
- * @return string Encrypted/Decrypted string
- */
-	public static function rijndael($text, $key, $operation) {
-		if (empty($key)) {
-			trigger_error(__d('cake_dev', 'You cannot use an empty key for %s', 'Security::rijndael()'), E_USER_WARNING);
-			return '';
-		}
-		if (empty($operation) || !in_array($operation, array('encrypt', 'decrypt'))) {
-			trigger_error(__d('cake_dev', 'You must specify the operation for Security::rijndael(), either encrypt or decrypt'), E_USER_WARNING);
-			return '';
-		}
-		if (strlen($key) < 32) {
-			trigger_error(__d('cake_dev', 'You must use a key larger than 32 bytes for Security::rijndael()'), E_USER_WARNING);
-			return '';
-		}
-		$algorithm = MCRYPT_RIJNDAEL_256;
-		$mode = MCRYPT_MODE_CBC;
-		$ivSize = mcrypt_get_iv_size($algorithm, $mode);
-
-		$cryptKey = substr($key, 0, 32);
-
-		if ($operation === 'encrypt') {
-			$iv = mcrypt_create_iv($ivSize, MCRYPT_RAND);
-			return $iv . '$$' . mcrypt_encrypt($algorithm, $cryptKey, $text, $mode, $iv);
-		}
-		// Backwards compatible decrypt with fixed iv
-		if (substr($text, $ivSize, 2) !== '$$') {
-			$iv = substr($key, strlen($key) - 32, 32);
-			return rtrim(mcrypt_decrypt($algorithm, $cryptKey, $text, $mode, $iv), "\0");
-		}
-		$iv = substr($text, 0, $ivSize);
-		$text = substr($text, $ivSize + 2);
-		return rtrim(mcrypt_decrypt($algorithm, $cryptKey, $text, $mode, $iv), "\0");
 	}
 
 /**
@@ -352,23 +308,13 @@ class Security {
 		// Generate the encryption and hmac key.
 		$key = substr(hash('sha256', $key . $hmacSalt), 0, 32);
 
-		if (Configure::read('Security.useOpenSsl')) {
-			$method = 'AES-256-CBC';
-			$ivSize = openssl_cipher_iv_length($method);
-			$iv = openssl_random_pseudo_bytes($ivSize);
-			$padLength = (int)ceil((strlen($plain) ?: 1) / $ivSize) * $ivSize;
-			$ciphertext = openssl_encrypt(str_pad($plain, $padLength, "\0"), $method, $key, true, $iv);
-			// Remove the PKCS#7 padding block for compatibility with mcrypt.
-			// Since we have padded the provided data with \0, the final block contains only padded bytes.
-			// So it can be removed safely.
-			$ciphertext = $iv . substr($ciphertext, 0, -$ivSize);
-		} else {
-			$algorithm = MCRYPT_RIJNDAEL_128;
-			$mode = MCRYPT_MODE_CBC;
-			$ivSize = mcrypt_get_iv_size($algorithm, $mode);
-			$iv = mcrypt_create_iv($ivSize, MCRYPT_DEV_URANDOM);
-			$ciphertext = $iv . mcrypt_encrypt($algorithm, $key, $plain, $mode, $iv);
-		}
+		$method = 'AES-256-CBC';
+		$ivSize = openssl_cipher_iv_length($method);
+		$iv = openssl_random_pseudo_bytes($ivSize);
+		$plain = (string)$plain;
+		$padLength = (int)ceil((strlen($plain) ?: 1) / $ivSize) * $ivSize;
+		$ciphertext = openssl_encrypt(str_pad($plain, $padLength, "\0"), $method, $key, true, $iv);
+		$ciphertext = $iv . substr($ciphertext, 0, -$ivSize);
 
 		$hmac = hash_hmac('sha256', $ciphertext, $key);
 		return $hmac . $ciphertext;
@@ -419,22 +365,13 @@ class Security {
 			return false;
 		}
 
-		if (Configure::read('Security.useOpenSsl')) {
-			$method = 'AES-256-CBC';
-			$ivSize = openssl_cipher_iv_length($method);
-			$iv = substr($cipher, 0, $ivSize);
-			$cipher = substr($cipher, $ivSize);
-			// Regenerate PKCS#7 padding block
-			$padding = openssl_encrypt('', $method, $key, true, substr($cipher, -$ivSize));
-			$plain = openssl_decrypt($cipher . $padding, $method, $key, true, $iv);
-		} else {
-			$algorithm = MCRYPT_RIJNDAEL_128;
-			$mode = MCRYPT_MODE_CBC;
-			$ivSize = mcrypt_get_iv_size($algorithm, $mode);
-			$iv = substr($cipher, 0, $ivSize);
-			$cipher = substr($cipher, $ivSize);
-			$plain = mcrypt_decrypt($algorithm, $key, $cipher, $mode, $iv);
-		}
+		$method = 'AES-256-CBC';
+		$ivSize = openssl_cipher_iv_length($method);
+		$iv = substr($cipher, 0, $ivSize);
+		$cipher = substr($cipher, $ivSize);
+		// Regenerate PKCS#7 padding block
+		$padding = openssl_encrypt('', $method, $key, true, substr($cipher, -$ivSize));
+		$plain = openssl_decrypt($cipher . $padding, $method, $key, true, $iv);
 
 		return rtrim($plain, "\0");
 	}

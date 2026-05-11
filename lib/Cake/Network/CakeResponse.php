@@ -26,6 +26,7 @@ App::uses('File', 'Utility');
  *
  * @package       Cake.Network
  */
+#[\AllowDynamicProperties]
 class CakeResponse {
 
 /**
@@ -516,7 +517,7 @@ class CakeResponse {
 			if (ini_get('mbstring.func_overload') & 2 && function_exists('mb_strlen')) {
 				$this->length($offset + mb_strlen($this->_body, '8bit'));
 			} else {
-				$this->length($this->_headers['Content-Length'] = $offset + strlen($this->_body));
+				$this->length($this->_headers['Content-Length'] = $offset + strlen((string)$this->_body));
 			}
 		}
 	}
@@ -590,7 +591,7 @@ class CakeResponse {
 			if ($value === null && strpos($header, ':') !== false) {
 				list($header, $value) = explode(':', $header, 2);
 			}
-			$this->_headers[$header] = is_array($value) ? array_map('trim', $value) : trim($value);
+			$this->_headers[$header] = is_array($value) ? array_map('trim', $value) : trim((string)$value);
 		}
 		return $this->_headers;
 	}
@@ -750,7 +751,7 @@ class CakeResponse {
  * @return mixed string mapped mime type or false if $alias is not mapped
  */
 	public function getMimeType($alias) {
-		if (isset($this->_mimeTypes[$alias])) {
+		if ($alias !== null && isset($this->_mimeTypes[$alias])) {
 			return $this->_mimeTypes[$alias];
 		}
 		return false;
@@ -1102,7 +1103,7 @@ class CakeResponse {
  * @return bool
  */
 	public function outputCompressed() {
-		return strpos(env('HTTP_ACCEPT_ENCODING'), 'gzip') !== false
+		return strpos((string)env('HTTP_ACCEPT_ENCODING'), 'gzip') !== false
 			&& (ini_get("zlib.output_compression") === '1' || in_array('ob_gzhandler', ob_list_handlers()));
 	}
 
@@ -1164,7 +1165,7 @@ class CakeResponse {
 		$ifNoneMatchHeader = $request->header('If-None-Match');
 		$etags = array();
 		if (is_string($ifNoneMatchHeader)) {
-			$etags = preg_split('/\s*,\s*/', $ifNoneMatchHeader, null, PREG_SPLIT_NO_EMPTY);
+			$etags = preg_split('/\s*,\s*/', $ifNoneMatchHeader, -1, PREG_SPLIT_NO_EMPTY);
 		}
 		$modifiedSince = $request->header('If-Modified-Since');
 		$checks = array();
@@ -1172,7 +1173,7 @@ class CakeResponse {
 			$checks[] = in_array('*', $etags) || in_array($responseTag, $etags);
 		}
 		if ($modifiedSince) {
-			$checks[] = strtotime($this->modified()) === strtotime($modifiedSince);
+			$checks[] = strtotime((string)$this->modified()) === strtotime((string)$modifiedSince);
 		}
 		if (empty($checks)) {
 			return false;
@@ -1374,7 +1375,7 @@ class CakeResponse {
 
 		$fileSize = $file->size();
 		if ($download) {
-			$agent = env('HTTP_USER_AGENT');
+			$agent = (string)env('HTTP_USER_AGENT');
 
 			if (preg_match('%Opera(/| )([0-9].[0-9]{1,2})%', $agent)) {
 				$contentType = 'application/octet-stream';

@@ -37,6 +37,8 @@ class PrototypeEngineHelperTest extends CakeTestCase {
 		$controller = null;
 		$this->View = $this->getMock('View', array('addScript'), array(&$controller));
 		$this->Proto = new PrototypeEngineHelper($this->View);
+		$this->_savedLocale = setlocale(LC_NUMERIC, 0);
+		setlocale(LC_NUMERIC, 'C');
 	}
 
 /**
@@ -47,7 +49,10 @@ class PrototypeEngineHelperTest extends CakeTestCase {
 	public function tearDown(): void {
 		parent::tearDown();
 		unset($this->Proto);
+		setlocale(LC_NUMERIC, $this->_savedLocale);
 	}
+
+	protected $_savedLocale = null;
 
 /**
  * test selector method

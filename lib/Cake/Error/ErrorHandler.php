@@ -114,6 +114,10 @@ class ErrorHandler {
  * @see http://php.net/manual/en/function.set-exception-handler.php
  */
 	public static function handleException($exception) {
+		// Do not attempt to render PHPUnit exceptions - let PHPUnit handle them.
+		if ($exception instanceof \PHPUnit\Exception) {
+			throw $exception;
+		}
 		$config = Configure::read('Exception');
 		static::_log($exception, $config);
 
@@ -300,7 +304,7 @@ class ErrorHandler {
 				$error = 'Notice';
 				$log = LOG_NOTICE;
 				break;
-			case E_STRICT:
+			case 2048: // E_STRICT (deprecated in PHP 8.5)
 				$error = 'Strict';
 				$log = LOG_NOTICE;
 				break;

@@ -26,6 +26,34 @@ App::uses('CakeTime', 'Utility');
 class CakeTimeTest extends CakeTestCase {
 
 /**
+ * strftime() and utf8_encode() are deprecated in PHP 8.1+/8.2+ but we
+ * still use them to mirror CakeTime's own behavior. These helpers
+ * silence the deprecation locally so the tests don't fail under
+ * failOnPhpunitDeprecation.
+ *
+ * @param string $format strftime() format string
+ * @param int $timestamp Unix timestamp
+ * @return string
+ */
+	protected static function _silentStrftime($format, $timestamp) {
+		set_error_handler(function () { return true; }, E_DEPRECATED);
+		try {
+			return strftime($format, $timestamp);
+		} finally {
+			restore_error_handler();
+		}
+	}
+
+	protected static function _silentUtf8Encode($string) {
+		set_error_handler(function () { return true; }, E_DEPRECATED);
+		try {
+			return utf8_encode($string);
+		} finally {
+			restore_error_handler();
+		}
+	}
+
+/**
  * Default system timezone identifier
  *
  * @var string
@@ -132,7 +160,7 @@ class CakeTimeTest extends CakeTestCase {
  *
  * @return void
  */
-	public function timeAgoEndProvider() {
+	public static function timeAgoEndProvider() {
 		return array(
 			array(
 				'+4 months +2 weeks +3 days',
@@ -279,7 +307,7 @@ class CakeTimeTest extends CakeTestCase {
 		$this->assertEquals('on 2007-09-25', $result);
 
 		$result = $this->Time->timeAgoInWords('2007-9-25', '%x');
-		$this->assertEquals('on ' . strftime('%x', strtotime('2007-9-25')), $result);
+		$this->assertEquals('on ' . static::_silentStrftime('%x', strtotime('2007-9-25')), $result);
 
 		$result = $this->Time->timeAgoInWords(
 			strtotime('+2 weeks +2 days'),
@@ -303,7 +331,7 @@ class CakeTimeTest extends CakeTestCase {
 			strtotime('+2 months +2 days'),
 			array('end' => '1 month', 'format' => '%x')
 		);
-		$this->assertEquals('on ' . strftime('%x', strtotime('+2 months +2 days')), $result);
+		$this->assertEquals('on ' . static::_silentStrftime('%x', strtotime('+2 months +2 days')), $result);
 	}
 
 /**
@@ -473,7 +501,8 @@ class CakeTimeTest extends CakeTestCase {
  */
 	public function testNiceShortI18n() {
 		$restore = setlocale(LC_ALL, 0);
-		setlocale(LC_ALL, 'es_ES');
+		$set = setlocale(LC_ALL, 'es_ES');
+		$this->skipIf($set === false, 'es_ES locale is not available on this system.');
 		$time = strtotime('2015-01-07 03:05:00');
 		$this->assertEquals('ene 7th 2015, 03:05', $this->Time->niceShort($time));
 		setlocale(LC_ALL, $restore);
@@ -557,7 +586,7 @@ class CakeTimeTest extends CakeTestCase {
 		$expected = $date->format('Y-m-d H:i:s');
 		$this->assertEquals($expected, $result);
 
-		$date = new DateTime(null, new DateTimeZone('America/New_York'));
+		$date = new DateTime('now', new DateTimeZone('America/New_York'));
 		$result = $this->Time->toServer($date, 'Pacific/Tahiti');
 		$date->setTimezone(new DateTimeZone(date_default_timezone_get()));
 		$expected = $date->format('Y-m-d H:i:s');
@@ -1174,7 +1203,7 @@ class CakeTimeTest extends CakeTestCase {
 		$this->assertEquals($expected, $result);
 
 		$result = $this->Time->i18nFormat($time, '%c');
-		$expected = 'jue 14 ene 2010 13:59:28 ' . utf8_encode(strftime('%Z', $time));
+		$expected = 'jue 14 ene 2010 13:59:28 ' . static::_silentUtf8Encode(static::_silentStrftime('%Z', $time));
 		$this->assertEquals($expected, $result);
 
 		$result = $this->Time->i18nFormat($time, 'Time is %r, and date is %x');
@@ -1188,7 +1217,7 @@ class CakeTimeTest extends CakeTestCase {
 		$this->assertEquals($expected, $result);
 
 		$result = $this->Time->i18nFormat($time, '%c');
-		$expected = 'mié 13 ene 2010 13:59:28 ' . utf8_encode(strftime('%Z', $time));
+		$expected = 'mié 13 ene 2010 13:59:28 ' . static::_silentUtf8Encode(static::_silentStrftime('%Z', $time));
 		$this->assertEquals($expected, $result);
 
 		$result = $this->Time->i18nFormat($time, 'Time is %r, and date is %x');

@@ -164,8 +164,8 @@ class CakeText {
 			$format = sprintf(
 				'/(?<!%s)%s%%s%s/',
 				preg_quote($options['escape'], '/'),
-				str_replace('%', '%%', preg_quote($options['before'], '/')),
-				str_replace('%', '%%', preg_quote($options['after'], '/'))
+				str_replace('%', '%%', preg_quote((string)$options['before'], '/')),
+				str_replace('%', '%%', preg_quote((string)$options['after'], '/'))
 			);
 		}
 
@@ -233,9 +233,9 @@ class CakeText {
 				), $clean);
 				$kleenex = sprintf(
 					'/[\s]*[a-z]+=(")(%s%s%s[\s]*)+\\1/i',
-					preg_quote($options['before'], '/'),
+					preg_quote((string)$options['before'], '/'),
 					$clean['word'],
-					preg_quote($options['after'], '/')
+					preg_quote((string)$options['after'], '/')
 				);
 				$str = preg_replace($kleenex, $clean['replacement'], $str);
 				if ($clean['andText']) {
@@ -252,14 +252,14 @@ class CakeText {
 
 				$kleenex = sprintf(
 					'/(%s%s%s%s|%s%s%s%s)/',
-					preg_quote($options['before'], '/'),
+					preg_quote((string)$options['before'], '/'),
 					$clean['word'],
-					preg_quote($options['after'], '/'),
+					preg_quote((string)$options['after'], '/'),
 					$clean['gap'],
 					$clean['gap'],
-					preg_quote($options['before'], '/'),
+					preg_quote((string)$options['before'], '/'),
 					$clean['word'],
-					preg_quote($options['after'], '/')
+					preg_quote((string)$options['after'], '/')
 				);
 				$str = preg_replace($kleenex, $clean['replacement'], $str);
 				break;
@@ -657,7 +657,7 @@ class CakeText {
 			$and = __d('cake', 'and');
 		}
 		if (count($list) > 1) {
-			return implode($separator, array_slice($list, null, -1)) . ' ' . $and . ' ' . array_pop($list);
+			return implode($separator, array_slice($list, 0, -1)) . ' ' . $and . ' ' . array_pop($list);
 		}
 
 		return array_pop($list);

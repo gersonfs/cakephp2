@@ -172,9 +172,16 @@ class CakePluginTest extends CakeTestCase {
 	 * @return void
 	 */
 	public function testLoadMultipleWithDefaultsMissingFile() {
-		$this->expectException(\PHPUnit\Framework\Exception::class);
-		CakePlugin::load(array('TestPlugin', 'TestPluginTwo'), array('bootstrap' => true, 'routes' => true));
-		CakePlugin::routes();
+		set_error_handler(static function ($errno, $errstr) {
+			throw new \PHPUnit\Framework\Exception($errstr, $errno);
+		}, E_WARNING);
+		try {
+			$this->expectException(\PHPUnit\Framework\Exception::class);
+			CakePlugin::load(array('TestPlugin', 'TestPluginTwo'), array('bootstrap' => true, 'routes' => true));
+			CakePlugin::routes();
+		} finally {
+			restore_error_handler();
+		}
 	}
 
 /**
@@ -188,7 +195,7 @@ class CakePluginTest extends CakeTestCase {
 			'routes' => true,
 			'ignoreMissing' => true
 		)));
-		CakePlugin::routes();
+		$this->assertTrue(CakePlugin::routes());
 	}
 
 /**

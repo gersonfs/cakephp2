@@ -99,7 +99,19 @@ class CakeRequestTest extends CakeTestCase {
 			$_GET['case'] = $this->_case;
 		}
 		Configure::write('App', $this->_app);
-		unset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']);
+		unset(
+			$_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'],
+			$_SERVER['HTTP_X_FORWARDED_HOST'],
+			$_SERVER['HTTP_X_FORWARDED_FOR'],
+			$_SERVER['HTTP_CLIENT_IP'],
+			$_SERVER['REQUEST_URI'],
+			$_SERVER['PHP_SELF'],
+			$_SERVER['PATH_INFO'],
+			$_SERVER['QUERY_STRING'],
+			$_SERVER['HTTP_REFERER']
+		);
+		$_POST = array();
+		$_FILES = array();
 	}
 
 /**
@@ -233,7 +245,7 @@ class CakeRequestTest extends CakeTestCase {
 		$request = new CakeRequest();
 		$this->assertEquals('other/path', $request->url);
 
-		$_SERVER['REQUEST_URI'] = str_repeat('x', strlen($base) - 4) . '://?/other/path';
+		$_SERVER['REQUEST_URI'] = str_repeat('x', max(0, strlen((string)$base) - 4)) . '://?/other/path';
 		$request = new CakeRequest();
 		$this->assertEquals('', $request->url);
 	}
@@ -806,7 +818,7 @@ class CakeRequestTest extends CakeTestCase {
 		$request->base = '/waves';
 		$request->here = '/waves/users/login';
 
-		$_SERVER['HTTP_REFERER'] = FULL_BASE_URL . '/waves/waves/add';
+		$_SERVER['HTTP_REFERER'] = Configure::read('App.fullBaseUrl') . '/waves/waves/add';
 
 		$result = $request->referer(true);
 		$this->assertSame($result, '/waves/add');
@@ -2218,7 +2230,7 @@ class CakeRequestTest extends CakeTestCase {
  *
  * @return array
  */
-	public function paramReadingDataProvider() {
+	public static function paramReadingDataProvider() {
 		return array(
 			array(
 				'action',

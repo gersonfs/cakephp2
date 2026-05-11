@@ -310,12 +310,12 @@ class ShellTest extends CakeTestCase
 		$this->Shell->stdout
 			->expects($this->exactly(4))
 			->method('write')
-			->withConsecutive(
+			->willReturnCallback($this->withConsecutive(
 				["Just a test", 1],
 				[['Just', 'a', 'test'], 1],
 				[['Just', 'a', 'test'], 2],
 				['', 1]
-			);
+			));
 
 		$this->Shell->out('Just a test');
 
@@ -336,11 +336,11 @@ class ShellTest extends CakeTestCase
 		$this->Shell->stdout
 			->expects($this->exactly(3))
 			->method('write')
-			->withConsecutive(
+			->willReturnCallback($this->withConsecutive(
 				['Verbose', 1],
 				['Normal', 1],
 				['Quiet', 1]
-			);
+			));
 
 		$this->Shell->params['verbose'] = true;
 		$this->Shell->params['quiet'] = false;
@@ -378,15 +378,13 @@ class ShellTest extends CakeTestCase
 
 		$this->Shell->stdout->expects($this->exactly(5))
 			->method('write')
-			->willReturnOnConsecutiveCalls($number, null, 9, null, null)
-			->withConsecutive(
-				['Some <info>text</info> I want to overwrite', 0],
-				[str_repeat("\x08", $number), 0],
-				['Less text', 0],
-				[str_repeat(' ', $number - 9), 0],
-				["\n", 0] // Adicionando a chamada extra com '\n'
-			);
-
+			->willReturnCallback($this->withConsecutive(
+				['Some <info>text</info> I want to overwrite', 0, '__return__' => $number],
+				[str_repeat("\x08", $number), 0, '__return__' => null],
+				['Less text', 0, '__return__' => 9],
+				[str_repeat(' ', $number - 9), 0, '__return__' => null],
+				["\n", 0, '__return__' => null]
+			));
 
 		$this->Shell->out('Some <info>text</info> I want to overwrite', 0);
 		$this->Shell->overwrite('Less text');
@@ -403,12 +401,12 @@ class ShellTest extends CakeTestCase
 		$this->Shell->stderr
 			->expects($this->exactly(4))
 			->method('write')
-			->withConsecutive(
+			->willReturnCallback($this->withConsecutive(
 				["Just a test", 1],
 				[["Just", "a", "test"], 1],
 				[["Just", "a", "test"], 2],
 				["", 1]
-			);
+			));
 
 		$this->Shell->err('Just a test');
 		$this->Shell->err(["Just", "a", "test"]);
@@ -445,7 +443,7 @@ class ShellTest extends CakeTestCase
 
 		$this->Shell->stdout->expects($this->exactly(9))
 			->method('write')
-			->withConsecutive(
+			->willReturnCallback($this->withConsecutive(
 				['', 0],
 				[$bar, 1],
 				['', 0],
@@ -455,7 +453,7 @@ class ShellTest extends CakeTestCase
 				["", 2],
 				[$bar, 1],
 				["", 2]
-			);
+			));
 
 		$this->Shell->hr();
 
@@ -473,12 +471,11 @@ class ShellTest extends CakeTestCase
 	{
 		$this->Shell->stderr->expects($this->exactly(3))
 			->method('write')
-			->withConsecutive(
+			->willReturnCallback($this->withConsecutive(
 				["<error>Error:</error> Foo Not Found", 1],
 				["<error>Error:</error> Foo Not Found", 1],
 				["Searched all...", 1]
-			);
-
+			));
 
 		$this->Shell->error('Foo Not Found');
 		$this->assertSame($this->Shell->stopped, 1);
@@ -599,7 +596,7 @@ class ShellTest extends CakeTestCase
 
 		$this->Shell->interactive = false;
 
-		$contents = "<?php{$eol}echo 'test';${eol}\$te = 'st';{$eol}";
+		$contents = "<?php{$eol}echo 'test';{$eol}\$te = 'st';{$eol}";
 		$result = $this->Shell->createFile($file, $contents);
 		$this->assertTrue($result);
 		$this->assertTrue(file_exists($file));
@@ -898,7 +895,7 @@ TEXT;
 	 *
 	 * @return array
 	 */
-	public function paramReadingDataProvider()
+	public static function paramReadingDataProvider()
 	{
 		return [
 			[
@@ -955,7 +952,7 @@ TEXT;
 		$this->assertFalse(file_exists(LOGS . 'error.log'));
 
 		// both file and console logging
-		require_once CORE_TEST_CASES . DS . 'Log' . DS . 'Engine' . DS . 'ConsoleLogTest.php';
+		require_once CAKE . 'Test' . DS . 'Case' . DS . 'Log' . DS . 'Engine' . DS . 'ConsoleLogTest.php';
 		$mock = $this->getMock('ConsoleLog', ['write'], [
 			['types' => 'error'],
 		]);

@@ -140,7 +140,7 @@ class ConsoleLogTest extends CakeTestCase {
 			'engine' => 'TestConsole',
 			));
 		if ((DS === '\\' && !(bool)env('ANSICON') && env('ConEmuANSI') !== 'ON') ||
-			(function_exists('posix_isatty') && !posix_isatty(null))
+			(function_exists('posix_isatty') && defined('STDERR') && !posix_isatty(STDERR))
 		) {
 			$expected = ConsoleOutput::PLAIN;
 		} else {

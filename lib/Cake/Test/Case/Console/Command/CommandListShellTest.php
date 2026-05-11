@@ -21,7 +21,7 @@ App::uses('ConsoleOutput', 'Console');
 App::uses('ConsoleInput', 'Console');
 App::uses('Shell', 'Console');
 App::uses('CommandTask', 'Console/Command/Task');
-App::uses('TestStringOutput', 'Test/Case/Console/Command');
+App::uses('ConsoleOutputFake', 'Test/Case/Console');
 
 /**
  * CommandListShellTest
@@ -47,7 +47,7 @@ class CommandListShellTest extends CakeTestCase {
 		), App::RESET);
 		CakePlugin::load(array('TestPlugin', 'TestPluginTwo'));
 
-		$out = new TestStringOutput();
+		$out = new ConsoleOutputFake();
 		$in = $this->getMockBuilder('ConsoleInput')->getMock();
 
 		$this->Shell = $this->getMockBuilder('CommandListShell')
@@ -85,7 +85,7 @@ class CommandListShellTest extends CakeTestCase {
 		$expected = "/\[.*TestPluginTwo.*\] example, welcome/";
 		$this->assertMatchesRegularExpression($expected, $output);
 
-		$expected = "/\[.*CORE.*\] acl, api, bake, command_list, completion, console, i18n, schema, server, test, testsuite, upgrade/";
+		$expected = "/\[.*CORE.*\] acl, api, bake, command_list, completion, console, i18n, schema, server, upgrade/";
 		$this->assertMatchesRegularExpression($expected, $output);
 
 		$expected = "/\[.*app.*\] sample/";

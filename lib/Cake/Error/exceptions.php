@@ -18,6 +18,38 @@
  */
 
 /**
+ * PDOException subclass that allows attaching the offending query and
+ * its bound params without triggering the dynamic-property deprecation
+ * introduced in PHP 8.2.
+ *
+ * @package       Cake.Error
+ */
+class CakePDOException extends PDOException {
+
+/**
+ * The SQL query that triggered the exception.
+ *
+ * @var string|null
+ */
+	public $queryString;
+
+/**
+ * Parameters bound to the query.
+ *
+ * @var array|null
+ */
+	public $params;
+
+	public function __construct(PDOException $previous, $queryString = null, $params = null) {
+		parent::__construct($previous->getMessage(), 0, $previous);
+		$this->errorInfo = $previous->errorInfo;
+		$this->code = $previous->getCode();
+		$this->queryString = $queryString;
+		$this->params = $params;
+	}
+}
+
+/**
  * Base class that all Exceptions extend.
  *
  * @package       Cake.Error

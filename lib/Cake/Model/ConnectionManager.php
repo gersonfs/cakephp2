@@ -95,7 +95,7 @@ class ConnectionManager {
 		$conn = static::$_connectionsEnum[$name];
 		$class = $conn['classname'];
 
-		if (strpos(App::location($class), 'Datasource') === false) {
+		if (!class_exists($class) && strpos((string)App::location($class), 'Datasource') === false) {
 			throw new MissingDatasourceException(array(
 				'class' => $class,
 				'plugin' => null,
@@ -177,7 +177,7 @@ class ConnectionManager {
 		if (!class_exists($conn['classname'])) {
 			throw new MissingDatasourceException(array(
 				'class' => $conn['classname'],
-				'plugin' => substr($plugin, 0, -1)
+				'plugin' => substr((string)$plugin, 0, -1)
 			));
 		}
 		return true;

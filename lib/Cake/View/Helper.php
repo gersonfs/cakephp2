@@ -374,7 +374,7 @@ class Helper extends CakeObject {
 		$path = $this->_encodeUrl($this->assetTimestamp($this->webroot($path)));
 
 		if (!empty($options['fullBase'])) {
-			$path = rtrim(Router::fullBaseUrl(), '/') . '/' . ltrim($path, '/');
+			$path = rtrim((string)Router::fullBaseUrl(), '/') . '/' . ltrim($path, '/');
 		}
 		return $path;
 	}
@@ -573,7 +573,7 @@ class Helper extends CakeObject {
 		if ($setScope === true) {
 			$this->_modelScope = $entity;
 		}
-		$parts = array_values(Hash::filter(explode('.', $entity)));
+		$parts = array_values(Hash::filter(explode('.', (string)$entity)));
 		if (empty($parts)) {
 			return;
 		}
@@ -605,6 +605,7 @@ class Helper extends CakeObject {
 		$this->_association = null;
 
 		$isHabtm = (
+			$this->_modelScope !== null &&
 			isset($this->fieldset[$this->_modelScope]['fields'][$parts[0]]['type']) &&
 			$this->fieldset[$this->_modelScope]['fields'][$parts[0]]['type'] === 'multiple'
 		);

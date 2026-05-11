@@ -123,8 +123,18 @@ class CakeSessionTest extends CakeTestCase {
  */
 	public function tearDown(): void {
 		if (TestCakeSession::started()) {
-			session_write_close();
+			@session_write_close();
 		}
+		if (session_status() === PHP_SESSION_ACTIVE) {
+			@session_destroy();
+		}
+		// Restore the native PHP session handler so subsequent test
+		// classes (Flash/Session components, I18n with session) start
+		// clean without inheriting TestCacheSession/TestAppLibSession etc.
+		session_set_save_handler(new \SessionHandler());
+		Configure::delete('Session');
+		Configure::write('Session', array('defaults' => 'php'));
+		TestCakeSession::destroy();
 		unset($_SESSION);
 		parent::tearDown();
 	}

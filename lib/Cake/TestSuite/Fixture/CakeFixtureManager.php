@@ -43,6 +43,13 @@ class CakeFixtureManager {
 /**
  * Holds the fixture classes that where instantiated
  *
+ * Static cache (shared across CakeFixtureManager instances) when enabled
+ * via CakeFixtureManager::$cacheInstances or env CAKEPHP_FIXTURE_CACHE=1.
+ * The cache speeds up application test suites where the same fixture
+ * objects are reused across hundreds of test methods (~10x faster startup);
+ * but breaks framework-level tests that drop/recreate the same table from
+ * multiple test classes. Defaults to OFF for backward compatibility.
+ *
  * @var array
  */
 	protected $_loaded = array();
@@ -53,6 +60,61 @@ class CakeFixtureManager {
  * @var array
  */
 	protected $_fixtureMap = array();
+
+/**
+ * When true (default), $_loaded and $_fixtureMap are kept in static
+ * storage and reused across CakeFixtureManager instances. The cache
+ * speeds up application test suites (~10x faster startup) where fixture
+ * objects are reused across many test methods.
+ *
+ * The framework's own test suite turns this OFF in autoload.php because
+ * many test classes drop/recreate the same tables and the cache makes
+ * `$fixture->created` state unreliable across classes.
+ *
+ * Override via env CAKEPHP_FIXTURE_CACHE=0 to force disabled, or set
+ * directly before the first CakeFixtureManager is constructed:
+ *
+ *   CakeFixtureManager::$cacheInstances = false;
+ *
+ * @var bool
+ */
+	public static $cacheInstances = null;
+
+/**
+ * Static (cross-instance) cache backing $_loaded when $cacheInstances is true.
+ *
+ * @var array
+ */
+	protected static $_loadedCache = array();
+
+/**
+ * Static (cross-instance) cache backing $_fixtureMap when $cacheInstances is true.
+ *
+ * @var array
+ */
+	protected static $_fixtureMapCache = array();
+
+	public function __construct() {
+		if (self::$cacheInstances === null) {
+			$env = getenv('CAKEPHP_FIXTURE_CACHE');
+			self::$cacheInstances = ($env === false || $env === '' || $env === '1');
+		}
+		if (self::$cacheInstances) {
+			$this->_loaded = &self::$_loadedCache;
+			$this->_fixtureMap = &self::$_fixtureMapCache;
+		}
+	}
+
+/**
+ * Clears the static fixture cache. Useful when toggling between unrelated
+ * test environments inside the same PHP process.
+ *
+ * @return void
+ */
+	public static function resetCache() {
+		self::$_loadedCache = array();
+		self::$_fixtureMapCache = array();
+	}
 
 /**
  * Inspects the test to look for unloaded fixtures and loads them
@@ -191,8 +253,21 @@ class CakeFixtureManager {
 			}
 		}
 		if (!empty($fixture->created) && in_array($db->configKeyName, $fixture->created)) {
-			$fixture->truncate($db);
-			return;
+			if (self::$cacheInstances) {
+				// Static cache survived across test classes; verify the table
+				// really exists before truncating to avoid PDOException when
+				// another test class dropped it.
+				$sources = (array)$db->listSources();
+				$table = $db->config['prefix'] . $fixture->table;
+				if (in_array($table, $sources)) {
+					$fixture->truncate($db);
+					return;
+				}
+				$fixture->created = array_diff($fixture->created, array($db->configKeyName));
+			} else {
+				$fixture->truncate($db);
+				return;
+			}
 		}
 
 		$sources = (array)$db->listSources();
@@ -296,8 +371,15 @@ class CakeFixtureManager {
 		foreach ($this->_loaded as $fixture) {
 			if (!empty($fixture->created)) {
 				foreach ($fixture->created as $ds) {
-					$db = ConnectionManager::getDataSource($ds);
-					$fixture->drop($db);
+					try {
+						$db = ConnectionManager::getDataSource($ds);
+						if ($db && method_exists($db, 'isConnected') && !$db->isConnected()) {
+							continue;
+						}
+						$fixture->drop($db);
+					} catch (\Throwable $e) {
+						// Connection may have been closed or table removed.
+					}
 				}
 			}
 		}

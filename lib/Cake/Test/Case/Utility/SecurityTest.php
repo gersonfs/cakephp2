@@ -36,7 +36,6 @@ class SecurityTest extends CakeTestCase {
  */
 	public function setUp(): void {
 		parent::setUp();
-		Configure::delete('Security.useOpenSsl');
 	}
 
 /**
@@ -46,7 +45,6 @@ class SecurityTest extends CakeTestCase {
  */
 	public function tearDown(): void {
 		parent::tearDown();
-		Configure::delete('Security.useOpenSsl');
 	}
 
 /**
@@ -90,8 +88,9 @@ class SecurityTest extends CakeTestCase {
 	 * @return void
 	 */
 	public function testHashInvalidSalt() {
-		$this->expectException(\PHPUnit\Framework\Exception::class);
-		Security::hash('someKey', 'blowfish', true);
+		$this->expectWarningException(function () {
+			Security::hash('someKey', 'blowfish', true);
+		});
 	}
 
 /**
@@ -100,8 +99,9 @@ class SecurityTest extends CakeTestCase {
 	 * @return void
 	 */
 	public function testHashAnotherInvalidSalt() {
-		$this->expectException(\PHPUnit\Framework\Exception::class);
-		Security::hash('someKey', 'blowfish', '$1$lksdjoijfaoijs');
+		$this->expectWarningException(function () {
+			Security::hash('someKey', 'blowfish', '$1$lksdjoijfaoijs');
+		});
 	}
 
 /**
@@ -110,8 +110,9 @@ class SecurityTest extends CakeTestCase {
 	 * @return void
 	 */
 	public function testHashYetAnotherInvalidSalt() {
-		$this->expectException(\PHPUnit\Framework\Exception::class);
-		Security::hash('someKey', 'blowfish', '$2a$10$123');
+		$this->expectWarningException(function () {
+			Security::hash('someKey', 'blowfish', '$2a$10$123');
+		});
 	}
 
 /**
@@ -120,8 +121,9 @@ class SecurityTest extends CakeTestCase {
 	 * @return void
 	 */
 	public function testHashInvalidCost() {
-		$this->expectException(\PHPUnit\Framework\Exception::class);
-		Security::setCost(1000);
+		$this->expectWarningException(function () {
+			Security::setCost(1000);
+		});
 	}
 /**
  * testHash method
@@ -272,74 +274,11 @@ class SecurityTest extends CakeTestCase {
 	 * @return void
 	 */
 	public function testCipherEmptyKey() {
-		$this->expectException(\PHPUnit\Framework\Exception::class);
-		$txt = 'some_text';
-		$key = '';
-		Security::cipher($txt, $key);
-	}
-
-/**
- * testRijndael method
- *
- * @return void
- */
-	public function testRijndael() {
-		$this->skipIf(!function_exists('mcrypt_encrypt'));
-		$txt = 'The quick brown fox jumped over the lazy dog.';
-		$key = 'DYhG93b0qyJfIxfs2guVoUubWwvniR2G0FgaC9mi';
-
-		$result = Security::rijndael($txt, $key, 'encrypt');
-		$this->assertEquals($txt, Security::rijndael($result, $key, 'decrypt'));
-
-		$result = Security::rijndael($key, $txt, 'encrypt');
-		$this->assertEquals($key, Security::rijndael($result, $txt, 'decrypt'));
-
-		$result = Security::rijndael('', $key, 'encrypt');
-		$this->assertEquals('', Security::rijndael($result, $key, 'decrypt'));
-
-		$key = 'this is my key of over 32 chars, yes it is';
-		$result = Security::rijndael($txt, $key, 'encrypt');
-		$this->assertEquals($txt, Security::rijndael($result, $key, 'decrypt'));
-	}
-
-/**
- * Test that rijndael() can still decrypt values with a fixed iv.
- *
- * @return void
- */
-	public function testRijndaelBackwardCompatibility() {
-		$this->skipIf(!function_exists('mcrypt_encrypt'));
-
-		$txt = 'The quick brown fox jumped over the lazy dog.';
-		$key = 'DYhG93b0qyJfIxfs2guVoUubWwvniR2G0FgaC9mi';
-
-		// Encrypted before random iv
-		$value = base64_decode('1WPjnq96LMzLGwNgmudHF+cAIqVUN5DaUZEpf5tm1EzSgt5iYY9o3d66iRI/fKJLTlTVGsa8HzW0jDNitmVXoQ==');
-		$this->assertEquals($txt, Security::rijndael($value, $key, 'decrypt'));
-	}
-
-/**
-	 * testRijndaelInvalidOperation method
-	 *
-	 * @return void
-	 */
-	public function testRijndaelInvalidOperation() {
-		$this->expectException(\PHPUnit\Framework\Exception::class);
-		$txt = 'The quick brown fox jumped over the lazy dog.';
-		$key = 'DYhG93b0qyJfIxfs2guVoUubWwvniR2G0FgaC9mi';
-		Security::rijndael($txt, $key, 'foo');
-	}
-
-/**
-	 * testRijndaelInvalidKey method
-	 *
-	 * @return void
-	 */
-	public function testRijndaelInvalidKey() {
-		$this->expectException(\PHPUnit\Framework\Exception::class);
-		$txt = 'The quick brown fox jumped over the lazy dog.';
-		$key = 'too small';
-		Security::rijndael($txt, $key, 'encrypt');
+		$this->expectWarningException(function () {
+			$txt = 'some_text';
+			$key = '';
+			Security::cipher($txt, $key);
+		});
 	}
 
 /**
@@ -348,7 +287,6 @@ class SecurityTest extends CakeTestCase {
  * @return void
  */
 	public function testEncryptDecrypt() {
-		$this->skipIf(!extension_loaded('mcrypt'), 'This test requires mcrypt to be installed');
 		$txt = 'The quick brown fox';
 		$key = 'This key is longer than 32 bytes long.';
 		$result = Security::encrypt($txt, $key);
@@ -358,60 +296,11 @@ class SecurityTest extends CakeTestCase {
 	}
 
 /**
- * Tests that encrypted strings are compatible between the mcrypt and openssl engine.
- *
- * @dataProvider plainTextProvider
- * @param string $txt Plain text to be encrypted.
- * @return void
- */
-	public function testEncryptDecryptCompatibility($txt) {
-		$this->skipIf(!extension_loaded('mcrypt'), 'This test requires mcrypt to be installed');
-		$this->skipIf(!extension_loaded('openssl'), 'This test requires openssl to be installed');
-		$this->skipIf(version_compare(PHP_VERSION, '5.3.3', '<'), 'This test requires PHP 5.3.3 or greater');
-
-		$key = '12345678901234567890123456789012';
-
-		Configure::write('Security.useOpenSsl', false);
-		$mcrypt = Security::encrypt($txt, $key);
-
-		Configure::write('Security.useOpenSsl', true);
-		$openssl = Security::encrypt($txt, $key);
-
-		$this->assertEquals(strlen($mcrypt), strlen($openssl));
-
-		Configure::write('Security.useOpenSsl', false);
-		$this->assertEquals($txt, Security::decrypt($mcrypt, $key));
-		$this->assertEquals($txt, Security::decrypt($openssl, $key));
-
-		Configure::write('Security.useOpenSsl', true);
-		$this->assertEquals($txt, Security::decrypt($mcrypt, $key));
-		$this->assertEquals($txt, Security::decrypt($openssl, $key));
-	}
-
-/**
- * Data provider for testEncryptDecryptCompatibility
- *
- * @return array
- */
-	public function plainTextProvider() {
-		return array(
-			array(''),
-			array('abcdefg'),
-			array('1234567890123456'),
-			array('The quick brown fox'),
-			array('12345678901234567890123456789012'),
-			array('The quick brown fox jumped over the lazy dog.'),
-			array('何らかのマルチバイト文字列'),
-		);
-	}
-
-/**
  * Test that changing the key causes decryption to fail.
  *
  * @return void
  */
 	public function testDecryptKeyFailure() {
-		$this->skipIf(!extension_loaded('mcrypt'), 'This test requires mcrypt to be installed');
 		$txt = 'The quick brown fox';
 		$key = 'This key is longer than 32 bytes long.';
 		Security::encrypt($txt, $key);
@@ -426,7 +315,6 @@ class SecurityTest extends CakeTestCase {
  * @return void
  */
 	public function testDecryptHmacFailure() {
-		$this->skipIf(!extension_loaded('mcrypt'), 'This test requires mcrypt to be installed');
 		$txt = 'The quick brown fox';
 		$key = 'This key is quite long and works well.';
 		$salt = 'this is a delicious salt!';
@@ -443,7 +331,6 @@ class SecurityTest extends CakeTestCase {
  * @return void
  */
 	public function testDecryptHmacSaltFailure() {
-		$this->skipIf(!extension_loaded('mcrypt'), 'This test requires mcrypt to be installed');
 		$txt = 'The quick brown fox';
 		$key = 'This key is quite long and works well.';
 		$salt = 'this is a delicious salt!';
@@ -472,7 +359,6 @@ class SecurityTest extends CakeTestCase {
  * @return void
  */
 	public function testEncryptDecryptFalseyData() {
-		$this->skipIf(!extension_loaded('mcrypt'), 'This test requires mcrypt to be installed');
 		$key = 'This is a key that is long enough to be ok.';
 
 		$result = Security::encrypt('', $key);

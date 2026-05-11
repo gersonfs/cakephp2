@@ -223,7 +223,7 @@ class ShellDispatcher {
 		}
 		$methods = array_diff(get_class_methods($Shell), get_class_methods('Shell'));
 		$added = in_array($command, $methods);
-		$private = substr($command, 0, 1) === '_' && method_exists($Shell, $command);
+		$private = $command !== null && substr($command, 0, 1) === '_' && method_exists($Shell, $command);
 
 		if (!$private) {
 			if ($added) {

@@ -209,18 +209,25 @@ class JsHelperTest extends CakeTestCase {
 	 * @return void
 	 */
 	public function testMethodDispatching() {
-		$this->expectException('PHPUnit\Framework\Exception');
-		$this->_useMock();
+		set_error_handler(static function ($errno, $errstr) {
+			throw new \PHPUnit\Framework\Exception($errstr, $errno);
+		}, E_USER_WARNING);
+		try {
+			$this->expectException('PHPUnit\Framework\Exception');
+			$this->_useMock();
 
-		$this->Js->TestJsEngine
-			->expects($this->once())
-			->method('event')
-			->with('click', 'callback');
+			$this->Js->TestJsEngine
+				->expects($this->once())
+				->method('event')
+				->with('click', 'callback');
 
-		$this->Js->event('click', 'callback');
+			$this->Js->event('click', 'callback');
 
-		$this->Js->TestJsEngine = new StdClass();
-		$this->Js->someMethodThatSurelyDoesntExist();
+			$this->Js->TestJsEngine = new StdClass();
+			$this->Js->someMethodThatSurelyDoesntExist();
+		} finally {
+			restore_error_handler();
+		}
 	}
 
 /**

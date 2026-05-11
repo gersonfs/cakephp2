@@ -228,7 +228,7 @@ if (!function_exists('h')) {
 			$charset = $double;
 			$double = true;
 		}
-		return htmlspecialchars($text, ENT_QUOTES, ($charset) ? $charset : $defaultCharset, $double);
+		return htmlspecialchars((string)$text, ENT_QUOTES, ($charset) ? $charset : $defaultCharset, $double);
 	}
 
 }
@@ -248,7 +248,7 @@ if (!function_exists('pluginSplit')) {
  * @link https://book.cakephp.org/2.0/en/core-libraries/global-constants-and-functions.html#pluginSplit
  */
 	function pluginSplit($name, $dotAppend = false, $plugin = null) {
-		if (strpos($name, '.') !== false) {
+		if ($name !== null && strpos($name, '.') !== false) {
 			$parts = explode('.', $name, 2);
 			if ($dotAppend) {
 				$parts[0] .= '.';
@@ -323,7 +323,7 @@ if (!function_exists('env')) {
 			if (isset($_SERVER['HTTPS'])) {
 				return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
 			}
-			return (strpos(env('SCRIPT_URI'), 'https://') === 0);
+			return (strpos((string)env('SCRIPT_URI'), 'https://') === 0);
 		}
 
 		if ($key === 'SCRIPT_NAME') {
@@ -354,15 +354,15 @@ if (!function_exists('env')) {
 
 		switch ($key) {
 			case 'DOCUMENT_ROOT':
-				$name = env('SCRIPT_NAME');
-				$filename = env('SCRIPT_FILENAME');
+				$name = (string)env('SCRIPT_NAME');
+				$filename = (string)env('SCRIPT_FILENAME');
 				$offset = 0;
 				if (!strpos($name, '.php')) {
 					$offset = 4;
 				}
 				return substr($filename, 0, -(strlen($name) + $offset));
 			case 'PHP_SELF':
-				return str_replace(env('DOCUMENT_ROOT'), '', env('SCRIPT_FILENAME'));
+				return str_replace((string)env('DOCUMENT_ROOT'), '', (string)env('SCRIPT_FILENAME'));
 			case 'CGI_MODE':
 				return (PHP_SAPI === 'cgi');
 			case 'HTTP_BASE':
@@ -488,7 +488,7 @@ if (!function_exists('clearCache')) {
  */
 	function clearCache($params = null, $type = 'views', $ext = '.php') {
 		if (is_string($params) || $params === null) {
-			$params = preg_replace('/\/\//', '/', $params);
+			$params = preg_replace('/\/\//', '/', (string)$params);
 			$cache = CACHE . $type . DS . $params;
 
 			if (is_file($cache . $ext)) {

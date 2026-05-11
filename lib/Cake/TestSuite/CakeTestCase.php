@@ -21,13 +21,17 @@ use PHPUnit\Framework\Exception;
 
 App::uses('CakeFixtureManager', 'TestSuite/Fixture');
 App::uses('CakeTestFixture', 'TestSuite/Fixture');
+App::uses('CakeRequest', 'Network');
+App::uses('CakeResponse', 'Network');
 
 /**
  * CakeTestCase class
  *
  * @package       Cake.TestSuite
  */
+#[\AllowDynamicProperties]
 abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
+
 
 /**
  * The class responsible for managing the creation, loading and removing of fixtures
@@ -69,6 +73,21 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  */
 	protected $_pathRestore = array();
 
+    public function __construct(string $name = 'unnamed')
+    {
+        parent::__construct($name);
+        $this->fixtureManager = new CakeFixtureManager();
+        $this->fixtureManager->fixturize($this);
+    }
+
+    public function __destruct()
+    {
+		if (isset($this->fixtureManager)) {
+			$this->fixtureManager->shutDown();
+		}
+        unset($this->fixtureManager, $this->db);
+    }
+
 /**
  * Runs the test case and collects the results in a TestResult object.
  * If no TestResult object is passed a new one will be created.
@@ -78,7 +97,7 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  * @return \PHPUnit\Framework\TestResult
  * @throws InvalidArgumentException
  */
-	public function run(\PHPUnit\Framework\TestResult $result = null) : \PHPUnit\Framework\TestResult {
+	/*public function run(\PHPUnit\Framework\TestResult $result = null) : \PHPUnit\Framework\TestResult {
 		$level = ob_get_level();
 
 		if (!empty($this->fixtureManager)) {
@@ -95,7 +114,7 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 		}
 
 		return $result;
-	}
+	}*/
 
 /**
  * Called when a test case method is about to start (to be overridden when needed.)
@@ -108,13 +127,8 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 
 	public static function assertAttributeEquals($expected, string $actualAttributeName, $actualClassOrObject, string $message = '', float $delta = 0.0, int $maxDepth = 10, bool $canonicalize = false, bool $ignoreCase = false): void
 	{
-		if (is_object($actualClassOrObject)) {
-			$value = self::getObjectAttributeCake($actualClassOrObject, $actualAttributeName);
-			self::assertEquals($expected, $value, $message);
-			return;
-		}
-
-		parent::assertAttributeEquals($expected,  $actualAttributeName, $actualClassOrObject, $message, $delta ,$maxDepth,  $canonicalize, $ignoreCase);
+		$value = self::getObjectAttributeCake($actualClassOrObject, $actualAttributeName);
+		self::assertEquals($expected, $value, $message);
 	}
 
 	public static function getObjectAttributeCake($object, string $attributeName)
@@ -133,11 +147,7 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 					return $object->{$attributeName};
 				}
 
-				$attribute->setAccessible(true);
-				$value = $attribute->getValue($object);
-				$attribute->setAccessible(false);
-
-				return $value;
+				return $attribute->getValue($object);
 			} catch (ReflectionException $e) {
 			}
 		} while ($reflector = $reflector->getParentClass());
@@ -175,6 +185,55 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	}
 
 /**
+ * Replacement for PHPUnit's removed withConsecutive() matcher.
+ *
+ * Accepts a list of expected argument groups (one group per invocation)
+ * and returns a callback compatible with willReturnCallback(). Each
+ * argument may be either a literal value (compared with assertSame) or a
+ * PHPUnit Constraint (evaluated with assertThat). An optional return value
+ * for each invocation may be provided via the special key `__return__`.
+ *
+ * Example:
+ * ```
+ * $mock->expects($this->exactly(2))
+ *     ->method('write')
+ *     ->willReturnCallback($this->withConsecutive(
+ *         ['foo', 1],
+ *         ['bar', 2]
+ *     ));
+ * ```
+ *
+ * @param array ...$invocations Expected argument groups per invocation.
+ * @return \Closure
+ */
+	public function withConsecutive(...$invocations) {
+		$callIndex = 0;
+		$test = $this;
+		return function (...$args) use (&$callIndex, $invocations, $test) {
+			if (!array_key_exists($callIndex, $invocations)) {
+				$test->fail(sprintf('Unexpected invocation #%d with %d argument(s).', $callIndex + 1, count($args)));
+			}
+			$expected = $invocations[$callIndex];
+			$return = null;
+			if (is_array($expected) && array_key_exists('__return__', $expected)) {
+				$return = $expected['__return__'];
+				unset($expected['__return__']);
+				$expected = array_values($expected);
+			}
+			foreach ($expected as $i => $value) {
+				$actual = $args[$i] ?? null;
+				if ($value instanceof \PHPUnit\Framework\Constraint\Constraint) {
+					$test->assertThat($actual, $value, sprintf('Invocation #%d, argument #%d', $callIndex + 1, $i + 1));
+				} else {
+					$test->assertEquals($value, $actual, sprintf('Invocation #%d, argument #%d', $callIndex + 1, $i + 1));
+				}
+			}
+			$callIndex++;
+			return $return;
+		};
+	}
+
+/**
  * Overrides SimpleTestCase::skipIf to provide a boolean return value
  *
  * @param bool $shouldSkip Whether or not the test should be skipped.
@@ -189,6 +248,35 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	}
 
 /**
+ * PHPUnit 10 no longer promotes PHP warnings/notices to exceptions.
+ * This helper registers an error handler that converts user-level
+ * errors into PHPUnit\Framework\Exception, then calls the callback
+ * with expectException already set, restoring the previous handler
+ * at the end (even on exception).
+ *
+ * Useful for tests that previously relied on `@expectedException
+ * PHPUnit_Framework_Error_Warning` style assertions.
+ *
+ * @param callable $callback The test body to execute.
+ * @param int $levels Bitmask of error levels to catch (default: user warnings + notices + deprecated).
+ * @return void
+ */
+	public function expectWarningException(callable $callback, $levels = null) {
+		if ($levels === null) {
+			$levels = E_USER_WARNING | E_USER_NOTICE | E_USER_DEPRECATED;
+		}
+		set_error_handler(static function ($errno, $errstr) {
+			throw new \PHPUnit\Framework\Exception($errstr, $errno);
+		}, $levels);
+		try {
+			$this->expectException(\PHPUnit\Framework\Exception::class);
+			$callback();
+		} finally {
+			restore_error_handler();
+		}
+	}
+
+/**
  * Setup the test case, backup the static object values so they can be restored.
  * Specifically backs up the contents of Configure and paths in App if they have
  * not already been backed up.
@@ -197,6 +285,8 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  */
 	protected function setUp() : void {
 		parent::setUp();
+
+		$this->fixtureManager->load($this);
 
 		if (empty($this->_configure)) {
 			$this->_configure = Configure::read();
@@ -216,6 +306,9 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  */
 	protected function tearDown() : void {
 		parent::tearDown();
+
+		$this->fixtureManager->unload($this);
+
 		App::build($this->_pathRestore, App::RESET);
 		if (class_exists('ClassRegistry', false)) {
 			ClassRegistry::flush();
@@ -224,20 +317,41 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 			Configure::clear();
 			Configure::write($this->_configure);
 		}
-		if (isset($_GET['debug']) && $_GET['debug']) {
-			ob_flush();
-		}
 		unset($this->_configure, $this->_pathRestore);
 	}
 
 /**
- * See CakeTestSuiteDispatcher::date()
+ * Returns the current date/time formatted with the given format.
  *
  * @param string $format format to be used.
  * @return string
  */
 	public static function date($format = 'Y-m-d H:i:s') {
-		return CakeTestSuiteDispatcher::date($format);
+		return date($format);
+	}
+
+/**
+ * Asserts that two datetime strings are equal within a tolerance in seconds.
+ * Avoids race conditions in tests that compare a stored timestamp with one
+ * generated immediately after.
+ *
+ * @param string $expected Expected datetime string.
+ * @param string $actual Actual datetime string.
+ * @param int $toleranceSeconds Allowed delta in seconds (default 2).
+ * @param string $message Optional message.
+ * @return void
+ */
+	public static function assertDateEquals($expected, $actual, $toleranceSeconds = 2, $message = '') {
+		$expectedTs = strtotime((string)$expected);
+		$actualTs = strtotime((string)$actual);
+		static::assertNotFalse($expectedTs, $message ?: 'Expected datetime is invalid.');
+		static::assertNotFalse($actualTs, $message ?: 'Actual datetime is invalid.');
+		$delta = abs($expectedTs - $actualTs);
+		static::assertLessThanOrEqual(
+			$toleranceSeconds,
+			$delta,
+			$message ?: sprintf('Datetimes %s and %s differ by more than %d seconds.', $expected, $actual, $toleranceSeconds)
+		);
 	}
 
 // @codingStandardsIgnoreStart PHPUnit overrides don't match CakePHP
@@ -247,20 +361,20 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  *
  * @return void
  */
-	protected function assertPreConditions() : void {
+	/*protected function assertPreConditions() : void {
 		parent::assertPreConditions();
 		$this->startTest($this->getName());
-	}
+	}*/
 
 /**
  * Announces the end of a test.
  *
  * @return void
  */
-	protected function assertPostConditions(): void {
+	/*protected function assertPostConditions(): void {
 		parent::assertPostConditions();
 		$this->endTest($this->getName());
-	}
+	}*/
 
 // @codingStandardsIgnoreEnd
 
@@ -645,7 +759,7 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  * @return void
  */
 	protected static function assertPattern($pattern, $string, $message = '') {
-		return static::assertRegExp($pattern, $string, $message);
+		return static::assertMatchesRegularExpression($pattern, $string, $message);
 	}
 
 /**
@@ -808,7 +922,26 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	) {
 		$MockBuilder = $this->getMockBuilder($originalClassName);
 		if (!empty($methods)) {
-			$MockBuilder = $MockBuilder->setMethods($methods);
+			$existingMethods = array();
+			$addedMethods = array();
+			if (class_exists($originalClassName) || interface_exists($originalClassName)) {
+				$ref = new ReflectionClass($originalClassName);
+				foreach ($methods as $method) {
+					if ($ref->hasMethod($method)) {
+						$existingMethods[] = $method;
+					} else {
+						$addedMethods[] = $method;
+					}
+				}
+			} else {
+				$existingMethods = $methods;
+			}
+			if (!empty($existingMethods)) {
+				$MockBuilder = $MockBuilder->onlyMethods($existingMethods);
+			}
+			if (!empty($addedMethods)) {
+				$MockBuilder = $MockBuilder->addMethods($addedMethods);
+			}
 		}
 		if (!empty($arguments)) {
 			$MockBuilder = $MockBuilder->setConstructorArgs($arguments);
@@ -894,6 +1027,39 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 			$callOriginalClone,
 			$callAutoload
 		);
+	}
+
+/**
+ * Compatibility shim for PHPUnit's removed at() method.
+ * Returns a matcher that matches the n-th invocation of a method.
+ *
+ * @param int $index The invocation index to match.
+ * @return \PHPUnit\Framework\MockObject\Rule\InvocationOrder
+ */
+	public static function at($index) {
+		return new class($index) extends \PHPUnit\Framework\MockObject\Rule\InvocationOrder {
+			private int $_index;
+			private int $_currentIndex = -1;
+
+			public function __construct(int $index) {
+				$this->_index = $index;
+			}
+
+			public function toString(): string {
+				return 'invoked at sequence index ' . $this->_index;
+			}
+
+			public function matches(\PHPUnit\Framework\MockObject\Invocation $invocation): bool {
+				$this->_currentIndex++;
+				return $this->_currentIndex === $this->_index;
+			}
+
+			protected function invokedDo(\PHPUnit\Framework\MockObject\Invocation $invocation): void {
+			}
+
+			public function verify(): void {
+			}
+		};
 	}
 
 /**
