@@ -329,7 +329,11 @@ class CakeTestFixture {
 	public function truncate($db) {
 		$fullDebug = $db->fullDebug;
 		$db->fullDebug = false;
-		$return = $db->truncate($this->table);
+		try {
+			$return = $db->truncate($this->table);
+		} catch (PDOException $e) {
+			$return = false;
+		}
 		$db->fullDebug = $fullDebug;
 		return $return;
 	}
