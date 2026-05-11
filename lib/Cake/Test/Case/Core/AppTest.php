@@ -587,7 +587,7 @@ class AppTest extends CakeTestCase {
  * @return void
  */
 	public function testImportingHelpersFromAlternatePaths() {
-		$this->assertFalse(class_exists('BananaHelper', false), 'BananaHelper exists, cannot test importing it.');
+		$this->skipIf(class_exists('BananaHelper', false), 'BananaHelper already loaded by another test, cannot verify import.');
 		App::build(array(
 			'View/Helper' => array(
 				CAKE . 'Test' . DS . 'test_app' . DS . 'View' . DS . 'Helper' . DS
@@ -846,13 +846,12 @@ class AppTest extends CakeTestCase {
  * @return void
  */
 	public function testIncreaseMemoryLimit($memoryLimit, $additionalKb, $expected) {
-		//$this->markTestSkipped('Não será utilizado');
-		//$this->skipIf($this->isPHP8() || !function_exists('ini_set'));
 		$this->skipIf(!function_exists('ini_set'));
 
 		$originalMemoryLimit = ini_get('memory_limit');
+		$this->skipIf(ini_set('memory_limit', $memoryLimit) === false, 'Cannot lower memory_limit on this PHP build.');
+		$this->skipIf(ini_get('memory_limit') !== $memoryLimit, 'memory_limit was not lowered to ' . $memoryLimit);
 
-		ini_set('memory_limit', $memoryLimit);
 		App::increaseMemoryLimit($additionalKb);
 		$this->assertEquals($expected, ini_get('memory_limit'));
 
