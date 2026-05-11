@@ -61,6 +61,11 @@ class ApplicationControllerTest extends ControllerTestCase {
  */
 	public function setUp(): void {
 		CakeSession::destroy();
+		if (session_status() === PHP_SESSION_ACTIVE) {
+			session_write_close();
+		}
+		session_set_save_handler(new \SessionHandler());
+		Configure::write('Session', array('defaults' => 'php'));
 		parent::setUp();
 	}
 
