@@ -133,7 +133,7 @@ class Xml {
  * @throws XmlException
  */
 	protected static function _loadXml($input, $options) {
-		$hasDisable = function_exists('libxml_disable_entity_loader');
+		$hasDisable = function_exists('libxml_disable_entity_loader') && PHP_VERSION_ID < 80000;
 		$internalErrors = libxml_use_internal_errors(true);
 		if ($hasDisable && !$options['loadEntities']) {
 			libxml_disable_entity_loader(true);

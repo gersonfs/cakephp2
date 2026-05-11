@@ -144,6 +144,10 @@ class TaskCollectionTest extends CakeTestCase {
 		$result = $this->Tasks->loaded();
 		$this->assertEquals(array('DbConfig'), $result, 'loaded() results are wrong.');
 
+		App::build(array(
+			'Plugin' => array(CAKE . 'Test' . DS . 'test_app' . DS . 'Plugin' . DS)
+		));
+		CakePlugin::load('TestPlugin');
 		$result = $this->Tasks->load('SomeTask', array('className' => 'TestPlugin.OtherTask'));
 		$this->assertInstanceOf('OtherTaskTask', $result);
 		$this->assertInstanceOf('OtherTaskTask', $this->Tasks->SomeTask);

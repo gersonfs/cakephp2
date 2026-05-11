@@ -2787,7 +2787,7 @@ class PaginatorHelperTest extends CakeTestCase {
  * @return void
  */
 	public function testAjaxLinkGenerationNumbers() {
-		$this->Paginator->Js->expectCallCount('link', 2);
+		$this->Paginator->Js->expects($this->exactly(2))->method('link');
 		$this->Paginator->numbers(array(
 			'modulus' => '2',
 			'url' => array('controller' => 'projects', 'action' => 'sort'),

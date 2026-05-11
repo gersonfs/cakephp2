@@ -95,22 +95,10 @@ class RssHelperTest extends CakeTestCase {
 		$content = 'content';
 
 		$result = $this->Rss->channel($attrib, $elements, $content);
-		$expected = array(
-			'channel' => array(
-				'a' => '1',
-				'b' => '2'
-			),
-			'<title',
-			'Title',
-			'/title',
-			'<link',
-			$this->Rss->url('/', true),
-			'/link',
-			'<description',
-			'content',
-			'/channel'
-		);
-		$this->assertTags($result, $expected);
+		$expected = '<channel a="1" b="2"><title>Title</title><link>' .
+			$this->Rss->url('/', true) .
+			'</link><description/>content</channel>';
+		$this->assertEquals($expected, $result);
 	}
 
 /**

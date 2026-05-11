@@ -147,6 +147,16 @@ class ExceptionRendererTest extends CakeTestCase {
 	public function setUp(): void {
 		parent::setUp();
 		Configure::write('Config.language', 'eng');
+		// Reset session to filesystem defaults so previous DB-backed
+		// session config from Model tests doesn't try to query a
+		// missing 'sessions' table during ExceptionRenderer flow.
+		if (session_status() === PHP_SESSION_ACTIVE) {
+			session_write_close();
+		}
+		session_set_save_handler(new \SessionHandler());
+		Configure::write('Session', array(
+			'defaults' => 'php',
+		));
 		App::build(array(
 			'View' => array(
 				CAKE . 'Test' . DS . 'test_app' . DS . 'View' . DS

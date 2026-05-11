@@ -99,7 +99,17 @@ class CakeRequestTest extends CakeTestCase {
 			$_GET['case'] = $this->_case;
 		}
 		Configure::write('App', $this->_app);
-		unset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']);
+		unset(
+			$_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'],
+			$_SERVER['HTTP_X_FORWARDED_HOST'],
+			$_SERVER['HTTP_X_FORWARDED_FOR'],
+			$_SERVER['HTTP_CLIENT_IP'],
+			$_SERVER['REQUEST_URI'],
+			$_SERVER['PHP_SELF'],
+			$_SERVER['PATH_INFO'],
+			$_SERVER['QUERY_STRING'],
+			$_SERVER['HTTP_REFERER']
+		);
 	}
 
 /**
