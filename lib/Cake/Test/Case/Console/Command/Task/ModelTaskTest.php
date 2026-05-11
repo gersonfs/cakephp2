@@ -798,7 +798,7 @@ class ModelTaskTest extends CakeTestCase {
 		$model = new Model(array('ds' => 'test', 'name' => 'CategoryThread'));
 
 		$this->Task->expects($this->any())->method('in')
-			->will($this->onConsecutiveCalls('n', 'y', 'n', 'n', 'n'));
+			->will($this->onConsecutiveCalls('n', 'y', 'n', 'n', 'n', 'n'));
 
 		$result = $this->Task->confirmAssociations($model, $associations);
 		$this->assertTrue(empty($result['hasOne']));

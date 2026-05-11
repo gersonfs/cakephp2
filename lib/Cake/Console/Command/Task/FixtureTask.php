@@ -203,7 +203,7 @@ class FixtureTask extends BakeTask {
 		if (!isset($options['records']) && $this->interactive) {
 			$prompt = __d('cake_console', "Would you like to build this fixture with data from %s's table?", $modelName);
 			$fromTable = $this->in($prompt, array('y', 'n'), 'n');
-			if (strtolower($fromTable) === 'y') {
+			if (strtolower((string)$fromTable) === 'y') {
 				$options['fromTable'] = true;
 			}
 		}
@@ -248,7 +248,7 @@ class FixtureTask extends BakeTask {
 		$this->_Schema = new CakeSchema();
 		$data = $this->_Schema->read(array('models' => false, 'connection' => $this->connection));
 		if (!isset($data['tables'][$useTable])) {
-			$this->err("<warning>Warning:</warning> Could not find the '${useTable}' table for ${model}.");
+			$this->err("<warning>Warning:</warning> Could not find the '{$useTable}' table for {$model}.");
 			return null;
 		}
 

@@ -192,6 +192,55 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	}
 
 /**
+ * Replacement for PHPUnit's removed withConsecutive() matcher.
+ *
+ * Accepts a list of expected argument groups (one group per invocation)
+ * and returns a callback compatible with willReturnCallback(). Each
+ * argument may be either a literal value (compared with assertSame) or a
+ * PHPUnit Constraint (evaluated with assertThat). An optional return value
+ * for each invocation may be provided via the special key `__return__`.
+ *
+ * Example:
+ * ```
+ * $mock->expects($this->exactly(2))
+ *     ->method('write')
+ *     ->willReturnCallback($this->withConsecutive(
+ *         ['foo', 1],
+ *         ['bar', 2]
+ *     ));
+ * ```
+ *
+ * @param array ...$invocations Expected argument groups per invocation.
+ * @return \Closure
+ */
+	public function withConsecutive(...$invocations) {
+		$callIndex = 0;
+		$test = $this;
+		return function (...$args) use (&$callIndex, $invocations, $test) {
+			if (!array_key_exists($callIndex, $invocations)) {
+				$test->fail(sprintf('Unexpected invocation #%d with %d argument(s).', $callIndex + 1, count($args)));
+			}
+			$expected = $invocations[$callIndex];
+			$return = null;
+			if (is_array($expected) && array_key_exists('__return__', $expected)) {
+				$return = $expected['__return__'];
+				unset($expected['__return__']);
+				$expected = array_values($expected);
+			}
+			foreach ($expected as $i => $value) {
+				$actual = $args[$i] ?? null;
+				if ($value instanceof \PHPUnit\Framework\Constraint\Constraint) {
+					$test->assertThat($actual, $value, sprintf('Invocation #%d, argument #%d', $callIndex + 1, $i + 1));
+				} else {
+					$test->assertEquals($value, $actual, sprintf('Invocation #%d, argument #%d', $callIndex + 1, $i + 1));
+				}
+			}
+			$callIndex++;
+			return $return;
+		};
+	}
+
+/**
  * Overrides SimpleTestCase::skipIf to provide a boolean return value
  *
  * @param bool $shouldSkip Whether or not the test should be skipped.

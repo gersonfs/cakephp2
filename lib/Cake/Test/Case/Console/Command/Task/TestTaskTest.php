@@ -613,7 +613,8 @@ class TestTaskTest extends CakeTestCase {
 			->method('in')
 			->will($this->onConsecutiveCalls(
 				5, //helper
-				1 //OtherHelper
+				1, //OtherHelper
+				'n' //no extra fixtures
 			));
 
 		$this->Task->expects($this->once())

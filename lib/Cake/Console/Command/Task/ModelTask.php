@@ -170,7 +170,7 @@ class ModelTask extends BakeTask {
 		while (!$valid) {
 			$len = strlen(count($options) + 1);
 			foreach ($options as $i => $option) {
-				$this->out(sprintf("%${len}d. %s", $i + 1, $option));
+				$this->out(sprintf("%{$len}d. %s", $i + 1, $option));
 			}
 			if (empty($prompt)) {
 				$prompt = __d('cake_console', 'Make a selection from the choices above');
@@ -426,7 +426,7 @@ class ModelTask extends BakeTask {
 				$this->hr();
 
 				$optionText = '';
-				for ($i = 1, $m = $defaultChoice / 2; $i <= $m; $i++) {
+				for ($i = 1, $m = (int)($defaultChoice / 2); $i <= $m; $i++) {
 					$line = sprintf("%2d. %s", $i, $this->_validations[$i]);
 					$optionText .= $line . str_repeat(" ", 31 - strlen($line));
 					if ($m + $i !== $defaultChoice) {
@@ -901,7 +901,7 @@ class ModelTask extends BakeTask {
 			$this->out(__d('cake_console', 'Possible Models based on your current database:'));
 			$len = strlen($count + 1);
 			for ($i = 0; $i < $count; $i++) {
-				$this->out(sprintf("%${len}d. %s", $i + 1, $this->_modelNames[$i]));
+				$this->out(sprintf("%{$len}d. %s", $i + 1, $this->_modelNames[$i]));
 			}
 		}
 		return $this->_tables;

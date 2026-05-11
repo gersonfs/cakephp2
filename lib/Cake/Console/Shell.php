@@ -595,7 +595,7 @@ class Shell extends CakeObject {
 			$this->_stop(self::CODE_ERROR);
 			return self::CODE_ERROR;
 		}
-		$result = trim($result);
+		$result = trim((string)$result);
 
 		if ($default !== null && ($result === '' || $result === null)) {
 			return $default;
@@ -851,9 +851,9 @@ class Shell extends CakeObject {
  * @link https://book.cakephp.org/2.0/en/console-and-shells.html#Shell::shortPath
  */
 	public function shortPath($file) {
-		$shortPath = str_replace(ROOT, null, $file);
-		$shortPath = str_replace('..' . DS, '', $shortPath);
-		return str_replace(DS . DS, DS, $shortPath);
+		$shortPath = str_replace(ROOT, '', (string)$file);
+		$shortPath = str_replace('..' . DS, '', (string)$shortPath);
+		return str_replace(DS . DS, DS, (string)$shortPath);
 	}
 
 /**

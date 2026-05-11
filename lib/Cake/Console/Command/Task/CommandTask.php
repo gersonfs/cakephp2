@@ -133,7 +133,7 @@ class CommandTask extends AppShell {
 	public function getShell($commandName) {
 		list($pluginDot, $name) = pluginSplit($commandName, true);
 
-		if (in_array(strtolower($pluginDot), array('app.', 'core.'))) {
+		if (in_array(strtolower((string)$pluginDot), array('app.', 'core.'))) {
 			$commandName = $name;
 			$pluginDot = '';
 		}
