@@ -119,10 +119,13 @@ class SessionComponentTest extends CakeTestCase {
 		// Reset session handler to default in case a previous test
 		// registered a custom one (e.g. Model/Datasource/CakeSessionTest).
 		if (session_status() === PHP_SESSION_ACTIVE) {
-			session_write_close();
+			@session_destroy();
 		}
+		$_SESSION = array();
 		session_set_save_handler(new \SessionHandler());
+		Configure::delete('Session');
 		Configure::write('Session', array('defaults' => 'php'));
+		CakeSession::destroy();
 		$_SESSION = null;
 		$this->ComponentCollection = new ComponentCollection();
 	}

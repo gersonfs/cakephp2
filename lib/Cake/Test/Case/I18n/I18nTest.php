@@ -35,10 +35,13 @@ class I18nTest extends CakeTestCase {
 		parent::setUp();
 
 		if (session_status() === PHP_SESSION_ACTIVE) {
-			session_write_close();
+			@session_destroy();
 		}
+		$_SESSION = array();
 		session_set_save_handler(new \SessionHandler());
+		Configure::delete('Session');
 		Configure::write('Session', array('defaults' => 'php'));
+		CakeSession::destroy();
 
 		Cache::delete('object_map', '_cake_core_');
 		App::build(array(

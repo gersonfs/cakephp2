@@ -38,10 +38,13 @@ class FlashComponentTest extends CakeTestCase {
 		// Reset session handler to PHP default to avoid carryover from
 		// Model/Datasource/CakeSessionTest which registers a custom one.
 		if (session_status() === PHP_SESSION_ACTIVE) {
-			session_write_close();
+			@session_destroy();
 		}
+		$_SESSION = array();
 		session_set_save_handler(new \SessionHandler());
+		Configure::delete('Session');
 		Configure::write('Session', array('defaults' => 'php'));
+		CakeSession::destroy();
 		$this->Components = new ComponentCollection();
 		$this->Flash = new FlashComponent($this->Components);
 	}
