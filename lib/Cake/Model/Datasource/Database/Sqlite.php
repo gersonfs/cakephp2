@@ -393,9 +393,9 @@ class Sqlite extends DboSource {
  */
 	public function limit($limit, $offset = null) {
 		if ($limit) {
-			$rt = sprintf(' LIMIT %u', $limit);
+			$rt = ' LIMIT ' . static::_intString($limit);
 			if ($offset) {
-				$rt .= sprintf(' OFFSET %u', $offset);
+				$rt .= ' OFFSET ' . static::_intString($offset);
 			}
 			return $rt;
 		}
