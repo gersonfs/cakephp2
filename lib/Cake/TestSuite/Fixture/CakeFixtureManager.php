@@ -190,14 +190,21 @@ class CakeFixtureManager {
 				$db = $this->_db;
 			}
 		}
-		if (!empty($fixture->created) && in_array($db->configKeyName, $fixture->created)) {
+		$sources = (array)$db->listSources();
+		$table = $db->config['prefix'] . $fixture->table;
+		$exists = in_array($table, $sources);
+
+		if (!empty($fixture->created) && in_array($db->configKeyName, $fixture->created) && $exists) {
 			$fixture->truncate($db);
 			return;
 		}
 
-		$sources = (array)$db->listSources();
-		$table = $db->config['prefix'] . $fixture->table;
-		$exists = in_array($table, $sources);
+		if (!$exists && !empty($fixture->created)) {
+			// Static $_loaded survived across test classes but the table was
+			// dropped externally (e.g. another test class or shell command).
+			// Resync the `created` marker before falling through to create().
+			$fixture->created = array_diff($fixture->created, array($db->configKeyName));
+		}
 
 		if ($drop && $exists) {
 			$fixture->drop($db);
@@ -296,8 +303,15 @@ class CakeFixtureManager {
 		foreach ($this->_loaded as $fixture) {
 			if (!empty($fixture->created)) {
 				foreach ($fixture->created as $ds) {
-					$db = ConnectionManager::getDataSource($ds);
-					$fixture->drop($db);
+					try {
+						$db = ConnectionManager::getDataSource($ds);
+						if ($db && method_exists($db, 'isConnected') && !$db->isConnected()) {
+							continue;
+						}
+						$fixture->drop($db);
+					} catch (\Throwable $e) {
+						// Connection may have been closed or table removed.
+					}
 				}
 			}
 		}
