@@ -553,7 +553,11 @@ class CakeSession {
 		}
 		static::$_cookieName = $sessionConfig['ini']['session.name'];
 
-		if (empty($sessionConfig['handler']) && !empty($sessionConfig['session.save_path']) && Configure::read('debug')) {
+		if (!empty($sessionConfig['handler'])) {
+			// PHP 7.2+ does not allow setting session.save_handler via ini_set;
+			// the handler is registered programmatically further below.
+			unset($sessionConfig['ini']['session.save_handler']);
+		} elseif (!empty($sessionConfig['session.save_path']) && Configure::read('debug')) {
 			if (!is_dir($sessionConfig['session.save_path'])) {
 				mkdir($sessionConfig['session.save_path'], 0775, true);
 			}
