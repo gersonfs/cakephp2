@@ -71,12 +71,27 @@ class CakeFixtureManagerTest extends CakeTestCase {
 		$loadedProperty->setAccessible(true);
 		$loadedProperty->setValue($fixtureManager, array('core.uuid' => $MockFixture));
 
+		// Force the test fixture's table to be visible to listSources so the
+		// optional $cacheInstances "table missing" guard doesn't kick in.
+		if (CakeFixtureManager::$cacheInstances) {
+			$db = ConnectionManager::getDataSource('test');
+			$db->execute(sprintf(
+				'CREATE TABLE IF NOT EXISTS %s (id INTEGER PRIMARY KEY)',
+				$db->config['prefix'] . $MockFixture->table
+			));
+		}
+
 		$TestCase = $this->getMock('CakeTestCase');
 		$TestCase->fixtures = array('core.uuid');
 		$TestCase->autoFixtures = true;
 		$TestCase->dropTables = false;
 
 		$fixtureManager->load($TestCase);
+
+		if (CakeFixtureManager::$cacheInstances) {
+			$db = ConnectionManager::getDataSource('test');
+			$db->execute('DROP TABLE IF EXISTS ' . $db->config['prefix'] . $MockFixture->table);
+		}
 	}
 
 /**

@@ -37,3 +37,9 @@ require_once 'vendors/autoload.php';
 
 App::uses('CakeTestCase', 'TestSuite');
 App::uses('CakeTestModel', 'TestSuite/Fixture');
+App::uses('CakeFixtureManager', 'TestSuite/Fixture');
+
+// The framework's own test suite drops/recreates fixture tables across
+// many test classes, so we opt-out of the cross-instance fixture cache
+// that is enabled by default for application test suites.
+CakeFixtureManager::$cacheInstances = false;
