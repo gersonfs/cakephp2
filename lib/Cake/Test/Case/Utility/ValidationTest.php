@@ -125,7 +125,10 @@ class ValidationTest extends CakeTestCase {
 		$this->_appLocale = array();
 		foreach (array(LC_MONETARY, LC_NUMERIC, LC_TIME) as $category) {
 			$this->_appLocale[$category] = setlocale($category, 0);
-			setlocale($category, 'en_US');
+			$applied = setlocale($category, 'en_US.UTF-8', 'en_US.utf8', 'en_US', 'C');
+			if ($applied === false) {
+				setlocale($category, 'C');
+			}
 		}
 	}
 

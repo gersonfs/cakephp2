@@ -36,6 +36,7 @@ jobs:
           mkdir lib/Cake/Test/test_app/tmp/cache lib/Cake/Test/test_app/tmp/cache/models lib/Cake/Test/test_app/tmp/cache/persistent lib/Cake/Test/test_app/tmp/cache/views lib/Cake/Test/test_app/tmp/logs lib/Cake/Test/test_app/tmp/sessions lib/Cake/Test/test_app/tmp/tests
           sudo locale-gen de_DE
           sudo locale-gen es_ES
+          sudo locale-gen en_US
           sudo systemctl start mysql.service
           mysql -uroot -p"root" -e "CREATE DATABASE cakephp_test"
           mysql -uroot -p"root" -e "CREATE DATABASE cakephp_test2"

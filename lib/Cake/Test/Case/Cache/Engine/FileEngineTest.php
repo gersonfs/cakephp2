@@ -384,14 +384,20 @@ class FileEngineTest extends CakeTestCase {
  * @return void
  */
 	public function testPathDoesNotExist() {
-		$this->skipIf(is_dir(TMP . 'tests' . DS . 'autocreate'), 'Cannot run if test directory exists.');
+		$path = TMP . 'tests' . DS . 'autocreate';
+		$this->skipIf(is_dir($path), 'Cannot run if test directory exists.');
 
 		Cache::config('autocreate', array(
 			'engine' => 'File',
-			'path' => TMP . 'tests' . DS . 'autocreate'
+			'path' => $path
 		));
 
+		$this->assertTrue(is_dir($path), 'Cache path was not auto-created.');
+
 		Cache::drop('autocreate');
+		if (is_dir($path)) {
+			rmdir($path);
+		}
 	}
 
 /**
