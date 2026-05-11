@@ -501,7 +501,7 @@ class I18n {
 					$r = unpack("L1len/L1offs", substr($data, $o_msg + $n * 8, 8));
 					$msgid = substr($data, $r["offs"], $r["len"]);
 					unset($msgid_plural);
-					$context = null;
+					$context = '';
 
 					if (strpos($msgid, "\x04") !== false) {
 						list($context, $msgid) = explode("\x04", $msgid);

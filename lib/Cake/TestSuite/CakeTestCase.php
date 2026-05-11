@@ -147,11 +147,10 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 					return $object->{$attributeName};
 				}
 
-				$attribute->setAccessible(true);
-				$value = $attribute->getValue($object);
-				$attribute->setAccessible(false);
-
-				return $value;
+				if (PHP_VERSION_ID < 80100) {
+					$attribute->setAccessible(true);
+				}
+				return $attribute->getValue($object);
 			} catch (ReflectionException $e) {
 			}
 		} while ($reflector = $reflector->getParentClass());
@@ -332,6 +331,30 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  */
 	public static function date($format = 'Y-m-d H:i:s') {
 		return date($format);
+	}
+
+/**
+ * Asserts that two datetime strings are equal within a tolerance in seconds.
+ * Avoids race conditions in tests that compare a stored timestamp with one
+ * generated immediately after.
+ *
+ * @param string $expected Expected datetime string.
+ * @param string $actual Actual datetime string.
+ * @param int $toleranceSeconds Allowed delta in seconds (default 2).
+ * @param string $message Optional message.
+ * @return void
+ */
+	public static function assertDateEquals($expected, $actual, $toleranceSeconds = 2, $message = '') {
+		$expectedTs = strtotime((string)$expected);
+		$actualTs = strtotime((string)$actual);
+		static::assertNotFalse($expectedTs, $message ?: 'Expected datetime is invalid.');
+		static::assertNotFalse($actualTs, $message ?: 'Actual datetime is invalid.');
+		$delta = abs($expectedTs - $actualTs);
+		static::assertLessThanOrEqual(
+			$toleranceSeconds,
+			$delta,
+			$message ?: sprintf('Datetimes %s and %s differ by more than %d seconds.', $expected, $actual, $toleranceSeconds)
+		);
 	}
 
 // @codingStandardsIgnoreStart PHPUnit overrides don't match CakePHP

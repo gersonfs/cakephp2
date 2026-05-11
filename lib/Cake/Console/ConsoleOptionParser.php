@@ -480,7 +480,7 @@ class ConsoleOptionParser {
  * @throws ConsoleException When an invalid parameter is encountered.
  */
 	public function parse($argv, $command = null) {
-		if (isset($this->_subcommands[$command]) && $this->_subcommands[$command]->parser()) {
+		if ($command !== null && isset($this->_subcommands[$command]) && $this->_subcommands[$command]->parser()) {
 			return $this->_subcommands[$command]->parser()->parse($argv);
 		}
 		$params = $args = array();
@@ -528,7 +528,7 @@ class ConsoleOptionParser {
  * @return string Generated help.
  */
 	public function help($subcommand = null, $format = 'text', $width = 72) {
-		if (isset($this->_subcommands[$subcommand]) &&
+		if ($subcommand !== null && isset($this->_subcommands[$subcommand]) &&
 			$this->_subcommands[$subcommand]->parser() instanceof self
 		) {
 			$subparser = $this->_subcommands[$subcommand]->parser();

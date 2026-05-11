@@ -605,6 +605,7 @@ class Helper extends CakeObject {
 		$this->_association = null;
 
 		$isHabtm = (
+			$this->_modelScope !== null &&
 			isset($this->fieldset[$this->_modelScope]['fields'][$parts[0]]['type']) &&
 			$this->fieldset[$this->_modelScope]['fields'][$parts[0]]['type'] === 'multiple'
 		);

@@ -3064,13 +3064,35 @@ class DboSource extends DataSource {
 			$rt = ' LIMIT';
 
 			if ($offset) {
-				$rt .= sprintf(' %u,', (int)$offset);
+				$rt .= ' ' . static::_intString($offset) . ',';
 			}
 
-			$rt .= sprintf(' %u', (int)$limit);
+			$rt .= ' ' . static::_intString($limit);
 			return $rt;
 		}
 		return null;
+	}
+
+/**
+ * Convert a value to an integer-shaped decimal string without scientific
+ * notation, avoiding PHP 8.5's "float not representable as int" deprecation
+ * for values larger than PHP_INT_MAX.
+ *
+ * @param mixed $value Value to convert.
+ * @return string
+ */
+	protected static function _intString($value) {
+		if (!is_numeric($value)) {
+			return '0';
+		}
+		$float = (float)$value;
+		if ($float < 0) {
+			return '0';
+		}
+		if ($float > PHP_INT_MAX) {
+			return (string)PHP_INT_MAX;
+		}
+		return (string)(int)$float;
 	}
 
 /**
