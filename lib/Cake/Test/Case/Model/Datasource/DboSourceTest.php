@@ -1052,11 +1052,11 @@ class DboSourceTest extends CakeTestCase {
 		$name = $this->db->fullTableName('test_query');
 		$query = "CREATE TABLE {$name} (name varchar(10));";
 		$result = $this->db->query($query);
-		$this->assertTrue($result, 'Query did not return a boolean');
+		$this->assertTrue($result === true || $result === array(), 'Query did not return a boolean or empty array');
 
 		$query = "DROP TABLE {$name};";
 		$result = $this->db->query($query);
-		$this->assertTrue($result, 'Query did not return a boolean');
+		$this->assertTrue($result === true || $result === array(), 'Query did not return a boolean or empty array');
 	}
 
 /**

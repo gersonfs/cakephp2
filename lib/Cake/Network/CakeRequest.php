@@ -257,8 +257,8 @@ class CakeRequest implements ArrayAccess {
 			if ($qPosition !== false && strpos($_SERVER['REQUEST_URI'], '://') > $qPosition) {
 				$uri = $_SERVER['REQUEST_URI'];
 			} else {
-				$baseUrl = Configure::read('App.fullBaseUrl');
-				if (substr($_SERVER['REQUEST_URI'], 0, strlen($baseUrl)) === $baseUrl) {
+				$baseUrl = (string)Configure::read('App.fullBaseUrl');
+				if ($baseUrl !== '' && substr($_SERVER['REQUEST_URI'], 0, strlen($baseUrl)) === $baseUrl) {
 					$uri = substr($_SERVER['REQUEST_URI'], strlen($baseUrl));
 				}
 			}
