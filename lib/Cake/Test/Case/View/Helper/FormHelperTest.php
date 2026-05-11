@@ -528,6 +528,7 @@ class FormHelperTest extends CakeTestCase {
 	public function setUp(): void {
 		parent::setUp();
 
+		$this->_oldDebug = Configure::read('debug');
 		Configure::write('Config.language', 'eng');
 		Configure::write('App.base', '');
 		Configure::delete('Asset');
@@ -574,6 +575,7 @@ class FormHelperTest extends CakeTestCase {
 		parent::tearDown();
 		unset($this->Form->Html, $this->Form, $this->Controller, $this->View);
 		Configure::write('Security.salt', $this->oldSalt);
+		Configure::write('debug', $this->_oldDebug);
 	}
 
 /**
