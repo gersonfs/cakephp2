@@ -23,7 +23,7 @@ App::uses('DboSource', 'Model/Datasource');
 App::uses('DboTestSource', 'Model/Datasource');
 App::uses('DboSecondTestSource', 'Model/Datasource');
 App::uses('MockDataSource', 'Model/Datasource');
-App::uses('PDOStatementFake', 'Test/Case/Util');
+App::uses('PDOStatementFake', 'Test/Util');
 
 require_once dirname(dirname(__FILE__)) . DS . 'models.php';
 
@@ -1348,6 +1348,7 @@ class DboSourceTest extends CakeTestCase {
 		if ($this->db instanceof Postgres || $this->db instanceof Sqlserver) {
 			$this->markTestSkipped('Cannot run this test with SqlServer or Postgres');
 		}
+		$this->loadFixtures('Article', 'User', 'Comment', 'Tag', 'ArticlesTag', 'Attachment');
 		Cache::delete('method_cache', '_cake_core_');
 		DboSource::$methodCache = array();
 		$Article = ClassRegistry::init('Article');
@@ -1408,7 +1409,7 @@ class DboSourceTest extends CakeTestCase {
  */
 	public function testLastError() {
 		$class = $this->isPHP81() ? 'PDOStatementFake' : 'PDOStatement';
-		$stmt = $this->getMock($class);
+		$stmt = $this->getMock($class, array('errorInfo'));
 		$stmt->expects($this->any())
 			->method('errorInfo')
 			->will($this->returnValue(array('', 'something', 'bad')));
@@ -1670,7 +1671,7 @@ class DboSourceTest extends CakeTestCase {
  *
  * @return array
  */
-	public static function joinStatementsWithPrefix($schema) {
+	public static function joinStatementsWithPrefix() {
 		return array(
 			array(array(
 				'type' => 'LEFT',
@@ -1707,6 +1708,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	public function testConditionKeysToString() {
+		$this->loadFixtures('Article', 'User', 'Comment', 'Tag', 'ArticlesTag', 'Attachment');
 		$Article = ClassRegistry::init('Article');
 		$conn = $this->getMock('MockPDO', array('quote'));
 		$db = new DboTestSource();
@@ -1740,6 +1742,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	public function testConditionKeysToStringVirtualFieldExpression() {
+		$this->loadFixtures('Article', 'User', 'Comment', 'Tag', 'ArticlesTag', 'Attachment');
 		$Article = ClassRegistry::init('Article');
 		$Article->virtualFields = array(
 			'extra' => $Article->getDataSource()->expression('something virtual')
@@ -1776,6 +1779,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	public function testConditionKeysToStringVirtualField() {
+		$this->loadFixtures('Article', 'User', 'Comment', 'Tag', 'ArticlesTag', 'Attachment');
 		$Article = ClassRegistry::init('Article');
 		$Article->virtualFields = array(
 			'extra' => 'something virtual'

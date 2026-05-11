@@ -1111,6 +1111,11 @@ class CakeSchemaTest extends CakeTestCase {
  * @return void
  */
 	public function testSchemaLoading() {
+		$this->Schema->write(array(
+			'name' => 'MyOtherApp',
+			'tables' => $this->Schema->tables,
+			'path' => TMP . 'tests'
+		));
 		$Other = $this->Schema->load(array('name' => 'MyOtherApp', 'path' => TMP . 'tests'));
 		$this->assertEquals('MyOtherApp', $Other->name);
 		$this->assertEquals($Other->tables, $this->Schema->tables);
