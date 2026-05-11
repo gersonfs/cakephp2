@@ -1871,10 +1871,6 @@ TEXT;
 	}
 
 	protected function _checkException($message) {
-		if (version_compare(PHP_VERSION, '7.4', '>=')) {
-			$this->setExpectedException('Error', $message);
-		} else {
-			$this->setExpectedException('\PHPUnit\Framework\Exception', $message);
-		}
+		$this->setExpectedException('Error', $message);
 	}
 }

@@ -147,9 +147,6 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 					return $object->{$attributeName};
 				}
 
-				if (PHP_VERSION_ID < 80100) {
-					$attribute->setAccessible(true);
-				}
 				return $attribute->getValue($object);
 			} catch (ReflectionException $e) {
 			}
