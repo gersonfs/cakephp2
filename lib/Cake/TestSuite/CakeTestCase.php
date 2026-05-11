@@ -21,6 +21,8 @@ use PHPUnit\Framework\Exception;
 
 App::uses('CakeFixtureManager', 'TestSuite/Fixture');
 App::uses('CakeTestFixture', 'TestSuite/Fixture');
+App::uses('CakeRequest', 'Network');
+App::uses('CakeResponse', 'Network');
 
 /**
  * CakeTestCase class

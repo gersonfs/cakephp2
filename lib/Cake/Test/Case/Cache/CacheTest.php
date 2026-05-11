@@ -243,6 +243,10 @@ class CacheTest extends CakeTestCase {
  */
 	public function testWritingWithConfig() {
 		$_cacheConfigSessions = Cache::config('sessions');
+		if (empty($_cacheConfigSessions)) {
+			Cache::config('sessions', array('engine' => 'File', 'path' => TMP . 'sessions'));
+			$_cacheConfigSessions = Cache::config('sessions');
+		}
 
 		Cache::write('test_something', 'this is the test data', 'tests');
 
@@ -371,6 +375,10 @@ class CacheTest extends CakeTestCase {
 		$this->assertFalse($result);
 
 		$_testsConfig = Cache::config('tests');
+		if (empty($_testsConfig)) {
+			Cache::config('tests', array('engine' => 'File', 'path' => TMP . 'tests'));
+			$_testsConfig = Cache::config('tests');
+		}
 		$result = Cache::drop('tests');
 		$this->assertTrue($result);
 

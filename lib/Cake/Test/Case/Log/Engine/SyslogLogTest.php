@@ -75,7 +75,7 @@ class SyslogLogTest extends CakeTestCase {
  *
  * @return array
  */
-	public function typesProvider() {
+	public static function typesProvider() {
 		return array(
 			array('emergency', LOG_EMERG),
 			array('alert', LOG_ALERT),

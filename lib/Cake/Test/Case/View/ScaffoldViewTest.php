@@ -20,6 +20,8 @@ App::uses('Controller', 'Controller');
 App::uses('Scaffold', 'Controller');
 App::uses('ScaffoldView', 'View');
 App::uses('AppModel', 'Model');
+App::uses('CakeRequest', 'Network');
+App::uses('CakeResponse', 'Network');
 
 require_once dirname(dirname(__FILE__)) . DS . 'Model' . DS . 'models.php';
 
