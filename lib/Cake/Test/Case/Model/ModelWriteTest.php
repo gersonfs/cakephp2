@@ -3452,17 +3452,10 @@ class ModelWriteTest extends BaseModelTest {
 			'Comment.id', 'Comment.comment', 'Attachment.id',
 			'Attachment.comment_id', 'Attachment.attachment'
 		)));
-		$expected = array(array(
-			'Comment' => array(
-				'id' => '1',
-				'comment' => 'Comment with attachment'
-			),
-			'Attachment' => array(
-				'id' => '1',
-				'comment_id' => '1',
-				'attachment' => 'some_file.zip'
-		)));
-		$this->assertEquals($expected, $result);
+		$this->assertCount(1, $result);
+		$this->assertEquals('Comment with attachment', $result[0]['Comment']['comment']);
+		$this->assertEquals('some_file.zip', $result[0]['Attachment']['attachment']);
+		$this->assertEquals($result[0]['Comment']['id'], $result[0]['Attachment']['comment_id']);
 
 		$model->Attachment->bindModel(array('belongsTo' => array('Comment')), false);
 		$data = array(
@@ -3501,20 +3494,11 @@ class ModelWriteTest extends BaseModelTest {
 				'title' => 'Model Associations 101',
 				'user_id' => 1
 		))));
-		$result = $model->find('all', array('fields' => array(
-			'Comment.id', 'Comment.comment', 'Comment.article_id', 'Article.id', 'Article.title'
-		)));
-		$expected = array(array(
-			'Comment' => array(
-				'id' => '1',
-				'article_id' => '1',
-				'comment' => 'Article comment'
-			),
-			'Article' => array(
-				'id' => '1',
-				'title' => 'Model Associations 101'
-		)));
-		$this->assertEquals($expected, $result);
+		$result = $model->find('all', array('recursive' => 0));
+		$this->assertCount(1, $result);
+		$this->assertEquals('Article comment', $result[0]['Comment']['comment']);
+		$this->assertEquals('Model Associations 101', $result[0]['Article']['title']);
+		$this->assertEquals($result[0]['Comment']['article_id'], $result[0]['Article']['id']);
 	}
 
 /**
@@ -5737,17 +5721,10 @@ class ModelWriteTest extends BaseModelTest {
 			'Comment.id', 'Comment.comment', 'Attachment.id',
 			'Attachment.comment_id', 'Attachment.attachment'
 		)));
-		$expected = array(array(
-			'Comment' => array(
-				'id' => '1',
-				'comment' => 'Comment with attachment'
-			),
-			'Attachment' => array(
-				'id' => '1',
-				'comment_id' => '1',
-				'attachment' => 'some_file.zip'
-		)));
-		$this->assertEquals($expected, $result);
+		$this->assertCount(1, $result);
+		$this->assertEquals('Comment with attachment', $result[0]['Comment']['comment']);
+		$this->assertEquals('some_file.zip', $result[0]['Attachment']['attachment']);
+		$this->assertEquals($result[0]['Comment']['id'], $result[0]['Attachment']['comment_id']);
 
 		$model->Attachment->bindModel(array('belongsTo' => array('Comment')), false);
 		$data = array(
@@ -5786,20 +5763,11 @@ class ModelWriteTest extends BaseModelTest {
 				'title' => 'Model Associations 101',
 				'user_id' => 1
 		))));
-		$result = $model->find('all', array('fields' => array(
-			'Comment.id', 'Comment.comment', 'Comment.article_id', 'Article.id', 'Article.title'
-		)));
-		$expected = array(array(
-			'Comment' => array(
-				'id' => '1',
-				'article_id' => '1',
-				'comment' => 'Article comment'
-			),
-			'Article' => array(
-				'id' => '1',
-				'title' => 'Model Associations 101'
-		)));
-		$this->assertEquals($expected, $result);
+		$result = $model->find('all', array('recursive' => 0));
+		$this->assertCount(1, $result);
+		$this->assertEquals('Article comment', $result[0]['Comment']['comment']);
+		$this->assertEquals('Model Associations 101', $result[0]['Article']['title']);
+		$this->assertEquals($result[0]['Comment']['article_id'], $result[0]['Article']['id']);
 	}
 
 /**

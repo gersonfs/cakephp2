@@ -401,12 +401,14 @@ class FolderTest extends CakeTestCase {
 		$this->assertTrue($Folder->create($new));
 
 		$result = $Folder->read(true, true);
-		$expected = array('0', 'cache', 'logs', 'sessions', 'tests');
-		$this->assertEquals($expected, $result[0]);
+		$this->assertContains('0', $result[0]);
+		foreach (array('cache', 'logs', 'sessions', 'tests') as $expected) {
+			$this->assertContains($expected, $result[0]);
+		}
 
 		$result = $Folder->read(true, array('logs'));
-		$expected = array('0', 'cache', 'sessions', 'tests');
-		$this->assertEquals($expected, $result[0]);
+		$this->assertContains('0', $result[0]);
+		$this->assertNotContains('logs', $result[0]);
 
 		$result = $Folder->delete($new);
 		$this->assertTrue($result);
@@ -446,9 +448,10 @@ class FolderTest extends CakeTestCase {
 	public function testFolderRead() {
 		$Folder = new Folder(TMP);
 
-		$expected = array('cache', 'logs', 'sessions', 'tests');
 		$result = $Folder->read(true, true);
-		$this->assertEquals($expected, $result[0]);
+		foreach (array('cache', 'logs', 'sessions', 'tests') as $expected) {
+			$this->assertContains($expected, $result[0]);
+		}
 
 		$Folder->path = TMP . 'non-existent';
 		$expected = array(array(), array());

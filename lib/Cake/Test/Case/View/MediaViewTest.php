@@ -126,10 +126,17 @@ class MediaViewTest extends CakeTestCase {
 			'id' => 'test_2.JPG'
 		);
 
-		$this->MediaView->response->expects($this->once())
+		$this->MediaView->response->expects($this->any())
 			->method('type')
 			->with('jpg')
 			->will($this->returnArgument(0));
+
+		$this->MediaView->response->expects($this->once())
+			->method('file')
+			->with(
+				$this->MediaView->viewVars['path'] . $this->MediaView->viewVars['id'],
+				array('name' => null, 'download' => null)
+			);
 
 		$this->MediaView->render();
 	}

@@ -2819,7 +2819,9 @@ class RouterTest extends CakeTestCase {
  * @return void
  */
 	public function testDefaultRouteClass() {
-		$this->getMock('CakeRoute', array(), array('/test'), 'TestDefaultRouteClass');
+		if (!class_exists('TestDefaultRouteClass', false)) {
+			$this->getMock('CakeRoute', array(), array('/test'), 'TestDefaultRouteClass');
+		}
 		Router::defaultRouteClass('TestDefaultRouteClass');
 
 		$result = Router::connect('/', array('controller' => 'pages', 'action' => 'display', 'home'));

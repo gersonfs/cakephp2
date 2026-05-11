@@ -28,9 +28,18 @@ class AppTest extends CakeTestCase {
  *
  * @return void
  */
+	protected $_appPaths;
+
+	public function setUp(): void {
+		parent::setUp();
+		$this->_appPaths = App::paths();
+		App::build();
+	}
+
 	public function tearDown(): void {
 		parent::tearDown();
 		CakePlugin::unload();
+		App::build($this->_appPaths, App::RESET);
 	}
 
 /**

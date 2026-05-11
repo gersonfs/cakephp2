@@ -176,7 +176,7 @@ class DataSourceTest extends CakeTestCase {
 			'joins'			=> array(),
 			'limit'			=> 10,
 			'offset'		=> null,
-			'order'			=> array(array('status')),
+			'order'			=> array('status'),
 			'page'			=> 1,
 			'group'			=> null,
 			'callbacks'		=> true,

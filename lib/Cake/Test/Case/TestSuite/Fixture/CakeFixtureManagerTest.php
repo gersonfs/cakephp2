@@ -53,11 +53,16 @@ class CakeFixtureManagerTest extends CakeTestCase {
  * @return void
  */
 	public function testLoadTruncatesTable() {
-		$MockFixture = $this->getMock('UuidFixture', array('truncate'));
+		$MockFixture = $this->getMock('UuidFixture', array('truncate', 'insert'));
 		$MockFixture
 			->expects($this->once())
 			->method('truncate')
 			->will($this->returnValue(true));
+		$MockFixture
+			->expects($this->any())
+			->method('insert')
+			->will($this->returnValue(true));
+		$MockFixture->created = array('test');
 
 		$fixtureManager = $this->fixtureManager;
 		$fixtureManagerReflection = new ReflectionClass($fixtureManager);
@@ -99,6 +104,9 @@ class CakeFixtureManagerTest extends CakeTestCase {
 		}
 		$db = $this->getMock('DboSource', $dboMethods);
 		$db->config['prefix'] = '';
+		$db->expects($this->any())
+			->method('listSources')
+			->will($this->returnValue(array($MockFixture->table)));
 
 		$fixtureManager->loadSingle('Uuid', $db, false);
 	}
