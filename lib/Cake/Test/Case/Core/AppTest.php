@@ -855,7 +855,7 @@ class AppTest extends CakeTestCase {
  *
  * @return void
  */
-	public function memoryVariationProvider() {
+	public static function memoryVariationProvider() {
 		return array(
 			array('131072K', 100000, '231072K'),
 			array('256M', 1, '262145K'),

@@ -228,7 +228,7 @@ if (!function_exists('h')) {
 			$charset = $double;
 			$double = true;
 		}
-		return htmlspecialchars($text, ENT_QUOTES, ($charset) ? $charset : $defaultCharset, $double);
+		return htmlspecialchars((string)$text, ENT_QUOTES, ($charset) ? $charset : $defaultCharset, $double);
 	}
 
 }

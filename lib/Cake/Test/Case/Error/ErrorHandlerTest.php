@@ -66,8 +66,12 @@ class ErrorHandlerTest extends CakeTestCase {
 		Router::setRequestInfo($request);
 		Configure::write('debug', 2);
 
-		CakeLog::disable('stdout');
-		CakeLog::disable('stderr');
+		if (in_array('stdout', CakeLog::configured(), true)) {
+			CakeLog::disable('stdout');
+		}
+		if (in_array('stderr', CakeLog::configured(), true)) {
+			CakeLog::disable('stderr');
+		}
 	}
 
 /**
@@ -80,8 +84,12 @@ class ErrorHandlerTest extends CakeTestCase {
 		if ($this->_restoreError) {
 			restore_error_handler();
 		}
-		CakeLog::enable('stdout');
-		CakeLog::enable('stderr');
+		if (in_array('stdout', CakeLog::configured(), true)) {
+			CakeLog::enable('stdout');
+		}
+		if (in_array('stderr', CakeLog::configured(), true)) {
+			CakeLog::enable('stderr');
+		}
 	}
 
 /**

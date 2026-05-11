@@ -279,7 +279,7 @@ class ObjectTestModel extends CakeTestModel {
  *
  * @package       Cake.Test.Case.Core
  */
-class ObjectTest extends CakeTestCase {
+class CakeObjectTest extends CakeTestCase {
 
 /**
  * fixtures

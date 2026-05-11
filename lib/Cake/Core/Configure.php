@@ -209,6 +209,9 @@ class Configure {
  * @return array|null
  */
 	public static function consume($var) {
+		if ($var === null) {
+			return null;
+		}
 		$simple = strpos($var, '.') === false;
 		if ($simple && !isset(static::$_values[$var])) {
 			return null;

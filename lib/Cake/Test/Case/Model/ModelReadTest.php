@@ -8885,6 +8885,7 @@ class ModelReadTest extends BaseModelTest {
  * @return void
  */
 	public function testQueryRespectsCacheQueriesAsSecondArgument() {
+		$this->loadFixtures('User');
 		$model = new User();
 		$model->save(array('user' => 'Chuck'));
 		$userTableName = $this->db->fullTableName('users');
@@ -8912,6 +8913,7 @@ class ModelReadTest extends BaseModelTest {
  * @return void
  */
 	public function testQueryRespectsCacheQueriesAsThirdArgument() {
+		$this->loadFixtures('User');
 		$model = new User();
 		$model->save(array('user' => 'Chuck'));
 		$userTableName = $this->db->fullTableName('users');
@@ -8938,6 +8940,7 @@ class ModelReadTest extends BaseModelTest {
  * @return void
  */
 	public function testQueryTakesModelCacheQueriesValueAsDefaultForOneArgument() {
+		$this->loadFixtures('User');
 		$model = new User();
 		$model->save(array('user' => 'Chuck'));
 		$userTableName = $this->db->fullTableName('users');
@@ -8963,6 +8966,7 @@ class ModelReadTest extends BaseModelTest {
  * @return void
  */
 	public function testQueryTakesModelCacheQueriesValueAsDefaultForTwoArguments() {
+		$this->loadFixtures('User');
 		$model = new User();
 		$model->save(array('user' => 'Chuck'));
 		$userTableName = $this->db->fullTableName('users');
