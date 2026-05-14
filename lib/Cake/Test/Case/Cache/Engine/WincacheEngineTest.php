@@ -25,7 +25,7 @@ App::uses('Cache', 'Cache');
  */
 class WincacheEngineTest extends CakeTestCase {
 
-	private ?bool $_cacheDisable;
+	private ?bool $_cacheDisable = null;
 /**
  * setUp method
  *

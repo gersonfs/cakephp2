@@ -57,9 +57,9 @@ class ModelIntegrationTest extends BaseModelTest {
 /**
  * testAssociationLazyLoading
  *
- * @group lazyloading
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\Group('lazyloading')]
 	public function testAssociationLazyLoading() {
 		$this->loadFixtures('ArticleFeaturedsTags');
 		$Article = new ArticleFeatured();
@@ -93,9 +93,9 @@ class ModelIntegrationTest extends BaseModelTest {
 /**
  * testAssociationLazyLoadWithHABTM
  *
- * @group lazyloading
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\Group('lazyloading')]
 	public function testAssociationLazyLoadWithHABTM() {
 		$this->loadFixtures('FruitsUuidTag', 'ArticlesTag');
 		$this->db->cacheSources = false;
@@ -121,9 +121,9 @@ class ModelIntegrationTest extends BaseModelTest {
 /**
  * testAssociationLazyLoadWithBindModel
  *
- * @group lazyloading
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\Group('lazyloading')]
 	public function testAssociationLazyLoadWithBindModel() {
 		$this->loadFixtures('Article', 'User');
 		$Article = new ArticleB();
@@ -1013,9 +1013,9 @@ class ModelIntegrationTest extends BaseModelTest {
 /**
  * test deconstruct with time fields.
  *
- * @dataProvider timeProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('timeProvider')]
 	public function testDeconstructFieldsTime($input, $result) {
 		$this->skipIf($this->db instanceof Sqlserver, 'This test is not compatible with SQL Server.');
 

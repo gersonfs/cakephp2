@@ -842,9 +842,9 @@ class AppTest extends CakeTestCase {
 /**
  * Test that increaseMemoryLimit increases the maximum amount of memory actually
  *
- * @dataProvider memoryVariationProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('memoryVariationProvider')]
 	public function testIncreaseMemoryLimit($memoryLimit, $additionalKb, $expected) {
 		$this->skipIf(!function_exists('ini_set'));
 

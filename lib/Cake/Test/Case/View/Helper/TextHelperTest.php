@@ -316,9 +316,9 @@ class TextHelperTest extends CakeTestCase {
 /**
  * testAutoLinkUrls method
  *
- * @dataProvider autoLinkProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('autoLinkProvider')]
 	public function testAutoLinkUrls($text, $expected) {
 		$result = $this->Text->autoLinkUrls($text);
 		$this->assertEquals($expected, $result);
@@ -477,9 +477,9 @@ class TextHelperTest extends CakeTestCase {
  *
  * @param string $text The text to link
  * @param string $expected The expected results.
- * @dataProvider autoLinkEmailProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('autoLinkEmailProvider')]
 	public function testAutoLinkEmails($text, $expected, $attrs = array()) {
 		$result = $this->Text->autoLinkEmails($text, $attrs);
 		$this->assertEquals($expected, $result);

@@ -548,9 +548,9 @@ class ControllerTaskTest extends CakeTestCase {
 /**
  * test that both plural and singular forms work for controller baking.
  *
- * @dataProvider nameVariations
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('nameVariations')]
 	public function testExecuteWithControllerNameVariations($name) {
 		$this->Task->connection = 'test';
 		$this->Task->path = '/my/path/';

@@ -748,9 +748,9 @@ class ControllerTest extends CakeTestCase {
 /**
  * testRedirect method
  *
- * @dataProvider statusCodeProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('statusCodeProvider')]
 	public function testRedirectByCode($code, $msg) {
 		$Controller = new Controller(null);
 		$Controller->response = $this->getMock('CakeResponse', array('header', 'statusCode'));
@@ -769,9 +769,9 @@ class ControllerTest extends CakeTestCase {
 /**
  * test redirecting by message
  *
- * @dataProvider statusCodeProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('statusCodeProvider')]
 	public function testRedirectByMessage($code, $msg) {
 		$Controller = new Controller(null);
 		$Controller->response = $this->getMock('CakeResponse', array('header', 'statusCode'));
@@ -1214,9 +1214,9 @@ class ControllerTest extends CakeTestCase {
 /**
 	 * test postConditions raising an exception on unsafe keys.
 	 *
-	 * @dataProvider dangerousPostConditionsProvider
 	 * @return void
 	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('dangerousPostConditionsProvider')]
 	public function testPostConditionsDangerous($data) {
 		$this->expectException(\RuntimeException::class);
 		$request = new CakeRequest('controller_posts/index');

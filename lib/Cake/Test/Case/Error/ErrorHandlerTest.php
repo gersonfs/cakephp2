@@ -128,9 +128,9 @@ class ErrorHandlerTest extends CakeTestCase {
 /**
  * test error mappings
  *
- * @dataProvider errorProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('errorProvider')]
 	public function testErrorMapping($error, $expected) {
 		set_error_handler('ErrorHandler::handleError');
 		$this->_restoreError = true;

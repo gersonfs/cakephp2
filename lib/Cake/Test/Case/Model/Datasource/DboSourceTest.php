@@ -1662,9 +1662,9 @@ class DboSourceTest extends CakeTestCase {
  * Test buildJoinStatement()
  * ensure that schemaName is not added when table value is a subquery
  *
- * @dataProvider joinStatements
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('joinStatements')]
 	public function testBuildJoinStatement($join, $expected) {
 		$db = $this->getMock('DboTestSource', array('getSchemaName'));
 		$db->expects($this->any())
@@ -1700,9 +1700,9 @@ class DboSourceTest extends CakeTestCase {
  * Test buildJoinStatement()
  * ensure that prefix is not added when table value is a subquery
  *
- * @dataProvider joinStatementsWithPrefix
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('joinStatementsWithPrefix')]
 	public function testBuildJoinStatementWithTablePrefix($join, $expected) {
 		$db = new DboTestSource();
 		$db->config['prefix'] = 'pre_';

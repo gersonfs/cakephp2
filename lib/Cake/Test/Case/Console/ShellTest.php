@@ -877,8 +877,8 @@ TEXT;
 	/**
 	 * Test reading params
 	 *
-	 * @dataProvider paramReadingDataProvider
 	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('paramReadingDataProvider')]
 	public function testParamReading($toRead, $expected)
 	{
 		$this->Shell->params = [

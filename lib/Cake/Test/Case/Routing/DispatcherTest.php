@@ -1523,10 +1523,10 @@ class DispatcherTest extends CakeTestCase {
 /**
  * Test assets
  *
- * @dataProvider assetProvider
  * @outputBuffering enabled
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('assetProvider')]
 	public function testAsset($url, $file) {
 		Router::reload();
 
@@ -1600,9 +1600,9 @@ class DispatcherTest extends CakeTestCase {
 /**
  * testFullPageCachingDispatch method
  *
- * @dataProvider cacheActionProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('cacheActionProvider')]
 	public function testFullPageCachingDispatch($url) {
 		Configure::write('Cache.disable', false);
 		Configure::write('Cache.check', true);

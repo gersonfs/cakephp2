@@ -147,9 +147,9 @@ class CakeTimeTest extends CakeTestCase {
 /**
  * testTimeAgoInWords method
  *
- * @dataProvider timeAgoProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('timeAgoProvider')]
 	public function testTimeAgoInWords($input, $expected) {
 		$result = $this->Time->timeAgoInWords($input);
 		$this->assertEquals($expected, $result);
@@ -203,9 +203,9 @@ class CakeTimeTest extends CakeTestCase {
 /**
  * test the end option for timeAgoInWords
  *
- * @dataProvider timeAgoEndProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('timeAgoEndProvider')]
 	public function testTimeAgoInWordsEnd($input, $expected, $end) {
 		$result = $this->Time->timeAgoInWords(
 			$input, array('end' => $end)

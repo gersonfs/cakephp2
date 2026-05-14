@@ -18,6 +18,12 @@
 
 use PHPUnit\Framework\Constraint\Attribute;
 use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\MockObject\Stub\ConsecutiveCalls;
+use PHPUnit\Framework\MockObject\Stub\ReturnArgument;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\MockObject\Stub\ReturnSelf;
+use PHPUnit\Framework\MockObject\Stub\ReturnStub;
+use PHPUnit\Framework\MockObject\Stub\ReturnValueMap;
 
 App::uses('CakeFixtureManager', 'TestSuite/Fixture');
 App::uses('CakeTestFixture', 'TestSuite/Fixture');
@@ -72,13 +78,6 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  * @var array
  */
 	protected $_pathRestore = array();
-
-    public function __construct(string $name = 'unnamed')
-    {
-        parent::__construct($name);
-        $this->fixtureManager = new CakeFixtureManager();
-        $this->fixtureManager->fixturize($this);
-    }
 
     public function __destruct()
     {
@@ -277,6 +276,68 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	}
 
 /**
+ * Backwards-compatibility helpers for stub factories removed from
+ * PHPUnit\Framework\TestCase in PHPUnit 12. They return the same Stub
+ * objects that PHPUnit's `->will()` still accepts.
+ */
+	public static function returnValue(mixed $value): ReturnStub {
+		return new ReturnStub($value);
+	}
+
+	public static function returnArgument(int $argumentIndex): ReturnArgument {
+		return new ReturnArgument($argumentIndex);
+	}
+
+	public static function returnCallback(callable $callback): ReturnCallback {
+		return new ReturnCallback($callback);
+	}
+
+	public static function returnSelf(): ReturnSelf {
+		return new ReturnSelf();
+	}
+
+	public static function returnValueMap(array $valueMap): ReturnValueMap {
+		return new ReturnValueMap($valueMap);
+	}
+
+	public static function onConsecutiveCalls(...$values): ConsecutiveCalls {
+		return new ConsecutiveCalls($values);
+	}
+
+/**
+ * Backwards-compatibility wrapper for getMockForAbstractClass(), removed
+ * in PHPUnit 12. Uses the MockBuilder to produce a mock of the abstract
+ * class with abstract methods auto-stubbed.
+ */
+	public function getMockForAbstractClass(
+		string $originalClassName,
+		array $arguments = [],
+		string $mockClassName = '',
+		bool $callOriginalConstructor = true,
+		bool $callOriginalClone = true,
+		bool $callAutoload = true,
+		array $mockedMethods = []
+	) {
+		$builder = $this->getMockBuilder($originalClassName);
+		if (!empty($arguments)) {
+			$builder->setConstructorArgs($arguments);
+		}
+		if (!$callOriginalConstructor) {
+			$builder->disableOriginalConstructor();
+		}
+		if (!$callOriginalClone) {
+			$builder->disableOriginalClone();
+		}
+		if (!empty($mockedMethods)) {
+			$builder->onlyMethods($mockedMethods);
+		}
+		if ($mockClassName !== '') {
+			$builder->setMockClassName($mockClassName);
+		}
+		return $builder->getMock();
+	}
+
+/**
  * Setup the test case, backup the static object values so they can be restored.
  * Specifically backs up the contents of Configure and paths in App if they have
  * not already been backed up.
@@ -286,6 +347,10 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	protected function setUp() : void {
 		parent::setUp();
 
+		if (!isset($this->fixtureManager)) {
+			$this->fixtureManager = new CakeFixtureManager();
+			$this->fixtureManager->fixturize($this);
+		}
 		$this->fixtureManager->load($this);
 
 		if (empty($this->_configure)) {
@@ -923,14 +988,11 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 		$MockBuilder = $this->getMockBuilder($originalClassName);
 		if (!empty($methods)) {
 			$existingMethods = array();
-			$addedMethods = array();
 			if (class_exists($originalClassName) || interface_exists($originalClassName)) {
 				$ref = new ReflectionClass($originalClassName);
 				foreach ($methods as $method) {
 					if ($ref->hasMethod($method)) {
 						$existingMethods[] = $method;
-					} else {
-						$addedMethods[] = $method;
 					}
 				}
 			} else {
@@ -938,9 +1000,6 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 			}
 			if (!empty($existingMethods)) {
 				$MockBuilder = $MockBuilder->onlyMethods($existingMethods);
-			}
-			if (!empty($addedMethods)) {
-				$MockBuilder = $MockBuilder->addMethods($addedMethods);
 			}
 		}
 		if (!empty($arguments)) {

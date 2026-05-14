@@ -1563,9 +1563,9 @@ class ViewTest extends CakeTestCase {
 /**
  * Test appending to a block with append.
  *
- * @dataProvider blockValueProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('blockValueProvider')]
 	public function testBlockAppend($value) {
 		$this->View->assign('testBlock', 'Block');
 		$this->View->append('testBlock', $value);
@@ -1592,9 +1592,9 @@ class ViewTest extends CakeTestCase {
 /**
  * Test prepending to a block with prepend.
  *
- * @dataProvider blockValueProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('blockValueProvider')]
 	public function testBlockPrepend($value) {
 		$this->View->assign('test', 'Block');
 		$this->View->prepend('test', $value);

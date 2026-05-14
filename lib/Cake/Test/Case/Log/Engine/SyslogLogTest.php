@@ -48,9 +48,9 @@ class SyslogLogTest extends CakeTestCase {
 /**
  * Tests that single lines are written to syslog
  *
- * @dataProvider typesProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('typesProvider')]
 	public function testWriteOneLine($type, $expected) {
 		$log = $this->getMock('SyslogLog', array('_open', '_write'));
 		$log->expects($this->once())->method('_write')->with($expected, $type . ': Foo');

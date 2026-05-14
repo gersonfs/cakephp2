@@ -347,11 +347,11 @@ class CakeTextTest extends CakeTestCase {
 /**
  * test that wordWrap() works the same as built-in wordwrap function
  *
- * @dataProvider wordWrapProvider
  * @return void
  * @covers ::wordWrap
  * @covers ::_wordWrap
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('wordWrapProvider')]
 	public function testWordWrap($text, $width, $break = "\n", $cut = false) {
 		$result = CakeText::wordWrap($text, $width, $break, $cut);
 		$expected = wordwrap($text, $width, $break, $cut);

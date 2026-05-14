@@ -1002,9 +1002,9 @@ TEXT;
 /**
  * test that execute passes with different inflections of the same name.
  *
- * @dataProvider nameVariations
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('nameVariations')]
 	public function testExecuteWithNamedModelVariations($name) {
 		$this->Task->connection = 'test';
 		$this->Task->path = '/my/path/';

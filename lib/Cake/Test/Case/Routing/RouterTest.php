@@ -1258,8 +1258,8 @@ class RouterTest extends CakeTestCase {
  * Test parse and reverse symmetry
  *
  * @return void
- * @dataProvider parseReverseSymmetryData
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('parseReverseSymmetryData')]
 	public function testParseReverseSymmetry($url) {
 		$this->assertSame($url, Router::reverse(Router::parse($url) + array('url' => array())));
 	}

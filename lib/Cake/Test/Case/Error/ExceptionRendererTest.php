@@ -671,9 +671,9 @@ class ExceptionRendererTest extends CakeTestCase {
 /**
  * Test the various CakeException sub classes
  *
- * @dataProvider errorProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('errorProvider')]
 	public function testCakeExceptionHandling($exception, $patterns, $code) {
 		$ExceptionRenderer = new ExceptionRenderer($exception);
 		$ExceptionRenderer->controller->response = $this->getMock('CakeResponse', array('statusCode', '_sendHeader'));

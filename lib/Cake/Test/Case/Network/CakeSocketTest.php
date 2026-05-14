@@ -117,9 +117,9 @@ class CakeSocketTest extends CakeTestCase {
 /**
 	 * testInvalidConnection method
 	 *
-	 * @dataProvider invalidConnections
 	 * @return void
 	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('invalidConnections')]
 	public function testInvalidConnection($data) {
 		$this->expectException('SocketException');
 		$this->Socket->config = array_merge($this->Socket->config, $data);

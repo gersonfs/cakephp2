@@ -261,9 +261,9 @@ class CakeResponseTest extends CakeTestCase {
 /**
  * Tests the send method and changing the content type
  *
- * @dataProvider charsetTypeProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('charsetTypeProvider')]
 	public function testSendChangingContentType($original, $expected) {
 		$response = $this->getMock('CakeResponse', array('_sendHeader', '_sendContent', '_setCookies'));
 		$response->type($original);
@@ -1094,7 +1094,6 @@ class CakeResponseTest extends CakeTestCase {
 /**
  * Test CORS
  *
- * @dataProvider corsData
  * @param CakeRequest $request
  * @param string $origin
  * @param string|array $domains
@@ -1105,6 +1104,7 @@ class CakeResponseTest extends CakeTestCase {
  * @param string|bool $expectedHeaders
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('corsData')]
 	public function testCors($request, $origin, $domains, $methods, $headers, $expectedOrigin, $expectedMethods = false, $expectedHeaders = false) {
 		$_SERVER['HTTP_ORIGIN'] = $origin;
 
@@ -1613,9 +1613,9 @@ class CakeResponseTest extends CakeTestCase {
 /**
  * Test the various range offset types.
  *
- * @dataProvider rangeProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('rangeProvider')]
 	public function testFileRangeOffsets($range, $length, $offsetResponse) {
 		$_SERVER['HTTP_RANGE'] = $range;
 		$response = $this->getMock('CakeResponse', array(
@@ -1745,9 +1745,9 @@ class CakeResponseTest extends CakeTestCase {
 /**
  * Test invalid file ranges.
  *
- * @dataProvider invalidFileRangeProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('invalidFileRangeProvider')]
 	public function testFileRangeInvalid($range) {
 		$_SERVER['HTTP_RANGE'] = $range;
 		$response = $this->getMock('CakeResponse', array(
@@ -1800,9 +1800,9 @@ class CakeResponseTest extends CakeTestCase {
 /**
  * testFileRangeOffsetsNoDownload method
  *
- * @dataProvider rangeProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('rangeProvider')]
 	public function testFileRangeOffsetsNoDownload($range, $length, $offsetResponse) {
 		$_SERVER['HTTP_RANGE'] = $range;
 		$response = $this->getMock('CakeResponse', array(
