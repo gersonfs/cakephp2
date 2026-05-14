@@ -1070,7 +1070,7 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 			if ($m->getDeclaringClass()->getName() !== $baseStub) continue;
 			if ($m->isStatic() || $m->isAbstract()) continue;
 			$name = $m->getName();
-			if (in_array($name, array('expects', '_cakeSetStub', '_cakeResolve'), true)) continue;
+			if (in_array($name, array('expects', '_cakeSetStub', '_cakeResolve', '_cakeSetMockedMethods'), true)) continue;
 			$params = array();
 			$callArgs = array();
 			foreach ($m->getParameters() as $p) {
@@ -1135,9 +1135,14 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 		if ($stubClass !== null) {
 			if ($callOriginalConstructor && !empty($arguments)) {
 				$refl = new ReflectionClass($stubClass);
-				return $refl->newInstanceArgs($arguments);
+				$stub = $refl->newInstanceArgs($arguments);
+			} else {
+				$stub = new $stubClass();
 			}
-			return new $stubClass();
+			if (is_array($methods)) {
+				$stub->_cakeSetMockedMethods($methods);
+			}
+			return $stub;
 		}
 		if (!empty($methods) && (class_exists($originalClassName) || interface_exists($originalClassName))) {
 			$ref = new ReflectionClass($originalClassName);

@@ -108,7 +108,9 @@ class CakeRequestTest extends CakeTestCase {
 			$_SERVER['PHP_SELF'],
 			$_SERVER['PATH_INFO'],
 			$_SERVER['QUERY_STRING'],
-			$_SERVER['HTTP_REFERER']
+			$_SERVER['HTTP_REFERER'],
+			$_SERVER['CONTENT_TYPE'],
+			$_SERVER['HTTP_CONTENT_TYPE']
 		);
 		$_POST = array();
 		$_FILES = array();

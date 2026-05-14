@@ -17,6 +17,30 @@ class CakeResponseStub extends CakeResponse {
 		});
 	}
 
+	protected function _setContentType() {
+		return $this->_cakeResolve('_setContentType', array(), function () {
+			return parent::_setContentType();
+		});
+	}
+
+	protected function _isActive() {
+		return $this->_cakeResolve('_isActive', array(), function () {
+			return parent::_isActive();
+		});
+	}
+
+	protected function _clearBuffer() {
+		return $this->_cakeResolve('_clearBuffer', array(), function () {
+			return parent::_clearBuffer();
+		});
+	}
+
+	protected function _flushBuffer() {
+		return $this->_cakeResolve('_flushBuffer', array(), function () {
+			return parent::_flushBuffer();
+		});
+	}
+
 	protected function _setCookies() {
 		return $this->_cakeResolve('_setCookies', array(), function () {
 			return parent::_setCookies();
