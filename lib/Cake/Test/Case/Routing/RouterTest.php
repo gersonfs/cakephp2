@@ -18,9 +18,50 @@
 
 App::uses('Router', 'Routing');
 App::uses('CakeResponse', 'Network');
+App::uses('CakeRoute', 'Routing/Route');
 
 if (!defined('FULL_BASE_URL')) {
 	define('FULL_BASE_URL', 'https://cakephp.org');
+}
+
+/**
+ * Test double route class whose parse() result can be controlled by the test.
+ *
+ * @package       Cake.Test.Case.Routing
+ */
+class MockConnectedRoute extends CakeRoute {
+
+/**
+ * Value returned by parse().
+ *
+ * @var array|bool
+ */
+	public $parseReturn = false;
+
+	public function parse($url) {
+		return $this->parseReturn;
+	}
+
+}
+
+/**
+ * Test double route class whose match() result can be controlled by the test.
+ *
+ * @package       Cake.Test.Case.Routing
+ */
+class MockReturnRoute extends CakeRoute {
+
+/**
+ * Value returned by match().
+ *
+ * @var string|bool
+ */
+	public $matchReturn = false;
+
+	public function match($url) {
+		return $this->matchReturn;
+	}
+
 }
 
 /**
@@ -2412,7 +2453,6 @@ class RouterTest extends CakeTestCase {
  * @return void
  */
 	public function testUsingCustomRouteClass() {
-		$this->getMock('CakeRoute', array(), array(), 'MockConnectedRoute', false);
 		$routes = Router::connect(
 			'/:slug',
 			array('controller' => 'posts', 'action' => 'view'),
@@ -2420,9 +2460,7 @@ class RouterTest extends CakeTestCase {
 		);
 		$this->assertInstanceOf('MockConnectedRoute', $routes[0], 'Incorrect class used. %s');
 		$expected = array('controller' => 'posts', 'action' => 'view', 'slug' => 'test');
-		$routes[0]->expects($this->any())
-			->method('parse')
-			->will($this->returnValue($expected));
+		$routes[0]->parseReturn = $expected;
 		$result = Router::parse('/test');
 		$this->assertEquals($expected, $result);
 	}
@@ -2685,10 +2723,8 @@ class RouterTest extends CakeTestCase {
 	public function testUrlFullUrlReturnFromRoute() {
 		$url = 'http://example.com/posts/view/1';
 
-		$this->getMock('CakeRoute', array(), array('/'), 'MockReturnRoute');
 		$routes = Router::connect('/:controller/:action', array(), array('routeClass' => 'MockReturnRoute'));
-		$routes[0]->expects($this->any())->method('match')
-			->will($this->returnValue($url));
+		$routes[0]->matchReturn = $url;
 
 		$result = Router::url(array('controller' => 'posts', 'action' => 'view', 1));
 		$this->assertEquals($url, $result);

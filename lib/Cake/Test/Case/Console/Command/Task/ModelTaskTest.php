@@ -170,7 +170,8 @@ class ModelTaskTest extends CakeTestCase {
  * @return void
  */
 	public function testGetNameWithOutOfBoundsOption() {
-		$this->Task->expects($this->any())->method('in')->will($this->onConsecutiveCalls(99, 1));
+		$invalidIndex = count($this->Task->listAll('test')) + 1;
+		$this->Task->expects($this->any())->method('in')->will($this->onConsecutiveCalls($invalidIndex, 1));
 		$this->Task->expects($this->once())->method('err');
 
 		$this->Task->getName('test');

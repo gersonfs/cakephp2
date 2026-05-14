@@ -1139,6 +1139,7 @@ class TranslateBehaviorTest extends CakeTestCase {
 		$this->loadFixtures('Translate', 'TranslatedItem');
 
 		$TestModel = new TranslatedItem();
+		$TestModel->locale = 'eng';
 
 		$translations = array('title' => 'Title');
 		$TestModel->bindTranslation($translations);
