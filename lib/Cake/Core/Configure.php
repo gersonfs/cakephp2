@@ -103,6 +103,7 @@ class Configure {
 				);
 			}
 			restore_error_handler();
+			restore_exception_handler();
 
 			static::_setErrorHandlers(
 				static::$_values['Error'],
