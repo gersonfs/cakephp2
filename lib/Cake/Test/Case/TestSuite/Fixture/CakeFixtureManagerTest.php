@@ -80,7 +80,9 @@ class CakeFixtureManagerTest extends CakeTestCase {
 			));
 		}
 
-		$TestCase = $this->getMock('CakeTestCase');
+		$TestCase = $this->getMockBuilder('CakeTestCase')
+			->setConstructorArgs(array('dummy'))
+			->getMock();
 		$TestCase->fixtures = array('core.uuid');
 		$TestCase->autoFixtures = true;
 		$TestCase->dropTables = false;

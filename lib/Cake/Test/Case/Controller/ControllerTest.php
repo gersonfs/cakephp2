@@ -1019,7 +1019,6 @@ class ControllerTest extends CakeTestCase {
 		$this->assertEquals('/posts/index', $result);
 
 		$Controller = new Controller($request);
-		$request->setReturnValue('referer', '/', array(true));
 		$result = $Controller->referer(array('controller' => 'posts', 'action' => 'index'), true);
 		$this->assertEquals('/posts/index', $result);
 
