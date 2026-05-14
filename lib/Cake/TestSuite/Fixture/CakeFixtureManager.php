@@ -62,6 +62,13 @@ class CakeFixtureManager {
 	protected $_fixtureMap = array();
 
 /**
+ * Holds the test cases that have already had their fixtures processed
+ *
+ * @var array
+ */
+	protected $_processed = array();
+
+/**
  * When true (default), $_loaded and $_fixtureMap are kept in static
  * storage and reused across CakeFixtureManager instances. The cache
  * speeds up application test suites (~10x faster startup) where fixture

@@ -43,6 +43,7 @@ class MockPDO extends PDO {
 	/**
 	 * @return false|string|void
 	 */
+	#[\ReturnTypeWillChange]
 	public function quote($string, $type = PDO::PARAM_INT)
 	{
 		return parent::quote($string, $type);
@@ -51,6 +52,7 @@ class MockPDO extends PDO {
 	/**
 	 * @return false|int|void
 	 */
+	#[\ReturnTypeWillChange]
 	public function exec($statement)
 	{
 		return parent::exec($statement);
@@ -59,6 +61,7 @@ class MockPDO extends PDO {
 	/**
 	 * @return false|string|void
 	 */
+	#[\ReturnTypeWillChange]
 	public function lastInsertId($name = null)
 	{
 		return parent::lastInsertId($name);
@@ -67,6 +70,7 @@ class MockPDO extends PDO {
 	/**
 	 * @return false|\PDOStatement|void
 	 */
+	#[\ReturnTypeWillChange]
 	public function prepare($query, $options = [])
 	{
 		return parent::prepare($query, $options);
@@ -75,6 +79,7 @@ class MockPDO extends PDO {
 	/**
 	 * @return false|\PDOStatement|void
 	 */
+	#[\ReturnTypeWillChange]
 	public function query(string $statement, ?int $mode = PDO::ATTR_DEFAULT_FETCH_MODE, $arg3 = null, ...$fechModeArgs)
 	{
 		return parent::query($statement, $mode, $arg3, $fechModeArgs);

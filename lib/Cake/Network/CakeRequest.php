@@ -433,7 +433,7 @@ class CakeRequest implements ArrayAccess {
 		} else {
 			$ipaddr = env('REMOTE_ADDR');
 		}
-		return trim($ipaddr);
+		return trim((string)$ipaddr);
 	}
 
 /**

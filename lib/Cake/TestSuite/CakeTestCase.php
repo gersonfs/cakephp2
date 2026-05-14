@@ -365,6 +365,61 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	}
 
 /**
+ * Runs the test method and then drops mock objects that never had any
+ * expectation configured.
+ *
+ * CakePHP's legacy `getMock()` shim is frequently used to build plain
+ * stubs (objects that just need to exist or return null). PHPUnit 12
+ * registers every such object and, lacking an invocation rule, emits a
+ * "No expectations were configured for the mock object" notice for it.
+ * Dropping those rule-less objects from the registry before PHPUnit
+ * verifies them suppresses the notice without changing behaviour: PHPUnit
+ * never verifies rule-less mocks anyway, it only reports them.
+ *
+ * @param string $methodName The test method to run.
+ * @param array $testArguments Arguments for the test method.
+ * @return mixed The test method return value.
+ */
+	protected function invokeTestMethod(string $methodName, array $testArguments): mixed {
+		try {
+			return parent::invokeTestMethod($methodName, $testArguments);
+		} finally {
+			$this->_dropMockObjectsWithoutExpectations();
+		}
+	}
+
+/**
+ * Removes registered mock objects that have neither an invocation count
+ * rule nor a parameters rule, i.e. the ones PHPUnit would only emit a
+ * notice for.
+ *
+ * @return void
+ */
+	protected function _dropMockObjectsWithoutExpectations() {
+		if (!property_exists(\PHPUnit\Framework\TestCase::class, 'mockObjects')) {
+			return;
+		}
+		$property = new ReflectionProperty(\PHPUnit\Framework\TestCase::class, 'mockObjects');
+		$mockObjects = $property->getValue($this);
+		if (empty($mockObjects)) {
+			return;
+		}
+		$kept = array();
+		foreach ($mockObjects as $entry) {
+			$mockObject = $entry['mockObject'];
+			if (!method_exists($mockObject, '__phpunit_hasInvocationCountRule')) {
+				$kept[] = $entry;
+				continue;
+			}
+			if ($mockObject->__phpunit_hasInvocationCountRule() ||
+				$mockObject->__phpunit_hasParametersRule()) {
+				$kept[] = $entry;
+			}
+		}
+		$property->setValue($this, $kept);
+	}
+
+/**
  * teardown any static object changes and restore them.
  *
  * @return void
