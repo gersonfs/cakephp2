@@ -18,8 +18,13 @@ class CakeStubBuilder {
 
 	protected $_method;
 
-	public function __construct($owner) {
+	protected $_index = null;
+
+	public function __construct($owner, $matcher = null) {
 		$this->_owner = $owner;
+		if (is_object($matcher) && method_exists($matcher, 'index')) {
+			$this->_index = $matcher->index();
+		}
 	}
 
 	public function method($name) {
@@ -31,45 +36,61 @@ class CakeStubBuilder {
 		return $this;
 	}
 
-	public function will($stub) {
+/**
+ * Stores a stub for the current method, either as the default stub or, when
+ * the builder was created from an `at($n)` matcher, as the stub for the n-th
+ * invocation.
+ *
+ * @param mixed $stub Stub or return value.
+ * @return void
+ */
+	protected function _store($stub) {
+		if ($this->_index !== null) {
+			$this->_owner->_cakeSetSeqStub($this->_method, $this->_index, $stub);
+			return;
+		}
 		$this->_owner->_cakeSetStub($this->_method, $stub);
+	}
+
+	public function will($stub) {
+		$this->_store($stub);
 		return $this;
 	}
 
 	public function willReturn($value) {
-		$this->_owner->_cakeSetStub($this->_method, $value);
+		$this->_store($value);
 		return $this;
 	}
 
 	public function willReturnCallback($callback) {
-		$this->_owner->_cakeSetStub($this->_method, $callback);
+		$this->_store($callback);
 		return $this;
 	}
 
 	public function willReturnArgument($index) {
-		$this->_owner->_cakeSetStub($this->_method, function (...$args) use ($index) {
+		$this->_store(function (...$args) use ($index) {
 			return $args[$index] ?? null;
 		});
 		return $this;
 	}
 
 	public function willReturnSelf() {
-		$this->_owner->_cakeSetStub($this->_method, $this->_owner);
+		$this->_store($this->_owner);
 		return $this;
 	}
 
 	public function willReturnMap(array $map) {
-		$this->_owner->_cakeSetStub($this->_method, new ReturnValueMap($map));
+		$this->_store(new ReturnValueMap($map));
 		return $this;
 	}
 
 	public function willReturnOnConsecutiveCalls(...$values) {
-		$this->_owner->_cakeSetStub($this->_method, new ConsecutiveCalls($values));
+		$this->_store(new ConsecutiveCalls($values));
 		return $this;
 	}
 
 	public function willThrowException(\Throwable $e) {
-		$this->_owner->_cakeSetStub($this->_method, function () use ($e) {
+		$this->_store(function () use ($e) {
 			throw $e;
 		});
 		return $this;
