@@ -328,9 +328,18 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 		if (!$callOriginalClone) {
 			$builder->disableOriginalClone();
 		}
-		if (!empty($mockedMethods)) {
-			$builder->onlyMethods($mockedMethods);
+		if (!$callAutoload) {
+			$builder->disableAutoload();
 		}
+		$methods = $mockedMethods;
+		if (class_exists($originalClassName) || interface_exists($originalClassName)) {
+			$ref = new ReflectionClass($originalClassName);
+			foreach ($ref->getMethods(ReflectionMethod::IS_ABSTRACT) as $method) {
+				$methods[] = $method->getName();
+			}
+			$methods = array_values(array_unique($methods));
+		}
+		$builder->onlyMethods($methods);
 		if ($mockClassName !== '') {
 			$builder->setMockClassName($mockClassName);
 		}
