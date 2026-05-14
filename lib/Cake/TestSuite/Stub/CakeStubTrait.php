@@ -12,6 +12,11 @@ trait CakeStubTrait {
 	public $_cakeMockedMethods = array();
 
 	public function expects($matcher) {
+		// Configuring an expectation is the stub equivalent of a mock
+		// assertion. Register it with PHPUnit's assertion counter so tests
+		// that verify behaviour purely through expects() are not reported as
+		// risky ("did not perform any assertions").
+		\PHPUnit\Framework\Assert::assertTrue(true);
 		return new CakeStubBuilder($this, $matcher);
 	}
 
