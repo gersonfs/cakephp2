@@ -17,6 +17,7 @@
  */
 
 App::uses('CakeTime', 'Utility');
+App::uses('I18n', 'I18n');
 
 /**
  * CakeTimeTest class
@@ -69,6 +70,13 @@ class CakeTimeTest extends CakeTestCase {
 		parent::setUp();
 		$this->Time = new CakeTime();
 		$this->_systemTimezoneIdentifier = date_default_timezone_get();
+
+		// Reset i18n state so a language selected by a previous test cannot
+		// remain as L10n's stale default and override the language a test
+		// asks for. Config.language is cleared before I18n::clear() so the
+		// recreated L10n instance starts without a default.
+		Configure::delete('Config.language');
+		I18n::clear();
 		Configure::write('Config.language', 'eng');
 	}
 
@@ -81,6 +89,8 @@ class CakeTimeTest extends CakeTestCase {
 		parent::tearDown();
 		unset($this->Time);
 		$this->_restoreSystemTimezone();
+		Configure::delete('Config.language');
+		I18n::clear();
 	}
 
 /**
@@ -504,7 +514,9 @@ class CakeTimeTest extends CakeTestCase {
 		$set = setlocale(LC_ALL, 'es_ES');
 		$this->skipIf($set === false, 'es_ES locale is not available on this system.');
 		$time = strtotime('2015-01-07 03:05:00');
-		$this->assertEquals('ene 7th 2015, 03:05', $this->Time->niceShort($time));
+		// Some systems' es_ES locale data abbreviates January as "ene.";
+		// accept the trailing period either way.
+		$this->assertMatchesRegularExpression('/^ene\.? 7th 2015, 03:05$/', $this->Time->niceShort($time));
 		setlocale(LC_ALL, $restore);
 	}
 
