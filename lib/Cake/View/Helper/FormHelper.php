@@ -3146,9 +3146,30 @@ class FormHelper extends AppHelper {
  */
 	protected function _lastAction($url) {
 		$action = html_entity_decode($this->url($url, true), ENT_QUOTES);
-		$query = parse_url($action, PHP_URL_QUERY);
-		$query = $query ? '?' . $query : '';
-		$this->_lastAction = parse_url($action, PHP_URL_PATH) . $query;
+
+		// parse_url() is not used here because it fails on CakePHP named
+		// parameters (e.g. `/posts/index/page:1`). Drop the fragment, then
+		// split off the query string, mirroring parse_url()'s behaviour.
+		$position = strpos($action, '#');
+		if ($position !== false) {
+			$action = substr($action, 0, $position);
+		}
+
+		$query = '';
+		$position = strpos($action, '?');
+		if ($position !== false) {
+			$query = substr($action, $position);
+			$action = substr($action, 0, $position);
+		}
+
+		// Drop the scheme://host portion, keeping only the path.
+		$position = strpos($action, '://');
+		if ($position !== false) {
+			$slash = strpos($action, '/', $position + 3);
+			$action = ($slash === false) ? '/' : substr($action, $slash);
+		}
+
+		$this->_lastAction = $action . $query;
 	}
 
 /**
