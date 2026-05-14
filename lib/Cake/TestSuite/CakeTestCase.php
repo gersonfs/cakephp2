@@ -79,13 +79,13 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  */
 	protected $_pathRestore = array();
 
-    public function __destruct()
+    /*public function __destruct()
     {
 		if (isset($this->fixtureManager)) {
 			$this->fixtureManager->shutDown();
 		}
         unset($this->fixtureManager, $this->db);
-    }
+    }*/
 
 /**
  * Runs the test case and collects the results in a TestResult object.
