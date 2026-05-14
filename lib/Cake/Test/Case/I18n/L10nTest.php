@@ -123,8 +123,14 @@ class L10nTest extends CakeTestCase {
 /**
  * testGet method with deprecated constant DEFAULT_LANGUAGE
  *
+ * Runs in a separate process: it defines the DEFAULT_LANGUAGE constant,
+ * which cannot be undefined and would otherwise become a permanent stale
+ * default for every L10n instance created afterwards in the same process.
+ *
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+	#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
 	public function testGetWithDeprecatedConstant() {
 		$this->skipIf(defined('DEFAULT_LANGUAGE'), 'Cannot re-define already defined constant.');
 

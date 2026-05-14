@@ -18,6 +18,12 @@
 
 use PHPUnit\Framework\Constraint\Attribute;
 use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\MockObject\Stub\ConsecutiveCalls;
+use PHPUnit\Framework\MockObject\Stub\ReturnArgument;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\MockObject\Stub\ReturnSelf;
+use PHPUnit\Framework\MockObject\Stub\ReturnStub;
+use PHPUnit\Framework\MockObject\Stub\ReturnValueMap;
 
 App::uses('CakeFixtureManager', 'TestSuite/Fixture');
 App::uses('CakeTestFixture', 'TestSuite/Fixture');
@@ -73,18 +79,12 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  */
 	protected $_pathRestore = array();
 
-    public function __construct(string $name = 'unnamed')
-    {
-        parent::__construct($name);
-        $this->fixtureManager = new CakeFixtureManager();
-        $this->fixtureManager->fixturize($this);
-    }
-
     /*public function __destruct()
     {
-        if (isset($this->fixtureManager)) {
-            $this->fixtureManager->shutDown();
-        }
+		if (isset($this->fixtureManager)) {
+			$this->fixtureManager->shutDown();
+		}
+        unset($this->fixtureManager, $this->db);
     }*/
 
 /**
@@ -276,6 +276,77 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	}
 
 /**
+ * Backwards-compatibility helpers for stub factories removed from
+ * PHPUnit\Framework\TestCase in PHPUnit 12. They return the same Stub
+ * objects that PHPUnit's `->will()` still accepts.
+ */
+	public static function returnValue(mixed $value): ReturnStub {
+		return new ReturnStub($value);
+	}
+
+	public static function returnArgument(int $argumentIndex): ReturnArgument {
+		return new ReturnArgument($argumentIndex);
+	}
+
+	public static function returnCallback(callable $callback): ReturnCallback {
+		return new ReturnCallback($callback);
+	}
+
+	public static function returnSelf(): ReturnSelf {
+		return new ReturnSelf();
+	}
+
+	public static function returnValueMap(array $valueMap): ReturnValueMap {
+		return new ReturnValueMap($valueMap);
+	}
+
+	public static function onConsecutiveCalls(...$values): ConsecutiveCalls {
+		return new ConsecutiveCalls($values);
+	}
+
+/**
+ * Backwards-compatibility wrapper for getMockForAbstractClass(), removed
+ * in PHPUnit 12. Uses the MockBuilder to produce a mock of the abstract
+ * class with abstract methods auto-stubbed.
+ */
+	public function getMockForAbstractClass(
+		string $originalClassName,
+		array $arguments = [],
+		string $mockClassName = '',
+		bool $callOriginalConstructor = true,
+		bool $callOriginalClone = true,
+		bool $callAutoload = true,
+		array $mockedMethods = []
+	) {
+		$builder = $this->getMockBuilder($originalClassName);
+		if (!empty($arguments)) {
+			$builder->setConstructorArgs($arguments);
+		}
+		if (!$callOriginalConstructor) {
+			$builder->disableOriginalConstructor();
+		}
+		if (!$callOriginalClone) {
+			$builder->disableOriginalClone();
+		}
+		if (!$callAutoload) {
+			$builder->disableAutoload();
+		}
+		$methods = $mockedMethods;
+		if (class_exists($originalClassName) || interface_exists($originalClassName)) {
+			$ref = new ReflectionClass($originalClassName);
+			foreach ($ref->getMethods(ReflectionMethod::IS_ABSTRACT) as $method) {
+				$methods[] = $method->getName();
+			}
+			$methods = array_values(array_unique($methods));
+		}
+		$builder->onlyMethods($methods);
+		if ($mockClassName !== '') {
+			$builder->setMockClassName($mockClassName);
+		}
+		return $builder->getMock();
+	}
+
+/**
  * Setup the test case, backup the static object values so they can be restored.
  * Specifically backs up the contents of Configure and paths in App if they have
  * not already been backed up.
@@ -285,6 +356,10 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	protected function setUp() : void {
 		parent::setUp();
 
+		if (!isset($this->fixtureManager)) {
+			$this->fixtureManager = new CakeFixtureManager();
+			$this->fixtureManager->fixturize($this);
+		}
 		$this->fixtureManager->load($this);
 
 		if (empty($this->_configure)) {
@@ -296,6 +371,61 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 		if (class_exists('Router', false)) {
 			Router::reload();
 		}
+	}
+
+/**
+ * Runs the test method and then drops mock objects that never had any
+ * expectation configured.
+ *
+ * CakePHP's legacy `getMock()` shim is frequently used to build plain
+ * stubs (objects that just need to exist or return null). PHPUnit 12
+ * registers every such object and, lacking an invocation rule, emits a
+ * "No expectations were configured for the mock object" notice for it.
+ * Dropping those rule-less objects from the registry before PHPUnit
+ * verifies them suppresses the notice without changing behaviour: PHPUnit
+ * never verifies rule-less mocks anyway, it only reports them.
+ *
+ * @param string $methodName The test method to run.
+ * @param array $testArguments Arguments for the test method.
+ * @return mixed The test method return value.
+ */
+	protected function invokeTestMethod(string $methodName, array $testArguments): mixed {
+		try {
+			return parent::invokeTestMethod($methodName, $testArguments);
+		} finally {
+			$this->_dropMockObjectsWithoutExpectations();
+		}
+	}
+
+/**
+ * Removes registered mock objects that have neither an invocation count
+ * rule nor a parameters rule, i.e. the ones PHPUnit would only emit a
+ * notice for.
+ *
+ * @return void
+ */
+	protected function _dropMockObjectsWithoutExpectations() {
+		if (!property_exists(\PHPUnit\Framework\TestCase::class, 'mockObjects')) {
+			return;
+		}
+		$property = new ReflectionProperty(\PHPUnit\Framework\TestCase::class, 'mockObjects');
+		$mockObjects = $property->getValue($this);
+		if (empty($mockObjects)) {
+			return;
+		}
+		$kept = array();
+		foreach ($mockObjects as $entry) {
+			$mockObject = $entry['mockObject'];
+			if (!method_exists($mockObject, '__phpunit_hasInvocationCountRule')) {
+				$kept[] = $entry;
+				continue;
+			}
+			if ($mockObject->__phpunit_hasInvocationCountRule() ||
+				$mockObject->__phpunit_hasParametersRule()) {
+				$kept[] = $entry;
+			}
+		}
+		$property->setValue($this, $kept);
 	}
 
 /**
@@ -910,6 +1040,97 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  * @deprecated Use `getMockBuilder()` or `createMock()` in new unit tests.
  * @see https://phpunit.de/manual/current/en/test-doubles.html
  */
+/**
+ * Resolves a stub class for classes whose `method()` clashes with PHPUnit 12's
+ * MockObject Method trait (CakeRequest, CakeResponse, subclasses thereof).
+ * For the base classes themselves, returns the pre-defined Stub. For
+ * subclasses, generates one on the fly that extends the user's class while
+ * mixing in CakeStubTrait and the appropriate method overrides.
+ *
+ * @param string $originalClassName Class the test asked to mock.
+ * @return string|null Stub class name, or null if no stub is needed.
+ */
+	protected function _resolveStubClass($originalClassName) {
+		App::uses('CakeRequestStub', 'TestSuite/Stub');
+		App::uses('CakeResponseStub', 'TestSuite/Stub');
+		App::uses('CakeStubTrait', 'TestSuite/Stub');
+		if (!class_exists($originalClassName, true)) {
+			return null;
+		}
+		$baseStub = null;
+		if (is_a($originalClassName, 'CakeRequest', true)) {
+			$baseStub = 'CakeRequestStub';
+		} elseif (is_a($originalClassName, 'CakeResponse', true)) {
+			$baseStub = 'CakeResponseStub';
+		}
+		if ($baseStub === null) {
+			return null;
+		}
+		if ($originalClassName === $baseStub || $originalClassName === substr($baseStub, 0, -4)) {
+			return $baseStub;
+		}
+		$dynClass = $originalClassName . '_CakeStub';
+		if (class_exists($dynClass, false)) {
+			return $dynClass;
+		}
+		$baseRef = new ReflectionClass($baseStub);
+		$bodyParts = array("\tuse CakeStubTrait;");
+		foreach ($baseRef->getMethods() as $m) {
+			if ($m->getDeclaringClass()->getName() !== $baseStub) continue;
+			if ($m->isStatic() || $m->isAbstract()) continue;
+			$name = $m->getName();
+			if (in_array($name, array('expects', '_cakeSetStub', '_cakeSetSeqStub', '_cakeResolve', '_cakeSetMockedMethods'), true)) continue;
+			$params = array();
+			$callArgs = array();
+			foreach ($m->getParameters() as $p) {
+				$pName = '$' . $p->getName();
+				$param = $pName;
+				if ($p->isDefaultValueAvailable()) {
+					$param .= ' = ' . var_export($p->getDefaultValue(), true);
+				} elseif ($p->allowsNull() && !$p->isVariadic()) {
+					$param .= ' = null';
+				}
+				$params[] = $param;
+				$callArgs[] = $pName;
+			}
+			$visibility = $m->isProtected() ? 'protected' : 'public';
+			$paramList = implode(', ', $params);
+			$callList = implode(', ', $callArgs);
+			$useClause = $callArgs ? ' use (' . $callList . ')' : '';
+			$bodyParts[] = "\t$visibility function $name($paramList) {";
+			$bodyParts[] = "\t\treturn \$this->_cakeResolve('$name', array($callList), function ()$useClause {";
+			$bodyParts[] = "\t\t\treturn parent::$name($callList);";
+			$bodyParts[] = "\t\t});";
+			$bodyParts[] = "\t}";
+		}
+		$code = "class $dynClass extends $originalClassName {\n" . implode("\n", $bodyParts) . "\n}";
+		eval($code);
+		return $dynClass;
+	}
+
+/**
+ * Generates (and caches) a subclass of `$originalClassName` that adds no-op
+ * stubs for each method in `$missing` so PHPUnit 12 can mock them. Replaces
+ * the removed `MockBuilder::addMethods()`.
+ *
+ * @param string $originalClassName Base class.
+ * @param array $missing Method names absent on the base class.
+ * @return string Generated subclass name.
+ */
+	protected function _extendWithStubMethods($originalClassName, array $missing) {
+		$dyn = $originalClassName . '_Sub_' . substr(md5(implode('|', $missing)), 0, 8);
+		if (class_exists($dyn, false)) {
+			return $dyn;
+		}
+		$body = '';
+		foreach ($missing as $name) {
+			if (!preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $name)) continue;
+			$body .= "\tpublic function $name() {}\n";
+		}
+		eval("class $dyn extends $originalClassName {\n$body}");
+		return $dyn;
+	}
+
 	protected function _buildMock(
 		$originalClassName,
 		$methods = array(),
@@ -919,17 +1140,39 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 		$callOriginalClone = true,
 		$callAutoload = true
 	) {
+		$stubClass = $this->_resolveStubClass($originalClassName);
+		if ($stubClass !== null) {
+			if ($callOriginalConstructor && !empty($arguments)) {
+				$refl = new ReflectionClass($stubClass);
+				$stub = $refl->newInstanceArgs($arguments);
+			} else {
+				$stub = new $stubClass();
+			}
+			if (is_array($methods)) {
+				$stub->_cakeSetMockedMethods($methods);
+			}
+			return $stub;
+		}
+		if (!empty($methods) && (class_exists($originalClassName) || interface_exists($originalClassName))) {
+			$ref = new ReflectionClass($originalClassName);
+			$missing = array();
+			foreach ($methods as $method) {
+				if (!$ref->hasMethod($method)) {
+					$missing[] = $method;
+				}
+			}
+			if (!empty($missing) && !$ref->isFinal()) {
+				$originalClassName = $this->_extendWithStubMethods($originalClassName, $missing);
+			}
+		}
 		$MockBuilder = $this->getMockBuilder($originalClassName);
 		if (!empty($methods)) {
 			$existingMethods = array();
-			$addedMethods = array();
 			if (class_exists($originalClassName) || interface_exists($originalClassName)) {
 				$ref = new ReflectionClass($originalClassName);
 				foreach ($methods as $method) {
 					if ($ref->hasMethod($method)) {
 						$existingMethods[] = $method;
-					} else {
-						$addedMethods[] = $method;
 					}
 				}
 			} else {
@@ -938,8 +1181,16 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 			if (!empty($existingMethods)) {
 				$MockBuilder = $MockBuilder->onlyMethods($existingMethods);
 			}
-			if (!empty($addedMethods)) {
-				$MockBuilder = $MockBuilder->addMethods($addedMethods);
+		} elseif (class_exists($originalClassName) || interface_exists($originalClassName)) {
+			$ref = new ReflectionClass($originalClassName);
+			$publicMethods = array();
+			foreach ($ref->getMethods(ReflectionMethod::IS_PUBLIC) as $m) {
+				if ($m->isConstructor() || $m->isStatic() || $m->isFinal()) continue;
+				if (strpos($m->getName(), '__') === 0) continue;
+				$publicMethods[] = $m->getName();
+			}
+			if (!empty($publicMethods)) {
+				$MockBuilder = $MockBuilder->onlyMethods($publicMethods);
 			}
 		}
 		if (!empty($arguments)) {
@@ -1042,6 +1293,10 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 
 			public function __construct(int $index) {
 				$this->_index = $index;
+			}
+
+			public function index(): int {
+				return $this->_index;
 			}
 
 			public function toString(): string {

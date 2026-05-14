@@ -110,7 +110,6 @@ class ErrorHandlerTest extends CakeTestCase {
 		$this->assertMatchesRegularExpression('/<pre class="cake-error">/', $result);
 		$this->assertMatchesRegularExpression('/<b>(Notice|Warning)<\/b>/', $result);
 		$this->assertMatchesRegularExpression('/variable\:?\s+\$?wrong/', $result);
-		restore_error_handler();
 	}
 
 /**
@@ -128,9 +127,9 @@ class ErrorHandlerTest extends CakeTestCase {
 /**
  * test error mappings
  *
- * @dataProvider errorProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('errorProvider')]
 	public function testErrorMapping($error, $expected) {
 		set_error_handler('ErrorHandler::handleError');
 		$this->_restoreError = true;
@@ -142,7 +141,6 @@ class ErrorHandlerTest extends CakeTestCase {
 
 		$result = ob_get_clean();
 		$this->assertMatchesRegularExpression('/<b>' . $expected . '<\/b>/', $result);
-		restore_error_handler();
 	}
 
 /**
@@ -165,7 +163,6 @@ class ErrorHandlerTest extends CakeTestCase {
 		}else{
 			$this->assertTrue(empty($result));
 		}
-		restore_error_handler();
 	}
 
 /**
@@ -196,7 +193,6 @@ class ErrorHandlerTest extends CakeTestCase {
 		if (file_exists(LOGS . 'debug.log')) {
 			unlink(LOGS . 'debug.log');
 		}
-		restore_error_handler();
 	}
 
 	public function testHandleErrorDebugOffPHP8() {
@@ -222,7 +218,6 @@ class ErrorHandlerTest extends CakeTestCase {
 		if (file_exists(LOGS . 'error.log')) {
 			unlink(LOGS . 'error.log');
 		}
-		restore_error_handler();
 	}
 
 /**
@@ -254,7 +249,6 @@ class ErrorHandlerTest extends CakeTestCase {
 		if (file_exists(LOGS . 'debug.log')) {
 			unlink(LOGS . 'debug.log');
 		}
-		restore_error_handler();
 	}
 
 	public function testHandleErrorLoggingTracePHP8() {
@@ -282,7 +276,6 @@ class ErrorHandlerTest extends CakeTestCase {
 		if (file_exists(LOGS . 'error.log')) {
 			unlink(LOGS . 'error.log');
 		}
-		restore_error_handler();
 	}
 
 /**

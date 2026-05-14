@@ -172,8 +172,9 @@ class ControllerTaskTest extends CakeTestCase {
  */
 	public function testGetNameInvalidIndex() {
 		$this->Task->interactive = true;
+		$invalidIndex = count($this->Task->listAll('test')) + 1;
 		$this->Task->expects($this->any())->method('in')
-			->will($this->onConsecutiveCalls(50, 'q'));
+			->will($this->onConsecutiveCalls($invalidIndex, 'q'));
 
 		$this->Task->expects($this->once())->method('err');
 		$this->Task->expects($this->once())->method('_stop');
@@ -548,9 +549,9 @@ class ControllerTaskTest extends CakeTestCase {
 /**
  * test that both plural and singular forms work for controller baking.
  *
- * @dataProvider nameVariations
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('nameVariations')]
 	public function testExecuteWithControllerNameVariations($name) {
 		$this->Task->connection = 'test';
 		$this->Task->path = '/my/path/';

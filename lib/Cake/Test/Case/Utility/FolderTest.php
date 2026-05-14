@@ -181,9 +181,9 @@ class FolderTest extends CakeTestCase {
 	}
 
 /**
-	 * @dataProvider inPathInvalidPathArgumentDataProvider
 	 * @param string $path
 	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('inPathInvalidPathArgumentDataProvider')]
 	public function testInPathInvalidPathArgument($path) {
 		$this->expectException(\InvalidArgumentException::class);
 		$this->expectExceptionMessage('The $path argument is expected to be an absolute path.');

@@ -298,9 +298,9 @@ class HelperTest extends CakeTestCase {
 /**
  * Test setting an entity and retrieving the entity, model and field.
  *
- * @dataProvider entityProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('entityProvider')]
 	public function testSetEntity($entity, $expected, $modelKey, $fieldKey) {
 		$this->Helper->setEntity($entity);
 		$this->assertEquals($expected, $this->Helper->entity());

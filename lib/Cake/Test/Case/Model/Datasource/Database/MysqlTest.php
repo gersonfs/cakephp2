@@ -98,9 +98,9 @@ class MysqlTest extends CakeTestCase {
 /**
  * Test Dbo value method
  *
- * @group quoting
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\Group('quoting')]
 	public function testQuoting() {
 		$result = $this->Dbo->fields($this->model);
 		$expected = array(
@@ -158,9 +158,9 @@ class MysqlTest extends CakeTestCase {
 /**
  * test that localized floats don't cause trouble.
  *
- * @group quoting
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\Group('quoting')]
 	public function testLocalizedFloats() {
 		$this->skipIf(DS === '\\', 'The locale is not supported in Windows and affect the others tests.');
 
@@ -271,9 +271,9 @@ class MysqlTest extends CakeTestCase {
 /**
  * testIndexDetection method
  *
- * @group indices
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\Group('indices')]
 	public function testIndexDetection() {
 		$this->Dbo->cacheSources = false;
 
@@ -372,9 +372,9 @@ class MysqlTest extends CakeTestCase {
  * MySQL 4.x returns index data in a different format,
  * Using a mock ensure that MySQL 4.x output is properly parsed.
  *
- * @group indices
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\Group('indices')]
 	public function testIndexOnMySQL4Output() {
 		$this->skipIf(version_compare(PHP_VERSION, '8.1', '>='), 'Escapando teste no PHP 8.1');
 		$name = $this->Dbo->fullTableName('simple');
@@ -548,9 +548,9 @@ class MysqlTest extends CakeTestCase {
 /**
  * testAlterSchemaIndexes method
  *
- * @group indices
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\Group('indices')]
 	public function testAlterSchemaIndexes() {
 		$this->Dbo->cacheSources = $this->Dbo->testing = false;
 		$table = $this->Dbo->fullTableName('altertest');
@@ -3270,8 +3270,8 @@ SQL;
  *
  * @return void
  *
- * @dataProvider buildColumnUnsignedProvider
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('buildColumnUnsignedProvider')]
 	public function testBuildColumnUnsigned($data, $expected) {
 		$result = $this->Dbo->buildColumn($data);
 		$this->assertEquals($expected, $result);

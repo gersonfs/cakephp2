@@ -1869,9 +1869,9 @@ class HttpSocketTest extends CakeTestCase {
 /**
  * test response status parsing
  *
- * @dataProvider statusProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('statusProvider')]
 	public function testResponseStatusParsing($status, $code, $msg = '') {
 		$this->Socket->connected = true;
 		$serverResponse = $status . "\r\nDate: Mon, 16 Apr 2007 04:14:16 GMT\r\nServer: CakeHttp Server\r\n\r\n<h1>This is a test!</h1>";

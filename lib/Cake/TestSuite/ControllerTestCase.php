@@ -256,10 +256,7 @@ abstract class ControllerTestCase extends CakeTestCase {
 		}
 
 		$_SERVER['REQUEST_URI'] = $url;
-		/** @var CakeRequest|PHPUnit_Framework_MockObject_MockObject $request */
-		$request = $this->getMockBuilder('CakeRequest')
-        ->onlyMethods(array('_readInput'))
-        ->getMock();
+		$request = $this->getMock('CakeRequest', array('_readInput'));
 
 		if (is_string($options['data'])) {
 			$request->expects($this->any())
@@ -376,10 +373,8 @@ abstract class ControllerTestCase extends CakeTestCase {
             ->getMock();
 
 		$controllerObj->name = $name;
-		/** @var CakeRequest|PHPUnit_Framework_MockObject_MockObject $request */
-		$request = $this->getMockBuilder('CakeRequest')->getMock();
-		/** @var CakeResponse|PHPUnit_Framework_MockObject_MockObject $response */
-		$response = $this->getMockBuilder($this->_responseClass)->onlyMethods(array('_sendHeader'))->getMock();
+		$request = $this->getMock('CakeRequest');
+		$response = $this->getMock($this->_responseClass, array('_sendHeader'));
 		$controllerObj->__construct($request, $response);
 		$controllerObj->Components->setController($controllerObj);
 

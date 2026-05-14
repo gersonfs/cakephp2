@@ -774,9 +774,9 @@ class CakeEmailTest extends CakeTestCase {
 /**
 	 * testInvalidHeaders
 	 *
-	 * @dataProvider invalidHeaders
 	 * @return void
 	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('invalidHeaders')]
 	public function testInvalidHeaders($value) {
 		$this->expectException('SocketException');
 		$this->CakeEmail->setHeaders($value);
@@ -785,9 +785,9 @@ class CakeEmailTest extends CakeTestCase {
 /**
 	 * testInvalidAddHeaders
 	 *
-	 * @dataProvider invalidHeaders
 	 * @return void
 	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('invalidHeaders')]
 	public function testInvalidAddHeaders($value) {
 		$this->expectException('SocketException');
 		$this->CakeEmail->addHeaders($value);

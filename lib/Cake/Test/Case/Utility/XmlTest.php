@@ -218,9 +218,9 @@ class XmlTest extends CakeTestCase {
 /**
 	 * testBuildInvalidData
 	 *
-	 * @dataProvider invalidDataProvider
 	 * @return void
 	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('invalidDataProvider')]
 	public function testBuildInvalidData($value) {
 		$this->expectException('XmlException');
 		Xml::build($value);
@@ -603,9 +603,9 @@ XML;
 /**
  * testFromArrayFail method
  *
- * @dataProvider invalidArrayDataProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('invalidArrayDataProvider')]
 	public function testFromArrayFail($value) {
 		try {
 			Xml::fromArray($value);
@@ -1173,9 +1173,9 @@ XML;
 /**
 	 * testToArrayFail method
 	 *
-	 * @dataProvider invalidToArrayDataProvider
 	 * @return void
 	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('invalidToArrayDataProvider')]
 	public function testToArrayFail($value) {
 		$this->expectException('XmlException');
 		$this->expectExceptionMessage('The input is not instance of SimpleXMLElement, DOMDocument or DOMNode.');

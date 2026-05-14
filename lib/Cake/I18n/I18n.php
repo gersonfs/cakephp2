@@ -293,13 +293,22 @@ class I18n {
 	}
 
 /**
- * Clears the domains internal data array. Useful for testing i18n.
+ * Resets the internal translation state. Useful for testing i18n.
+ *
+ * Besides emptying the loaded domains, it drops the resolved language and
+ * recreates the L10n instance so a stale default language captured at
+ * construction time cannot leak between consecutive translations.
  *
  * @return void
  */
 	public static function clear() {
 		$self = I18n::getInstance();
 		$self->_domains = array();
+		$self->_lang = null;
+		$self->_noLocale = false;
+		$self->domain = null;
+		$self->category = 'LC_MESSAGES';
+		$self->l10n = new L10n();
 	}
 
 /**

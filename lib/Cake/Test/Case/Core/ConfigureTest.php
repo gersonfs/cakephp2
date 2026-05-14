@@ -83,6 +83,11 @@ class ConfigureTest extends CakeTestCase {
 
 		$this->assertEquals($expected['foo'], $result['foo']);
 		$this->assertFalse($result['base']);
+
+		// Configure::bootstrap() installs CakePHP's error/exception handlers;
+		// restore them so the test leaves the handler stack as it found it.
+		restore_error_handler();
+		restore_exception_handler();
 	}
 
 /**

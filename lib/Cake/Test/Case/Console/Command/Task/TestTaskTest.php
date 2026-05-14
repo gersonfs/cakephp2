@@ -646,9 +646,9 @@ class TestTaskTest extends CakeTestCase {
 /**
  * Test filename generation for each type + plugins
  *
- * @dataProvider caseFileNameProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('caseFileNameProvider')]
 	public function testTestCaseFileName($type, $class, $expected) {
 		$this->Task->path = DS . 'my' . DS . 'path' . DS . 'tests' . DS;
 
@@ -747,9 +747,9 @@ class TestTaskTest extends CakeTestCase {
 /**
  * Test that mapType returns the correct package names.
  *
- * @dataProvider mapTypeProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('mapTypeProvider')]
 	public function testMapType($original, $plugin, $expected) {
 		$this->assertEquals($expected, $this->Task->mapType($original, $plugin));
 	}

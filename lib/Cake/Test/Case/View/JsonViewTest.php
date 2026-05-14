@@ -186,9 +186,9 @@ class JsonViewTest extends CakeTestCase {
 /**
  * Test render with a valid string in _serialize.
  *
- * @dataProvider renderWithoutViewProvider
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('renderWithoutViewProvider')]
 	public function testRenderWithoutView($data, $serialize, $expected) {
 		$Request = new CakeRequest();
 		$Response = new CakeResponse();

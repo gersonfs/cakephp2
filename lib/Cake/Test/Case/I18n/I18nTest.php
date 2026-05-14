@@ -43,6 +43,12 @@ class I18nTest extends CakeTestCase {
 		Configure::write('Session', array('defaults' => 'php'));
 		CakeSession::destroy();
 
+		// Each test selects its own language; start from a clean slate so a
+		// language left over from a previous test cannot become the stale
+		// default captured by the L10n instance.
+		Configure::delete('Config.language');
+		I18n::clear();
+
 		Cache::delete('object_map', '_cake_core_');
 		App::build(array(
 			'Locale' => array(CAKE . 'Test' . DS . 'test_app' . DS . 'Locale' . DS),
@@ -59,6 +65,8 @@ class I18nTest extends CakeTestCase {
 	public function tearDown(): void {
 		parent::tearDown();
 
+		Configure::delete('Config.language');
+		I18n::clear();
 		Cache::delete('object_map', '_cake_core_');
 		CakeSession::destroy();
 		App::build();

@@ -108,7 +108,9 @@ class CakeRequestTest extends CakeTestCase {
 			$_SERVER['PHP_SELF'],
 			$_SERVER['PATH_INFO'],
 			$_SERVER['QUERY_STRING'],
-			$_SERVER['HTTP_REFERER']
+			$_SERVER['HTTP_REFERER'],
+			$_SERVER['CONTENT_TYPE'],
+			$_SERVER['HTTP_CONTENT_TYPE']
 		);
 		$_POST = array();
 		$_FILES = array();
@@ -2083,12 +2085,12 @@ class CakeRequestTest extends CakeTestCase {
 /**
  * Test environment detection
  *
- * @dataProvider environmentGenerator
  * @param $name
  * @param $env
  * @param $expected
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('environmentGenerator')]
 	public function testEnvironmentDetection($name, $env, $expected) {
 		$_GET = array();
 		$this->_loadEnvironment($env);
@@ -2206,8 +2208,8 @@ class CakeRequestTest extends CakeTestCase {
 /**
  * Test reading params
  *
- * @dataProvider paramReadingDataProvider
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('paramReadingDataProvider')]
 	public function testParamReading($toRead, $expected) {
 		$request = new CakeRequest('/');
 		$request->addParams(array(

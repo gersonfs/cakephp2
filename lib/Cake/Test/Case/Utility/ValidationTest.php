@@ -1526,7 +1526,7 @@ class ValidationTest extends CakeTestCase {
 		$this->assertTrue(Validation::decimal('-1234', null));
 		$this->assertTrue(Validation::decimal('+1234', null));
 		$this->assertTrue(Validation::decimal((float)1234, null));
-		$this->assertTrue(Validation::decimal((double)1234, null));
+		$this->assertTrue(Validation::decimal((float)1234, null));
 		$this->assertTrue(Validation::decimal((int)1234, null));
 
 		$this->assertFalse(Validation::decimal('', null));
@@ -1556,7 +1556,7 @@ class ValidationTest extends CakeTestCase {
 		$this->assertTrue(Validation::decimal(.01, true));
 		$this->assertTrue(Validation::decimal('.01', true));
 		$this->assertTrue(Validation::decimal((float)1234, true));
-		$this->assertTrue(Validation::decimal((double)1234, true));
+		$this->assertTrue(Validation::decimal((float)1234, true));
 
 		$this->assertFalse(Validation::decimal('', true));
 		$this->assertFalse(Validation::decimal('string', true));
@@ -1596,7 +1596,7 @@ class ValidationTest extends CakeTestCase {
 		$this->assertFalse(Validation::decimal(.0, 1));
 		$this->assertFalse(Validation::decimal(.00, 2));
 		$this->assertFalse(Validation::decimal((float)1234, 1));
-		$this->assertFalse(Validation::decimal((double)1234, 1));
+		$this->assertFalse(Validation::decimal((float)1234, 1));
 		$this->assertFalse(Validation::decimal((int)1234, 1));
 		$this->assertFalse(Validation::decimal('1234.5678', '3'));
 		$this->assertFalse(Validation::decimal(1234.5678, 3));

@@ -1,29 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
-         bootstrap="lib/Cake/Test/autoload.php"
-         cacheDirectory=".phpunit.cache"
-         executionOrder="depends,defects"
-         requireCoverageMetadata="false"
-         beStrictAboutCoverageMetadata="true"
-         beStrictAboutOutputDuringTests="false"
-		 displayDetailsOnPhpunitDeprecations="true"
-         failOnPhpunitDeprecation="true"
-		 displayDetailsOnTestsThatTriggerDeprecations="true"
-		 displayDetailsOnTestsThatTriggerErrors="true"
-		 displayDetailsOnTestsThatTriggerNotices="true"
-		 displayDetailsOnTestsThatTriggerWarnings="true"
-         failOnRisky="true"
-         failOnWarning="true">
-    <testsuites>
-        <testsuite name="default">
-            <directory>lib/Cake/Test/Case</directory>
-        </testsuite>
-    </testsuites>
-
-    <source>
-        <include>
-            <directory>lib/Cake</directory>
-        </include>
-    </source>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/12.5/phpunit.xsd" bootstrap="lib/Cake/Test/autoload.php" cacheDirectory=".phpunit.cache" executionOrder="depends,defects" requireCoverageMetadata="false" beStrictAboutCoverageMetadata="true" beStrictAboutOutputDuringTests="false" displayDetailsOnPhpunitDeprecations="true" failOnPhpunitDeprecation="true" displayDetailsOnTestsThatTriggerDeprecations="true" displayDetailsOnTestsThatTriggerErrors="true" displayDetailsOnTestsThatTriggerNotices="true" displayDetailsOnTestsThatTriggerWarnings="true" failOnRisky="true" failOnWarning="true">
+  <testsuites>
+    <testsuite name="default">
+      <directory>lib/Cake/Test/Case</directory>
+    </testsuite>
+  </testsuites>
+  <source>
+    <include>
+      <directory>lib/Cake</directory>
+    </include>
+  </source>
 </phpunit>

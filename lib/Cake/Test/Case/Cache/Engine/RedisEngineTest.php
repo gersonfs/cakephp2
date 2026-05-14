@@ -26,7 +26,7 @@ App::uses('RedisEngine', 'Cache/Engine');
  */
 class RedisEngineTest extends CakeTestCase {
 
-	private ?bool $_cacheDisable;
+	private ?bool $_cacheDisable = null;
 /**
  * setUp method
  *

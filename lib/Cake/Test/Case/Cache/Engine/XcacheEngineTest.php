@@ -25,7 +25,7 @@ App::uses('Cache', 'Cache');
  */
 class XcacheEngineTest extends CakeTestCase {
 
-	private ?bool $_cacheDisable;
+	private ?bool $_cacheDisable = null;
 /**
  * setUp method
  *

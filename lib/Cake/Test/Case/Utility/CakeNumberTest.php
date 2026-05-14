@@ -746,9 +746,9 @@ class CakeNumberTest extends CakeTestCase {
 /**
  * testFromReadableSize
  *
- * @dataProvider filesizes
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('filesizes')]
 	public function testFromReadableSize($params, $expected) {
 		$result = $this->Number->fromReadableSize($params['size'], $params['default']);
 		$this->assertEquals($expected, $result);

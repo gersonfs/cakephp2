@@ -515,9 +515,9 @@ class ViewTaskTest extends CakeTestCase {
 /**
  * test that both plural and singular forms can be used for baking views.
  *
- * @dataProvider nameVariations
  * @return void
  */
+	#[\PHPUnit\Framework\Attributes\DataProvider('nameVariations')]
 	public function testExecuteWithControllerVariations($name) {
 		$this->Task->args = array($name);
 
