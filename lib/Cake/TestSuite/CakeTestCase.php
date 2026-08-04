@@ -436,7 +436,9 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	protected function tearDown() : void {
 		parent::tearDown();
 
-		$this->fixtureManager->unload($this);
+		if (!empty($this->fixtureManager)) {
+			$this->fixtureManager->unload($this);
+		}
 
 		App::build($this->_pathRestore, App::RESET);
 		if (class_exists('ClassRegistry', false)) {

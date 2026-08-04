@@ -171,7 +171,10 @@ class Mysql extends DboSource {
 		);
 
 		if (!empty($config['encoding'])) {
-			$flags[PDO::MYSQL_ATTR_INIT_COMMAND] = 'SET NAMES ' . $config['encoding'];
+			$initCommandAttr = defined('Pdo\\Mysql::ATTR_INIT_COMMAND')
+				? constant('Pdo\\Mysql::ATTR_INIT_COMMAND')
+				: PDO::MYSQL_ATTR_INIT_COMMAND;
+			$flags[$initCommandAttr] = 'SET NAMES ' . $config['encoding'];
 		}
 		if (!empty($config['ssl_key']) && !empty($config['ssl_cert'])) {
 			$flags[PDO::MYSQL_ATTR_SSL_KEY] = $config['ssl_key'];
