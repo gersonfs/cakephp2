@@ -203,9 +203,8 @@ class ModelReadTest extends BaseModelTest {
 		$isStrictGroupBy = $isOnlyFullGroupBy ||
 			$this->db instanceof Postgres ||
 			$this->db instanceof Sqlite ||
-			$this->db instanceof Oracle ||
-			$this->db instanceof Sqlserver;
-		$message = 'Postgres, Oracle, SQLite, SQL Server and MySQL in ONLY_FULL_GROUP_BY ' .
+			$this->db instanceof Oracle;
+		$message = 'Postgres, Oracle, SQLite and MySQL in ONLY_FULL_GROUP_BY ' .
 			'mode have strict GROUP BY and are incompatible with this test.';
 		$this->skipIf($isStrictGroupBy, $message);
 	}
@@ -559,7 +558,6 @@ class ModelReadTest extends BaseModelTest {
  * @return void
  */
 	public function testRecursiveUnbind() {
-		$this->skipIf($this->db instanceof Sqlserver, 'The test of testRecursiveUnbind test is not compatible with SQL Server, because it check for time columns.');
 
 		$this->loadFixtures('Apple', 'Sample');
 		$TestModel = new Apple();
@@ -3956,7 +3954,6 @@ class ModelReadTest extends BaseModelTest {
  * @return void
  */
 	public function testFindCombinedRelations() {
-		$this->skipIf($this->db instanceof Sqlserver, 'The test of testRecursiveUnbind test is not compatible with SQL Server, because it check for time columns.');
 
 		$this->loadFixtures('Apple', 'Sample');
 		$TestModel = new Apple();
@@ -6834,25 +6831,21 @@ class ModelReadTest extends BaseModelTest {
 		)));
 		$this->assertEquals($expected, $result);
 
-		// These tests are expected to fail on SQL Server since the LIMIT/OFFSET
-		// hack can't handle small record counts.
-		if (!($this->db instanceof Sqlserver)) {
-			$result = $TestModel->find('all', array('limit' => 3, 'page' => 2));
-			$expected = array(
-				array(
-					'User' => array(
-						'id' => '4',
-						'user' => 'garrett',
-						'password' => '5f4dcc3b5aa765d61d8327deb882cf99',
-						'created' => '2007-03-17 01:22:23',
-						'updated' => '2007-03-17 01:24:31'
-			)));
-			$this->assertEquals($expected, $result);
+		$result = $TestModel->find('all', array('limit' => 3, 'page' => 2));
+		$expected = array(
+			array(
+				'User' => array(
+					'id' => '4',
+					'user' => 'garrett',
+					'password' => '5f4dcc3b5aa765d61d8327deb882cf99',
+					'created' => '2007-03-17 01:22:23',
+					'updated' => '2007-03-17 01:24:31'
+		)));
+		$this->assertEquals($expected, $result);
 
-			$result = $TestModel->find('all', array('limit' => 3, 'page' => 3));
-			$expected = array();
-			$this->assertEquals($expected, $result);
-		}
+		$result = $TestModel->find('all', array('limit' => 3, 'page' => 3));
+		$expected = array();
+		$this->assertEquals($expected, $result);
 	}
 
 /**
@@ -7413,7 +7406,6 @@ class ModelReadTest extends BaseModelTest {
  */
 	public function testFindCountDistinct() {
 		$this->skipIf($this->db instanceof Sqlite, 'SELECT COUNT(DISTINCT field) is not compatible with SQLite.');
-		$this->skipIf($this->db instanceof Sqlserver, 'This test is not compatible with SQL Server.');
 
 		$this->loadFixtures('Project', 'Thread');
 		$TestModel = new Project();
@@ -8318,13 +8310,10 @@ class ModelReadTest extends BaseModelTest {
 		$result = $Post->find('first');
 		$this->assertEquals(2, $result['Post']['two']);
 
-		// SQL Server does not support operators in expressions
-		if (!($this->db instanceof Sqlserver)) {
-			$Post->Author->virtualFields = array('false' => '1 = 2');
-			$result = $Post->find('first');
-			$this->assertEquals(2, $result['Post']['two']);
-			$this->assertFalse((bool)$result['Author']['false']);
-		}
+		$Post->Author->virtualFields = array('false' => '1 = 2');
+		$result = $Post->find('first');
+		$this->assertEquals(2, $result['Post']['two']);
+		$this->assertFalse((bool)$result['Author']['false']);
 
 		$result = $Post->find('first', array('fields' => array('author_id')));
 		$this->assertFalse(isset($result['Post']['two']));

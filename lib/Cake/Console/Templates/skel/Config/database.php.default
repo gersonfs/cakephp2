@@ -12,8 +12,7 @@
  * datasource => The name of a supported datasource; valid options are as follows:
  *  Database/Mysql - MySQL 4 & 5,
  *  Database/Sqlite - SQLite (PHP5 only),
- *  Database/Postgres - PostgreSQL 7 and higher,
- *  Database/Sqlserver - Microsoft SQL Server 2005 and higher
+ *  Database/Postgres - PostgreSQL 7 and higher
  *
  * You can add custom database datasources (or override existing datasources) by adding the
  * appropriate file to app/Model/Datasource/Database. Datasources should be named 'MyDatasource.php',
@@ -30,8 +29,7 @@
  * on a per-table basis with the Model::$tablePrefix property.
  *
  * schema =>
- * For Postgres/Sqlserver specifies which schema you would like to use the tables in. Postgres defaults to 'public'. For Sqlserver, it defaults to empty and use
- * the connected user's default schema (typically 'dbo').
+ * For Postgres specifies which schema you would like to use the tables in. Postgres defaults to 'public'.
  *
  * encoding =>
  * For MySQL, Postgres specifies the character encoding to use when connecting to the

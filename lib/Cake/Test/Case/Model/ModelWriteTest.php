@@ -630,9 +630,6 @@ class ModelWriteTest extends BaseModelTest {
 
 		$this->loadFixtures('CategoryThread');
 		$column = 'COLUMN ';
-		if ($this->db instanceof Sqlserver) {
-			$column = '';
-		}
 		$column .= $this->db->buildColumn(array('name' => 'child_count', 'type' => 'integer'));
 		$this->db->query('ALTER TABLE ' . $this->db->fullTableName('category_threads') . ' ADD ' . $column);
 		$this->db->flushMethodCache();
@@ -5402,7 +5399,6 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testSaveAllEmptyData() {
-		$this->skipIf($this->db instanceof Sqlserver, 'This test is not compatible with SQL Server.');
 
 		$this->loadFixtures('Article', 'ProductUpdateAll', 'Comment', 'Attachment');
 		$model = new Article();
@@ -6860,7 +6856,6 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testSaveManyEmptyData() {
-		$this->skipIf($this->db instanceof Sqlserver, 'This test is not compatible with SQL Server.');
 
 		$this->loadFixtures('Article', 'ProductUpdateAll', 'Comment', 'Attachment');
 		$model = new Article();
@@ -6878,7 +6873,6 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testSaveAssociatedEmptyData() {
-		$this->skipIf($this->db instanceof Sqlserver, 'This test is not compatible with SQL Server.');
 
 		$this->loadFixtures('Article', 'ProductUpdateAll', 'Comment', 'Attachment');
 		$model = new Article();
@@ -7055,7 +7049,7 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testUpdateAllEmptyValues() {
-		$this->skipIf($this->db instanceof Sqlserver || $this->db instanceof Postgres, 'This test is not compatible with Postgres or SQL Server.');
+		$this->skipIf($this->db instanceof Postgres, 'This test is not compatible with Postgres.');
 
 		$this->loadFixtures('Author', 'Post');
 		$model = new Author();

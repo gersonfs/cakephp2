@@ -746,9 +746,6 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	public function testValue() {
-		if ($this->db instanceof Sqlserver) {
-			$this->markTestSkipped('Cannot run this test with SqlServer');
-		}
 		$result = $this->db->value('{$__cakeForeignKey__$}');
 		$this->assertEquals('{$__cakeForeignKey__$}', $result);
 
@@ -1358,8 +1355,8 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	public function testFieldsCacheKeyWithSchemanameChange() {
-		if ($this->db instanceof Postgres || $this->db instanceof Sqlserver) {
-			$this->markTestSkipped('Cannot run this test with SqlServer or Postgres');
+		if ($this->db instanceof Postgres) {
+			$this->markTestSkipped('Cannot run this test with Postgres');
 		}
 		$this->loadFixtures('Article', 'User', 'Comment', 'Tag', 'ArticlesTag', 'Attachment');
 		Cache::delete('method_cache', '_cake_core_');

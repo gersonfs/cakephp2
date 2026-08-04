@@ -9,5 +9,11 @@
     <include>
       <directory>lib/Cake</directory>
     </include>
+    <exclude>
+      <directory>lib/Cake/Test</directory>
+      <directory>lib/Cake/Console/Templates</directory>
+      <directory>lib/Cake/TestSuite/templates</directory>
+      <directory>lib/Cake/Config</directory>
+    </exclude>
   </source>
 </phpunit>

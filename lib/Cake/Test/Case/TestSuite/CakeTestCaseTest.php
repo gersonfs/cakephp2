@@ -19,7 +19,6 @@
  */
 App::uses('CakePlugin', 'Core');
 App::uses('Controller', 'Controller');
-App::uses('CakeHtmlReporter', 'TestSuite/Reporter');
 App::uses('Model', 'Model');
 
 /**
@@ -88,7 +87,6 @@ class CakeTestCaseTest extends CakeTestCase {
 	public function setUp(): void {
 		parent::setUp();
 		$this->markTestSkipped('CakeTestCaseTest depends on PHPUnit < 10 TestResult API.');
-		$this->Reporter = $this->getMock('CakeHtmlReporter');
 	}
 
 /**
@@ -99,7 +97,6 @@ class CakeTestCaseTest extends CakeTestCase {
 	public function tearDown(): void {
 		parent::tearDown();
 		unset($this->Result);
-		unset($this->Reporter);
 	}
 
 /**

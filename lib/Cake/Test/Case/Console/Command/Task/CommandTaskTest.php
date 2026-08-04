@@ -79,8 +79,7 @@ class CommandTaskTest extends CakeTestCase {
 				'console',
 				'i18n',
 				'schema',
-				'server',
-				'upgrade'
+				'server'
 			),
 			'TestPlugin' => array(
 				'example',
@@ -119,7 +118,6 @@ class CommandTaskTest extends CakeTestCase {
 			'i18n',
 			'schema',
 			'server',
-			'upgrade',
 			'sample'
 		);
 		$this->assertEquals($expected, $result);

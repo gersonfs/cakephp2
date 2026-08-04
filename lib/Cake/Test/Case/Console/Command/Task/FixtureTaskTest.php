@@ -239,11 +239,6 @@ class FixtureTaskTest extends CakeTestCase {
  * @return void
  */
 	public function testImportRecordsNoEscaping() {
-		$db = ConnectionManager::getDataSource('test');
-		if ($db instanceof Sqlserver) {
-			$this->markTestSkipped('This test does not run on SQLServer');
-		}
-
 		$Article = ClassRegistry::init('Article');
 		$Article->updateAll(array('body' => "'Body \"value\"'"));
 

@@ -143,9 +143,6 @@ class ProjectTaskTest extends CakeTestCase {
 		$File = new File($path . DS . 'webroot' . DS . 'index.php');
 		$contents = $File->read();
 		$this->assertMatchesRegularExpression('/define\(\'CAKE_CORE_INCLUDE_PATH\', .*?DS/', $contents);
-		$File = new File($path . DS . 'webroot' . DS . 'test.php');
-		$contents = $File->read();
-		$this->assertMatchesRegularExpression('/define\(\'CAKE_CORE_INCLUDE_PATH\', .*?DS/', $contents);
 	}
 
 /**
@@ -167,9 +164,6 @@ class ProjectTaskTest extends CakeTestCase {
 
 		$this->assertTrue(is_dir($this->Task->args[0]), 'No project dir');
 		$contents = file_get_contents($path . DS . 'webroot' . DS . 'index.php');
-		$this->assertMatchesRegularExpression('#//define\(\'CAKE_CORE_INCLUDE_PATH#', $contents);
-
-		$contents = file_get_contents($path . DS . 'webroot' . DS . 'test.php');
 		$this->assertMatchesRegularExpression('#//define\(\'CAKE_CORE_INCLUDE_PATH#', $contents);
 
 		ini_set('include_path', $restore);
@@ -277,9 +271,6 @@ class ProjectTaskTest extends CakeTestCase {
 		$this->Task->corePath($path);
 
 		$File = new File($path . 'webroot' . DS . 'index.php');
-		$contents = $File->read();
-		$this->assertDoesNotMatchRegularExpression('/define\(\'CAKE_CORE_INCLUDE_PATH\', ROOT/', $contents);
-		$File = new File($path . 'webroot' . DS . 'test.php');
 		$contents = $File->read();
 		$this->assertDoesNotMatchRegularExpression('/define\(\'CAKE_CORE_INCLUDE_PATH\', ROOT/', $contents);
 	}

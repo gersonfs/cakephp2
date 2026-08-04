@@ -17,7 +17,6 @@
  */
 
 App::uses('CakeObject', 'Core');
-App::uses('Object', 'Core');
 App::uses('Router', 'Routing');
 App::uses('Controller', 'Controller');
 App::uses('Model', 'Model');
