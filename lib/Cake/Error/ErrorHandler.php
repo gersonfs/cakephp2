@@ -208,7 +208,11 @@ class ErrorHandler {
  * @return bool true if error was handled
  */
 	public static function handleError($code, $description, $file = null, $line = null, $context = null) {
-		if (error_reporting() === 0) {
+		// Respect error suppression. Up to PHP 7 the `@` operator zeroed
+		// error_reporting(); since PHP 8 it leaves a fixed non-zero mask with
+		// the suppressed level cleared, so the level has to be tested against
+		// the mask instead of comparing the whole value to zero.
+		if (!(error_reporting() & $code)) {
 			return false;
 		}
 		list($error, $log) = static::mapErrorCode($code);

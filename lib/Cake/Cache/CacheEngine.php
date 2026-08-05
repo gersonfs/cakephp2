@@ -57,7 +57,12 @@ abstract class CacheEngine {
 			$this->_groupPrefix = str_repeat('%s_', count($this->settings['groups']));
 		}
 		if (!is_numeric($this->settings['duration'])) {
-			$this->settings['duration'] = strtotime($this->settings['duration']) - time();
+			// Both sides must be read from the same instant: with two separate
+			// clock reads a second boundary falling between them yields a
+			// duration one second shorter than configured, which for short
+			// durations is a large relative error and expires entries early.
+			$now = time();
+			$this->settings['duration'] = strtotime($this->settings['duration'], $now) - $now;
 		}
 		return true;
 	}

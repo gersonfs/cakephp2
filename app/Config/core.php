@@ -314,18 +314,7 @@
  * 		'prefix' => Inflector::slug(APP_DIR) . '_', //[optional]  prefix every cache file with this string
  *	));
  *
- * Xcache (http://xcache.lighttpd.net/)
- *
- * 	 Cache::config('default', array(
- *		'engine' => 'Xcache', //[required]
- *		'duration' => 3600, //[optional]
- *		'probability' => 100, //[optional]
- *		'prefix' => Inflector::slug(APP_DIR) . '_', //[optional] prefix every cache file with this string
- *		'user' => 'user', //user from xcache.admin.user settings
- *		'password' => 'password', //plaintext password (xcache.admin.pass)
- *	));
- *
- * Memcached (http://www.danga.com/memcached/)
+ * Memcached (https://memcached.org/)
  *
  * Uses the memcached extension. See http://php.net/memcached
  *
@@ -341,13 +330,15 @@
  * 		'compress' => false, // [optional] compress data in Memcached (slower, but uses less memory)
  *	));
  *
- *  Wincache (http://php.net/wincache)
+ * Redis (https://redis.io/)
  *
  * 	 Cache::config('default', array(
- *		'engine' => 'Wincache', //[required]
+ *		'engine' => 'Redis', //[required]
  *		'duration' => 3600, //[optional]
  *		'probability' => 100, //[optional]
  *		'prefix' => Inflector::slug(APP_DIR) . '_', //[optional]  prefix every cache file with this string
+ *		'server' => '127.0.0.1', //[optional]
+ *		'port' => 6379, //[optional]
  *	));
  */
 
@@ -369,7 +360,7 @@ if (Configure::read('debug') > 0) {
 	$duration = '+10 seconds';
 }
 
-// Prefix each application on the same server with a different string, to avoid Memcache and APC conflicts.
+// Prefix each application on the same server with a different string, to avoid Memcached and APC conflicts.
 $prefix = 'myapp_';
 
 /**

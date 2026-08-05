@@ -260,7 +260,7 @@ class FileEngine extends CacheEngine {
  * @return void
  */
 	protected function _clearDirectory($path, $now, $threshold) {
-		$prefixLength = strlen($this->settings['prefix']);
+		$prefixLength = strlen((string)$this->settings['prefix']);
 
 		if (!is_dir($path)) {
 			return;
@@ -424,7 +424,7 @@ class FileEngine extends CacheEngine {
 		foreach ($contents as $object) {
 			$containsGroup = strpos($object->getPathName(), DS . $group . DS) !== false;
 			$hasPrefix = true;
-			if (strlen($this->settings['prefix']) !== 0) {
+			if (strlen((string)$this->settings['prefix']) !== 0) {
 				$hasPrefix = strpos($object->getBaseName(), $this->settings['prefix']) === 0;
 			}
 			if ($object->isFile() && $containsGroup && $hasPrefix) {

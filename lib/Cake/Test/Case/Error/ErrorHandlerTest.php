@@ -48,12 +48,20 @@ class ErrorHandlerTest extends CakeTestCase {
 	protected $_restoreError = false;
 
 /**
+ * error_reporting() level in place before a test widened it.
+ *
+ * @var int
+ */
+	protected $_errorReporting = null;
+
+/**
  * setup create a request object to get out of router later.
  *
  * @return void
  */
 	public function setUp(): void {
 		parent::setUp();
+		$this->_errorReporting = error_reporting();
 		App::build(array(
 			'View' => array(
 				CAKE . 'Test' . DS . 'test_app' . DS . 'View' . DS
@@ -81,6 +89,9 @@ class ErrorHandlerTest extends CakeTestCase {
  */
 	public function tearDown(): void {
 		parent::tearDown();
+		if ($this->_errorReporting !== null) {
+			error_reporting($this->_errorReporting);
+		}
 		if ($this->_restoreError) {
 			restore_error_handler();
 		}
@@ -100,6 +111,11 @@ class ErrorHandlerTest extends CakeTestCase {
 	public function testHandleErrorDebugOn() {
 		set_error_handler('ErrorHandler::handleError');
 		$this->_restoreError = true;
+		// ErrorHandler::handleError() honours error_reporting() so that the
+		// `@` operator keeps working. PHPUnit masks E_WARNING/E_NOTICE out of
+		// error_reporting() to handle them itself, so these tests have to widen
+		// it back or the handler correctly stays silent. tearDown() restores it.
+		error_reporting(E_ALL & ~E_DEPRECATED);
 
 		Debugger::getInstance()->output('html');
 
@@ -133,6 +149,11 @@ class ErrorHandlerTest extends CakeTestCase {
 	public function testErrorMapping($error, $expected) {
 		set_error_handler('ErrorHandler::handleError');
 		$this->_restoreError = true;
+		// ErrorHandler::handleError() honours error_reporting() so that the
+		// `@` operator keeps working. PHPUnit masks E_WARNING/E_NOTICE out of
+		// error_reporting() to handle them itself, so these tests have to widen
+		// it back or the handler correctly stays silent. tearDown() restores it.
+		error_reporting(E_ALL & ~E_DEPRECATED);
 
 		Debugger::getInstance()->output('html');
 
@@ -151,6 +172,11 @@ class ErrorHandlerTest extends CakeTestCase {
 	public function testErrorSuppressed() {
 		set_error_handler('ErrorHandler::handleError');
 		$this->_restoreError = true;
+		// ErrorHandler::handleError() honours error_reporting() so that the
+		// `@` operator keeps working. PHPUnit masks E_WARNING/E_NOTICE out of
+		// error_reporting() to handle them itself, so these tests have to widen
+		// it back or the handler correctly stays silent. tearDown() restores it.
+		error_reporting(E_ALL & ~E_DEPRECATED);
 
 		ob_start();
 		//@codingStandardsIgnoreStart
@@ -158,11 +184,7 @@ class ErrorHandlerTest extends CakeTestCase {
 		//@codingStandardsIgnoreEnd
 		$result = ob_get_clean();
 
-		if ($this->isPHP8()) {
-			$this->assertFalse(empty($result));
-		}else{
-			$this->assertTrue(empty($result));
-		}
+		$this->assertTrue(empty($result), 'The @ operator must keep the error handler silent.');
 	}
 
 /**
@@ -180,6 +202,11 @@ class ErrorHandlerTest extends CakeTestCase {
 
 		set_error_handler('ErrorHandler::handleError');
 		$this->_restoreError = true;
+		// ErrorHandler::handleError() honours error_reporting() so that the
+		// `@` operator keeps working. PHPUnit masks E_WARNING/E_NOTICE out of
+		// error_reporting() to handle them itself, so these tests have to widen
+		// it back or the handler correctly stays silent. tearDown() restores it.
+		error_reporting(E_ALL & ~E_DEPRECATED);
 
 		$out .= '';
 
@@ -205,6 +232,11 @@ class ErrorHandlerTest extends CakeTestCase {
 
 		set_error_handler('ErrorHandler::handleError');
 		$this->_restoreError = true;
+		// ErrorHandler::handleError() honours error_reporting() so that the
+		// `@` operator keeps working. PHPUnit masks E_WARNING/E_NOTICE out of
+		// error_reporting() to handle them itself, so these tests have to widen
+		// it back or the handler correctly stays silent. tearDown() restores it.
+		error_reporting(E_ALL & ~E_DEPRECATED);
 
 		$out .= '';
 
@@ -236,6 +268,11 @@ class ErrorHandlerTest extends CakeTestCase {
 
 		set_error_handler('ErrorHandler::handleError');
 		$this->_restoreError = true;
+		// ErrorHandler::handleError() honours error_reporting() so that the
+		// `@` operator keeps working. PHPUnit masks E_WARNING/E_NOTICE out of
+		// error_reporting() to handle them itself, so these tests have to widen
+		// it back or the handler correctly stays silent. tearDown() restores it.
+		error_reporting(E_ALL & ~E_DEPRECATED);
 
 		$out .= '';
 
@@ -262,6 +299,11 @@ class ErrorHandlerTest extends CakeTestCase {
 
 		set_error_handler('ErrorHandler::handleError');
 		$this->_restoreError = true;
+		// ErrorHandler::handleError() honours error_reporting() so that the
+		// `@` operator keeps working. PHPUnit masks E_WARNING/E_NOTICE out of
+		// error_reporting() to handle them itself, so these tests have to widen
+		// it back or the handler correctly stays silent. tearDown() restores it.
+		error_reporting(E_ALL & ~E_DEPRECATED);
 
 		$out .= '';
 
@@ -418,6 +460,9 @@ class ErrorHandlerTest extends CakeTestCase {
  */
 	public function testExceptionRendererNestingDebug() {
 		Configure::write('debug', 2);
+		// handleException() reports renderer failures with E_USER_ERROR, which
+		// PHPUnit masks out of error_reporting(). tearDown() restores it.
+		error_reporting(E_ALL & ~E_DEPRECATED);
 		Configure::write('Exception.renderer', 'FaultyExceptionRenderer');
 
 		$result = false;
@@ -440,6 +485,7 @@ class ErrorHandlerTest extends CakeTestCase {
  */
 	public function testExceptionRendererNestingProduction() {
 		Configure::write('debug', 0);
+		error_reporting(E_ALL & ~E_DEPRECATED);
 		Configure::write('Exception.renderer', 'FaultyExceptionRenderer');
 
 		$result = false;

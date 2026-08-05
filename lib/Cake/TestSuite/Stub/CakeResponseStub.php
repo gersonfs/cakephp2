@@ -108,4 +108,34 @@ class CakeResponseStub extends CakeResponse {
 		});
 	}
 
+	public function body($content = null) {
+		return $this->_cakeResolve('body', array($content), function () use ($content) {
+			return parent::body($content);
+		});
+	}
+
+	public function disableCache() {
+		return $this->_cakeResolve('disableCache', array(), function () {
+			return parent::disableCache();
+		});
+	}
+
+	public function cache($since, $time = '+1 day') {
+		return $this->_cakeResolve('cache', array($since, $time), function () use ($since, $time) {
+			return parent::cache($since, $time);
+		});
+	}
+
+	public function compress() {
+		return $this->_cakeResolve('compress', array(), function () {
+			return parent::compress();
+		});
+	}
+
+	public function file($path, $options = array()) {
+		return $this->_cakeResolve('file', array($path, $options), function () use ($path, $options) {
+			return parent::file($path, $options);
+		});
+	}
+
 }

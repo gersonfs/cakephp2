@@ -282,21 +282,10 @@
  * 		'prefix' => Inflector::slug(APP_DIR) . '_', //[optional]  prefix every cache file with this string
  *	));
  *
- * Xcache (https://xcache.lighttpd.net/)
+ * Memcached (https://memcached.org/)
  *
  * 	 Cache::config('default', array(
- *		'engine' => 'Xcache', //[required]
- *		'duration' => 3600, //[optional]
- *		'probability' => 100, //[optional]
- *		'prefix' => Inflector::slug(APP_DIR) . '_', //[optional] prefix every cache file with this string
- *		'user' => 'user', //user from xcache.admin.user settings
- *		'password' => 'password', //plaintext password (xcache.admin.pass)
- *	));
- *
- * Memcache (http://www.danga.com/memcached/)
- *
- * 	 Cache::config('default', array(
- *		'engine' => 'Memcache', //[required]
+ *		'engine' => 'Memcached', //[required]
  *		'duration' => 3600, //[optional]
  *		'probability' => 100, //[optional]
  * 		'prefix' => Inflector::slug(APP_DIR) . '_', //[optional]  prefix every cache file with this string
@@ -304,16 +293,18 @@
  * 			'127.0.0.1:11211' // localhost, default port 11211
  * 		), //[optional]
  * 		'persistent' => true, // [optional] set this to false for non-persistent connections
- * 		'compress' => false, // [optional] compress data in Memcache (slower, but uses less memory)
+ * 		'compress' => false, // [optional] compress data in Memcached (slower, but uses less memory)
  *	));
  *
- *  Wincache (https://secure.php.net/wincache)
+ * Redis (https://redis.io/)
  *
  * 	 Cache::config('default', array(
- *		'engine' => 'Wincache', //[required]
+ *		'engine' => 'Redis', //[required]
  *		'duration' => 3600, //[optional]
  *		'probability' => 100, //[optional]
  *		'prefix' => Inflector::slug(APP_DIR) . '_', //[optional]  prefix every cache file with this string
+ *		'server' => '127.0.0.1', //[optional]
+ *		'port' => 6379, //[optional]
  *	));
  */
 
@@ -335,7 +326,7 @@ if (Configure::read('debug') > 0) {
 	$duration = '+10 seconds';
 }
 
-// Prefix each application on the same server with a different string, to avoid Memcache and APC conflicts.
+// Prefix each application on the same server with a different string, to avoid Memcached and APC conflicts.
 $prefix = 'myapp_';
 
 /**

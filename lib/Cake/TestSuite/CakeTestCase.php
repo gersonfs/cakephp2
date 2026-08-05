@@ -55,6 +55,15 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	public $autoFixtures = true;
 
 /**
+ * Stub objects built by _buildMock() for classes that cannot be doubled by
+ * PHPUnit. They are not registered with PHPUnit, so their expectations have to
+ * be verified explicitly — see assertPostConditions().
+ *
+ * @var array
+ */
+	protected $_cakeStubObjects = array();
+
+/**
  * Control table create/drops on each test method.
  *
  * Set this to false to avoid tables to be dropped if they already exist
@@ -508,6 +517,23 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	}*/
 
 // @codingStandardsIgnoreEnd
+
+/**
+ * Verifies the expectations of stub objects built by _buildMock().
+ *
+ * Those stubs are hand written doubles for classes PHPUnit cannot double, so
+ * they are invisible to verifyMockObjects(). PHPUnit only runs this hook when
+ * the test body itself succeeded, which is the same point at which it verifies
+ * its own mocks.
+ *
+ * @return void
+ */
+	protected function assertPostConditions(): void {
+		parent::assertPostConditions();
+		foreach ($this->_cakeStubObjects as $stub) {
+			$stub->_cakeVerify();
+		}
+	}
 
 /**
  * Chooses which fixtures to load for a given test
@@ -1076,12 +1102,19 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 			return $dynClass;
 		}
 		$baseRef = new ReflectionClass($baseStub);
+		// The trait's own methods are declared in the base stub class too, but
+		// they must not be mirrored: the generated override would delegate to a
+		// parent that does not have them.
+		$traitMethods = array();
+		foreach ((new ReflectionClass('CakeStubTrait'))->getMethods() as $traitMethod) {
+			$traitMethods[] = $traitMethod->getName();
+		}
 		$bodyParts = array("\tuse CakeStubTrait;");
 		foreach ($baseRef->getMethods() as $m) {
 			if ($m->getDeclaringClass()->getName() !== $baseStub) continue;
 			if ($m->isStatic() || $m->isAbstract()) continue;
 			$name = $m->getName();
-			if (in_array($name, array('expects', '_cakeSetStub', '_cakeSetSeqStub', '_cakeResolve', '_cakeSetMockedMethods'), true)) continue;
+			if (in_array($name, $traitMethods, true)) continue;
 			$params = array();
 			$callArgs = array();
 			foreach ($m->getParameters() as $p) {
@@ -1153,6 +1186,7 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 			if (is_array($methods)) {
 				$stub->_cakeSetMockedMethods($methods);
 			}
+			$this->_cakeStubObjects[] = $stub;
 			return $stub;
 		}
 		if (!empty($methods) && (class_exists($originalClassName) || interface_exists($originalClassName))) {
@@ -1314,6 +1348,11 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 			}
 
 			public function verify(): void {
+				if ($this->_currentIndex < $this->_index) {
+					throw new \PHPUnit\Framework\ExpectationFailedException(
+						'The expected invocation at index ' . $this->_index . ' was never matched.'
+					);
+				}
 			}
 		};
 	}

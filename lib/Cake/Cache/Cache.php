@@ -90,11 +90,10 @@ class Cache {
  *
  * - `FileEngine` - Uses simple files to store content. Poor performance, but good for
  *    storing large objects, or things that are not IO sensitive.
- * - `ApcEngine` - Uses the APC object cache, one of the fastest caching engines.
- * - `MemcacheEngine` - Uses the PECL::Memcache extension and Memcached for storage.
- *   Fast reads/writes, and benefits from memcache being distributed.
- * - `XcacheEngine` - Uses the Xcache extension, an alternative to APC.
- * - `WincacheEngine` - Uses Windows Cache Extension for PHP. Supports wincache 1.1.0 and higher.
+ * - `ApcEngine` - Uses the APCu object cache, one of the fastest caching engines.
+ * - `MemcachedEngine` - Uses the PECL::Memcached extension for storage.
+ *   Fast reads/writes, and benefits from memcached being distributed.
+ * - `RedisEngine` - Uses the PECL::Redis extension for storage.
  *
  * The following keys are used in core cache engines:
  *
@@ -105,13 +104,12 @@ class Cache {
  *    with either another cache config or another application.
  * - `probability` Probability of hitting a cache gc cleanup. Setting to 0 will disable
  *    cache::gc from ever being called automatically.
- * - `servers' Used by memcache. Give the address of the memcached servers to use.
- * - `compress` Used by memcache. Enables memcache's compressed format.
+ * - `servers' Used by memcached. Give the address of the memcached servers to use.
+ * - `compress` Used by memcached. Enables memcached's compressed format.
  * - `serialize` Used by FileCache. Should cache objects be serialized first.
  * - `path` Used by FileCache. Path to where cachefiles should be saved.
  * - `lock` Used by FileCache. Should files be locked before writing to them?
- * - `user` Used by Xcache. Username for XCache
- * - `password` Used by Xcache/Redis. Password for XCache/Redis
+ * - `password` Used by Redis. Password for Redis
  *
  * @param string $name Name of the configuration
  * @param array $settings Optional associative array of settings passed to the engine
