@@ -211,6 +211,19 @@ class Cache {
 			return false;
 		}
 		unset(static::$_config[$name], static::$_engines[$name]);
+
+		// The group index has to lose the configuration too, otherwise
+		// groupConfigs() keeps reporting groups that point at a configuration
+		// which no longer exists.
+		foreach (static::$_groups as $group => $configs) {
+			$configs = array_values(array_diff($configs, array($name)));
+			if ($configs) {
+				static::$_groups[$group] = $configs;
+			} else {
+				unset(static::$_groups[$group]);
+			}
+		}
+
 		return true;
 	}
 

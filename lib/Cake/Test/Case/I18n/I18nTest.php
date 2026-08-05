@@ -49,7 +49,11 @@ class I18nTest extends CakeTestCase {
 		Configure::delete('Config.language');
 		I18n::clear();
 
-		Cache::delete('object_map', '_cake_core_');
+		// I18n caches each loaded domain in the persistent _cake_core_ cache and
+		// I18n::clear() only empties the in-memory copy, so a domain loaded by an
+		// earlier test before the plugin path existed would keep being served
+		// from that cache, without the plugin translations.
+		Cache::clear(false, '_cake_core_');
 		App::build(array(
 			'Locale' => array(CAKE . 'Test' . DS . 'test_app' . DS . 'Locale' . DS),
 			'Plugin' => array(CAKE . 'Test' . DS . 'test_app' . DS . 'Plugin' . DS)
@@ -67,7 +71,7 @@ class I18nTest extends CakeTestCase {
 
 		Configure::delete('Config.language');
 		I18n::clear();
-		Cache::delete('object_map', '_cake_core_');
+		Cache::clear(false, '_cake_core_');
 		CakeSession::destroy();
 		App::build();
 		CakePlugin::unload();

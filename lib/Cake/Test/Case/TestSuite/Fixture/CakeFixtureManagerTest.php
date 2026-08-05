@@ -44,6 +44,12 @@ class CakeFixtureManagerTest extends CakeTestCase {
  */
 	public function tearDown(): void {
 		parent::tearDown();
+		// These tests overwrite the manager's $_loaded via reflection. With the
+		// cross-instance cache enabled that property is bound by reference to
+		// the static cache, so writing to it replaces the shared map with mock
+		// fixtures and every later test inherits them — the real tables then
+		// never get truncated and inserts collide.
+		CakeFixtureManager::resetCache();
 		unset($this->fixtureManager);
 	}
 

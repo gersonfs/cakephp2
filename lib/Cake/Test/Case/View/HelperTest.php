@@ -219,6 +219,11 @@ class HelperTest extends CakeTestCase {
 		App::build(array(
 			'Plugin' => array(CAKE . 'Test' . DS . 'test_app' . DS . 'Plugin' . DS),
 		));
+		// TestHelper declares TestPlugin.OtherHelper. Registering the path is
+		// not enough: the plugin has to be loaded, and tearDown() unloads every
+		// plugin, so relying on another test having loaded it makes this class
+		// depend on execution order.
+		CakePlugin::load('TestPlugin');
 	}
 
 /**

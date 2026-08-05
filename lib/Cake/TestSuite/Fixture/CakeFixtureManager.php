@@ -261,16 +261,18 @@ class CakeFixtureManager {
 		}
 		if (!empty($fixture->created) && in_array($db->configKeyName, $fixture->created)) {
 			if (self::$cacheInstances) {
-				// Static cache survived across test classes; verify the table
-				// really exists before truncating to avoid PDOException when
-				// another test class dropped it.
-				$sources = (array)$db->listSources();
-				$table = $db->config['prefix'] . $fixture->table;
-				if (in_array($table, $sources)) {
+				// The static cache survived across test classes, so the table
+				// may have been dropped meanwhile. listSources() is itself
+				// cached per datasource and can be stale, which would leave the
+				// table untruncated and make the following insert collide with
+				// the rows already there; truncating and treating a failure as
+				// "table is gone" does not depend on that cache.
+				try {
 					$fixture->truncate($db);
 					return;
+				} catch (Exception $e) {
+					$fixture->created = array_diff($fixture->created, array($db->configKeyName));
 				}
-				$fixture->created = array_diff($fixture->created, array($db->configKeyName));
 			} else {
 				$fixture->truncate($db);
 				return;

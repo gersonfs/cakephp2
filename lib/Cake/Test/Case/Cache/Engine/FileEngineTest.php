@@ -41,6 +41,10 @@ class FileEngineTest extends CakeTestCase {
 		parent::setUp();
 		Configure::write('Cache.disable', false);
 		Cache::config('file_test', array('engine' => 'File', 'path' => CACHE));
+		// Cache configurations are global. This class repoints 'sessions' at a
+		// different path, so the original has to be put back or CacheTest reads
+		// the wrong settings.
+		$this->_sessionsConfig = Cache::config('sessions');
 	}
 
 /**
@@ -55,6 +59,17 @@ class FileEngineTest extends CakeTestCase {
 		Cache::drop('file_groups');
 		Cache::drop('file_groups2');
 		Cache::drop('file_groups3');
+		// 'repeat' declares a 'users' group; left configured it shows up in
+		// Cache::groupConfigs() for every later test.
+		Cache::drop('repeat');
+		Cache::drop('autocreate');
+		Cache::drop('mask_test');
+		Cache::drop('windows_test');
+		if (!empty($this->_sessionsConfig['settings'])) {
+			Cache::config('sessions', $this->_sessionsConfig['settings']);
+		} else {
+			Cache::drop('sessions');
+		}
 	}
 
 /**
