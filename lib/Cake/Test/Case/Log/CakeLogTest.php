@@ -40,6 +40,34 @@ class CakeLogTest extends CakeTestCase {
 	}
 
 /**
+ * Restores the streams the application bootstrap sets up.
+ *
+ * Clearing only in setUp() left the last test's streams active for the rest of
+ * the run, so a later test logging to the same file got its message written
+ * twice. Dropping them without restoring the defaults is not enough either:
+ * CakeLog::write() does not auto-configure, so every later log() call would
+ * silently return false.
+ *
+ * @return void
+ */
+	public function tearDown(): void {
+		parent::tearDown();
+		foreach (CakeLog::configured() as $stream) {
+			CakeLog::drop($stream);
+		}
+		CakeLog::config('debug', array(
+			'engine' => 'File',
+			'types' => array('notice', 'info', 'debug'),
+			'file' => 'debug',
+		));
+		CakeLog::config('error', array(
+			'engine' => 'File',
+			'types' => array('warning', 'error', 'critical', 'alert', 'emergency'),
+			'file' => 'error',
+		));
+	}
+
+/**
  * test importing loggers from app/libs and plugins.
  *
  * @return void

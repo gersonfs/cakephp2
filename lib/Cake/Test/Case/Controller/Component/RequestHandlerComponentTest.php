@@ -108,6 +108,7 @@ class RequestHandlerComponentTest extends CakeTestCase {
  */
 	public function setUp(): void {
 		parent::setUp();
+		$this->_serverAccept = isset($_SERVER['HTTP_ACCEPT']) ? $_SERVER['HTTP_ACCEPT'] : null;
 		$this->_init();
 	}
 
@@ -139,6 +140,14 @@ class RequestHandlerComponentTest extends CakeTestCase {
 			$_SERVER['HTTP_IF_NONE_MATCH'],
 			$_SERVER['HTTP_IF_MODIFIED_SINCE']
 		);
+		// 20 tests in this class overwrite HTTP_ACCEPT. Leaving it behind makes
+		// CakeRequest::is('json') true for every later test; AuthComponent then
+		// answers 403 and calls Component::_stop(), an exit() that ends the run.
+		if ($this->_serverAccept === null) {
+			unset($_SERVER['HTTP_ACCEPT']);
+		} else {
+			$_SERVER['HTTP_ACCEPT'] = $this->_serverAccept;
+		}
 		if (!headers_sent()) {
 			header('Content-type: text/html'); //reset content type.
 		}

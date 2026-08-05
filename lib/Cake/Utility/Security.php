@@ -224,7 +224,7 @@ class Security {
 		}
 
 		$seed = Configure::read('Security.cipherSeed');
-		srand((int)fmod((float)$seed, PHP_INT_MAX));
+		srand(static::_seedToInt($seed));
 		$out = '';
 		$keyLength = strlen((string)$key);
 		for ($i = 0, $textLength = strlen((string)$text); $i < $textLength; $i++) {
@@ -237,6 +237,38 @@ class Security {
 		}
 		srand();
 		return $out;
+	}
+
+/**
+ * Converts Security.cipherSeed into the srand() seed, reproducing exactly what
+ * a plain (int)(float) cast produced before PHP 8.1 made out-of-range float to
+ * int conversions undefined (and PHP 8.5 started warning about them).
+ *
+ * Reproducing the old value matters: the seed drives the keystream of
+ * Security::cipher(), so any change would make data encrypted by an earlier
+ * version decrypt to garbage. Seeds are commonly long digit strings whose float
+ * value falls outside the integer range, which is precisely the case that used
+ * to wrap.
+ *
+ * @param string|int|float $seed Configured cipher seed.
+ * @return int
+ */
+	protected static function _seedToInt($seed) {
+		$float = (float)$seed;
+		if (!is_finite($float)) {
+			return 0;
+		}
+		if ($float >= -9223372036854775808.0 && $float < 9223372036854775808.0) {
+			return (int)$float;
+		}
+		$wrapped = fmod($float, 18446744073709551616.0);
+		if ($wrapped < 0) {
+			$wrapped += 18446744073709551616.0;
+		}
+		if ($wrapped >= 9223372036854775808.0) {
+			$wrapped -= 18446744073709551616.0;
+		}
+		return (int)$wrapped;
 	}
 
 /**

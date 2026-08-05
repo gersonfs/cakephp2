@@ -54,6 +54,10 @@ class DebuggerTest extends CakeTestCase {
 	public function tearDown(): void {
 		parent::tearDown();
 		Configure::write('log', true);
+		// testLog()/testLogDepth() configure an extra file stream. Leaving it
+		// behind gives later tests two streams pointing at the same log file,
+		// so every message is written twice.
+		CakeLog::drop('file');
 		if ($this->_restoreError) {
 			restore_error_handler();
 		}

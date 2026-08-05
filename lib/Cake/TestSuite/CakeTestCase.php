@@ -365,6 +365,8 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	protected function setUp() : void {
 		parent::setUp();
 
+		static::time(true);
+
 		if (!isset($this->fixtureManager)) {
 			$this->fixtureManager = new CakeFixtureManager();
 			$this->fixtureManager->fixturize($this);
@@ -461,13 +463,38 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	}
 
 /**
- * Returns the current date/time formatted with the given format.
+ * Timestamp frozen for the duration of one test.
+ *
+ * CakeTestModel::save() installs date() as the formatter for datetime columns,
+ * so the value written to the database and the value a test compares it against
+ * must come from the same instant. Reading the clock twice makes every such
+ * comparison fail whenever a second boundary falls between the write and the
+ * assertion.
+ *
+ * The freeze is per test rather than per run (which is what the deleted
+ * CakeTestSuiteDispatcher did): it closes the same race, while keeping the value
+ * within milliseconds of the real clock, so comparisons against rows written by
+ * models that do not use the formatter stay valid.
+ *
+ * @param bool $reset Whether to re-read the clock.
+ * @return int
+ */
+	public static function time($reset = false) {
+		static $now = null;
+		if ($reset || $now === null) {
+			$now = time();
+		}
+		return $now;
+	}
+
+/**
+ * Returns the date/time frozen for this test, formatted with the given format.
  *
  * @param string $format format to be used.
  * @return string
  */
 	public static function date($format = 'Y-m-d H:i:s') {
-		return date($format);
+		return date($format, static::time());
 	}
 
 /**

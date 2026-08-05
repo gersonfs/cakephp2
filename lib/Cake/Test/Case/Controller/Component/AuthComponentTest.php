@@ -177,6 +177,26 @@ class AuthTestController extends Controller {
 	public $testUrl = null;
 
 /**
+ * Records that the controller wanted to halt, instead of exiting.
+ *
+ * @var bool
+ */
+	public $testStop = false;
+
+/**
+ * CakeObject::_stop() calls exit(). A redirect issued by AuthComponent while
+ * the user is unauthenticated would therefore terminate the whole PHPUnit
+ * process, taking every remaining test and the result output with it. Record
+ * the attempt instead, so such a case surfaces as an ordinary test failure.
+ *
+ * @param int|string $status See CakeObject::_stop()
+ * @return void
+ */
+	protected function _stop($status = 0) {
+		$this->testStop = true;
+	}
+
+/**
  * construct method
  */
 	public function __construct($request, $response) {
@@ -415,6 +435,12 @@ class AuthComponentTest extends CakeTestCase {
  */
 	public function tearDown(): void {
 		parent::tearDown();
+
+		// The testAjaxLogin* tests set this and unset it inline at the end of
+		// the test body, so a failing assertion leaks it. AuthComponent then
+		// takes its ajax branch for every later test, which ends in
+		// Component::_stop() — an exit() that kills the whole run.
+		unset($_SERVER['HTTP_X_REQUESTED_WITH']);
 
 		TestAuthComponent::clearUser();
 		$this->Auth->Session->delete('Auth');

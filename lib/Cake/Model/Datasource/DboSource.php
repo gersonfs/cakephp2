@@ -3082,17 +3082,50 @@ class DboSource extends DataSource {
  * @return string
  */
 	protected static function _intString($value) {
+		return sprintf('%u', static::_toInt($value));
+	}
+
+/**
+ * Converts a value to an integer the way a plain (int) cast used to, without
+ * the "float not representable as int" deprecation PHP 8.1+ raises for values
+ * outside the integer range.
+ *
+ * Integers and integral strings are converted directly, so no precision is lost
+ * on values near PHP_INT_MAX; only genuine floats go through the wrap.
+ *
+ * @param mixed $value Value to convert.
+ * @return int
+ */
+	protected static function _toInt($value) {
+		if (is_int($value)) {
+			return $value;
+		}
+		if (is_bool($value)) {
+			return (int)$value;
+		}
 		if (!is_numeric($value)) {
-			return '0';
+			return 0;
+		}
+		if (is_string($value) && preg_match('/^[+-]?[0-9]+$/', trim($value))) {
+			return (int)$value;
 		}
 		$float = (float)$value;
-		if ($float < 0) {
-			return '0';
+		if (!is_finite($float)) {
+			return 0;
 		}
-		if ($float > PHP_INT_MAX) {
-			return (string)PHP_INT_MAX;
+		if ($float >= -9223372036854775808.0 && $float < 9223372036854775808.0) {
+			return (int)$float;
 		}
-		return (string)(int)$float;
+		// Two's complement wrap over 2^64, which is what the cast produced
+		// before PHP made out-of-range conversions undefined.
+		$wrapped = fmod($float, 18446744073709551616.0);
+		if ($wrapped < 0) {
+			$wrapped += 18446744073709551616.0;
+		}
+		if ($wrapped >= 9223372036854775808.0) {
+			$wrapped -= 18446744073709551616.0;
+		}
+		return (int)$wrapped;
 	}
 
 /**

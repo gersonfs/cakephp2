@@ -128,10 +128,13 @@ class CookieComponent extends Component {
 /**
  * Type of encryption to use.
  *
- * Currently two methods are available: cipher and rijndael
+ * Currently two methods are available: cipher and aes.
  * Defaults to Security::cipher(). Cipher is horribly insecure and only
  * the default because of backwards compatibility. In new applications you should
- * always change this to 'aes' or 'rijndael'.
+ * always change this to 'aes'.
+ *
+ * The 'rijndael' method was dropped: it relied on Security::rijndael(), which
+ * was backed by ext/mcrypt and no longer exists on the supported PHP range.
  *
  * @var string
  */
@@ -343,11 +346,10 @@ class CookieComponent extends Component {
 	public function type($type = 'cipher') {
 		$availableTypes = array(
 			'cipher',
-			'rijndael',
 			'aes'
 		);
 		if (!in_array($type, $availableTypes)) {
-			trigger_error(__d('cake_dev', 'You must use cipher, rijndael or aes for cookie encryption type'), E_USER_WARNING);
+			trigger_error(__d('cake_dev', 'You must use cipher or aes for cookie encryption type'), E_USER_WARNING);
 			$type = 'cipher';
 		}
 		$this->_type = $type;
@@ -439,9 +441,6 @@ class CookieComponent extends Component {
 			return $value;
 		}
 		$prefix = "Q2FrZQ==.";
-		if ($this->_type === 'rijndael') {
-			$cipher = Security::rijndael($value, $this->key, 'encrypt');
-		}
 		if ($this->_type === 'cipher') {
 			$cipher = Security::cipher($value, $this->key);
 		}
@@ -486,9 +485,6 @@ class CookieComponent extends Component {
 			return $this->_explode($value);
 		}
 		$value = base64_decode(substr($value, strlen($prefix)));
-		if ($this->_type === 'rijndael') {
-			$plain = Security::rijndael($value, $this->key, 'decrypt');
-		}
 		if ($this->_type === 'cipher') {
 			$plain = Security::cipher($value, $this->key);
 		}
