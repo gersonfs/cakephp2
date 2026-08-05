@@ -28,12 +28,12 @@ App::uses('CacheEngine', 'Cache');
  *
  * ```
  *	Cache::config('shared', array(
- *		'engine' => 'Apc',
+ *		'engine' => 'File',
  *		'prefix' => 'my_app_'
  *  ));
  * ```
  *
- * This would configure an APC cache engine to the 'shared' alias. You could then read and write
+ * This would configure a File cache engine to the 'shared' alias. You could then read and write
  * to that cache alias by using it for the `$config` parameter in the various Cache methods. In
  * general all Cache operations are supported by all cache engines. However, Cache::increment() and
  * Cache::decrement() are not supported by File caching.
@@ -86,11 +86,10 @@ class Cache {
  *
  * `Cache::config('default');`
  *
- * There are 5 built-in caching engines:
+ * There are 3 built-in caching engines:
  *
  * - `FileEngine` - Uses simple files to store content. Poor performance, but good for
  *    storing large objects, or things that are not IO sensitive.
- * - `ApcEngine` - Uses the APCu object cache, one of the fastest caching engines.
  * - `MemcachedEngine` - Uses the PECL::Memcached extension for storage.
  *   Fast reads/writes, and benefits from memcached being distributed.
  * - `RedisEngine` - Uses the PECL::Redis extension for storage.

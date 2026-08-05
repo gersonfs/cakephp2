@@ -305,15 +305,6 @@
  * 		'mask' => 0664, //[optional]
  *	));
  *
- * APC (http://pecl.php.net/package/APC)
- *
- * 	 Cache::config('default', array(
- *		'engine' => 'Apc', //[required]
- *		'duration' => 3600, //[optional]
- *		'probability' => 100, //[optional]
- * 		'prefix' => Inflector::slug(APP_DIR) . '_', //[optional]  prefix every cache file with this string
- *	));
- *
  * Memcached (https://memcached.org/)
  *
  * Uses the memcached extension. See http://php.net/memcached
@@ -360,7 +351,7 @@ if (Configure::read('debug') > 0) {
 	$duration = '+10 seconds';
 }
 
-// Prefix each application on the same server with a different string, to avoid Memcached and APC conflicts.
+// Prefix each application on the same server with a different string, to avoid Memcached conflicts.
 $prefix = 'myapp_';
 
 /**
