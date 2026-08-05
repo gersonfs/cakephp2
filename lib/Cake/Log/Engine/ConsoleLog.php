@@ -48,18 +48,11 @@ class ConsoleLog extends BaseLog {
  */
 	public function __construct($config = array()) {
 		parent::__construct($config);
-		if ((DS === '\\' && !(bool)env('ANSICON') && env('ConEmuANSI') !== 'ON') ||
-			(function_exists('posix_isatty') && defined('STDERR') && !posix_isatty(STDERR))
-		) {
-			$outputAs = ConsoleOutput::PLAIN;
-		} else {
-			$outputAs = ConsoleOutput::COLOR;
-		}
 		$config = Hash::merge(array(
 			'stream' => 'php://stderr',
 			'types' => null,
 			'scopes' => array(),
-			'outputAs' => $outputAs,
+			'outputAs' => null,
 			), $this->_config);
 		$config = $this->config($config);
 		if ($config['stream'] instanceof ConsoleOutput) {
@@ -69,7 +62,45 @@ class ConsoleLog extends BaseLog {
 		} else {
 			throw new CakeLogException('`stream` not a ConsoleOutput nor string');
 		}
+		if ($config['outputAs'] === null) {
+			$config['outputAs'] = static::_defaultOutputAs($config['stream']);
+			$this->_config['outputAs'] = $config['outputAs'];
+		}
 		$this->_output->outputAs($config['outputAs']);
+	}
+
+/**
+ * Decides whether output should be colourised.
+ *
+ * The check has to look at the stream that was actually configured: testing
+ * STDERR unconditionally means a configuration such as
+ * `'stream' => LOGS . 'cli.log'` gets ANSI escape sequences written into the
+ * log file whenever the process happens to run on a terminal.
+ *
+ * @param string|ConsoleOutput $stream The configured stream.
+ * @return string One of the ConsoleOutput output modes.
+ */
+	protected static function _defaultOutputAs($stream) {
+		$consoleStreams = array('php://stderr', 'php://stdout', 'php://output');
+		if (!is_string($stream) || !in_array($stream, $consoleStreams, true)) {
+			return ConsoleOutput::PLAIN;
+		}
+		if (DS === '\\' && !(bool)env('ANSICON') && env('ConEmuANSI') !== 'ON') {
+			return ConsoleOutput::PLAIN;
+		}
+		if (!function_exists('posix_isatty')) {
+			return ConsoleOutput::PLAIN;
+		}
+		$handle = null;
+		if ($stream === 'php://stdout' && defined('STDOUT')) {
+			$handle = STDOUT;
+		} elseif (defined('STDERR')) {
+			$handle = STDERR;
+		}
+		if ($handle === null || !posix_isatty($handle)) {
+			return ConsoleOutput::PLAIN;
+		}
+		return ConsoleOutput::COLOR;
 	}
 
 /**

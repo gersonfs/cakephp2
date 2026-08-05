@@ -584,7 +584,16 @@ class CakeSession {
 			}
 		}
 		if (!empty($sessionConfig['handler']) && !isset($sessionConfig['handler']['engine'])) {
-			call_user_func_array('session_set_save_handler', $sessionConfig['handler']);
+			// Passing the six callbacks separately is deprecated as of PHP 8.4.
+			// Wrapping them in a SessionHandlerInterface keeps the documented
+			// configuration working on the supported PHP range.
+			$callbacks = array_values($sessionConfig['handler']);
+			if (count($callbacks) >= 6) {
+				App::uses('CakeSessionHandlerCallbacks', 'Model/Datasource/Session');
+				session_set_save_handler(new CakeSessionHandlerCallbacks($callbacks), false);
+			} else {
+				call_user_func_array('session_set_save_handler', $sessionConfig['handler']);
+			}
 		}
 		if (!empty($sessionConfig['handler']['engine']) && !headers_sent()) {
 			$handler = static::_getHandler($sessionConfig['handler']['engine']);

@@ -97,17 +97,6 @@ class BasicAuthenticate extends BaseAuthenticate {
 		return $this->_findUser($username, $pass);
 	}
 
-	private function isTesteFalha(): bool
-	{
-		foreach(debug_backtrace() as $data) {
-			if($data['function'] == 'testStatelessFollowedByStatefulAuth') {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 /**
  * Handles an unauthenticated access attempt by sending appropriate login headers
  *

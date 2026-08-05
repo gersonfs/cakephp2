@@ -95,7 +95,11 @@ class ConnectionManager {
 		$conn = static::$_connectionsEnum[$name];
 		$class = $conn['classname'];
 
-		if (!class_exists($class) && strpos((string)App::location($class), 'Datasource') === false) {
+		// loadDataSource() has already made sure the class exists, so testing
+		// that again can never fail. What actually matters is that it really is
+		// a datasource: without this any autoloadable class was accepted and
+		// blew up later inside its own constructor.
+		if (!is_subclass_of($class, 'DataSource')) {
 			throw new MissingDatasourceException(array(
 				'class' => $class,
 				'plugin' => null,

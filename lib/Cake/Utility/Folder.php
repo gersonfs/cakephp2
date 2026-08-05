@@ -579,13 +579,21 @@ class Folder {
 		if ($this->create($nextPathname, $mode)) {
 			if (!file_exists($pathname)) {
 				$old = umask(0);
-				if (@mkdir($pathname, $mode)) {
+				//@codingStandardsIgnoreStart
+				$created = @mkdir($pathname, $mode);
+				//@codingStandardsIgnoreEnd
+				if ($created) {
 					umask($old);
 					$this->_messages[] = __d('cake_dev', '%s created', $pathname);
 					return true;
 				}
 				umask($old);
-				$this->_errors[] = __d('cake_dev', '%s NOT created', $pathname);
+				// Keep the suppression - callers rely on create() failing
+				// quietly - but carry the reason the OS gave, which used to be
+				// discarded entirely.
+				$reason = error_get_last();
+				$this->_errors[] = __d('cake_dev', '%s NOT created', $pathname) .
+					(isset($reason['message']) ? ' (' . $reason['message'] . ')' : '');
 				return false;
 			}
 		}

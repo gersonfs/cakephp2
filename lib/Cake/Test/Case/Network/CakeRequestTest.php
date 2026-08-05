@@ -67,6 +67,15 @@ class CakeRequestTest extends CakeTestCase {
 	public function setUp(): void {
 		parent::setUp();
 		$this->_app = Configure::read('App');
+		// This class rewrites $_GET and the path-related $_SERVER entries to
+		// simulate different deployments. They are process globals, so anything
+		// left behind changes how later tests resolve base paths and query
+		// strings.
+		$this->_get = $_GET;
+		$this->_serverPaths = array();
+		foreach (array('SCRIPT_FILENAME', 'DOCUMENT_ROOT', 'SCRIPT_NAME') as $key) {
+			$this->_serverPaths[$key] = isset($_SERVER[$key]) ? $_SERVER[$key] : null;
+		}
 		$this->_case = null;
 		if (isset($_GET['case'])) {
 			$this->_case = $_GET['case'];
@@ -114,6 +123,14 @@ class CakeRequestTest extends CakeTestCase {
 		);
 		$_POST = array();
 		$_FILES = array();
+		$_GET = $this->_get;
+		foreach ($this->_serverPaths as $key => $value) {
+			if ($value === null) {
+				unset($_SERVER[$key]);
+			} else {
+				$_SERVER[$key] = $value;
+			}
+		}
 	}
 
 /**

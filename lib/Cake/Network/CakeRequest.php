@@ -629,11 +629,11 @@ class CakeRequest implements ArrayAccess {
 				return env($detect['env']) == $detect['value'];
 			}
 			if (isset($detect['pattern'])) {
-				return (bool)preg_match($detect['pattern'], env($detect['env']));
+				return (bool)preg_match($detect['pattern'], (string)env($detect['env']));
 			}
 			if (isset($detect['options'])) {
 				$pattern = '/' . implode('|', $detect['options']) . '/i';
-				return (bool)preg_match($pattern, env($detect['env']));
+				return (bool)preg_match($pattern, (string)env($detect['env']));
 			}
 		}
 		return false;

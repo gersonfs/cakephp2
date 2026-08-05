@@ -502,8 +502,10 @@ class CakeSocket {
 		}
 		$enableCryptoResult = false;
 		try {
+			//@codingStandardsIgnoreStart
 			$enableCryptoResult = @stream_socket_enable_crypto($this->connection, $enable,
 				$this->_encryptMethods[$type . '_' . $clientOrServer]);
+			//@codingStandardsIgnoreEnd
 		} catch (Exception $e) {
 			$this->setLastError(null, $e->getMessage());
 			throw new SocketException($e->getMessage());
@@ -512,7 +514,14 @@ class CakeSocket {
 			$this->encrypted = $enable;
 			return true;
 		}
+		// The suppression above keeps handshake failures from surfacing as PHP
+		// warnings, but the OpenSSL reason is the only useful diagnostic here,
+		// so it goes into the exception instead of being dropped.
+		$reason = error_get_last();
 		$errorMessage = __d('cake_dev', 'Unable to perform enableCrypto operation on CakeSocket');
+		if (isset($reason['message'])) {
+			$errorMessage .= ': ' . $reason['message'];
+		}
 		$this->setLastError(null, $errorMessage);
 		throw new SocketException($errorMessage);
 	}

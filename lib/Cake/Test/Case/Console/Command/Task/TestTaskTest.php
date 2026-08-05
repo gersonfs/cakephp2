@@ -193,6 +193,14 @@ class TestTaskTest extends CakeTestCase {
  */
 	public function setUp(): void {
 		parent::setUp();
+		// App::objects() keys its cache by the type string as given, so
+		// 'model' and 'Model' are separate entries in the persistent
+		// object_map. testGetClassName() compares its own App::objects('model')
+		// against the list TestTask builds with App::objects('Model'); if one
+		// of them is served from a map cached under a different set of App
+		// paths, the two disagree.
+		Cache::delete('object_map', '_cake_core_');
+
 		$out = $this->getMock('ConsoleOutput', array(), array(), '', false);
 		$in = $this->getMock('ConsoleInput', array(), array(), '', false);
 
@@ -327,7 +335,11 @@ class TestTaskTest extends CakeTestCase {
  * @return void
  */
 	public function testGetClassName() {
-		$objects = App::objects('model');
+		// TestTask::getClassName() asks App::objects('Model'). App::objects()
+		// keys its cache by the string it receives, so querying 'model' here
+		// can return a different list and make the comparison below depend on
+		// which spelling another test cached first.
+		$objects = App::objects('Model');
 		$this->skipIf(empty($objects), 'No models in app.');
 
 		$this->Task->expects($this->at(0))->method('in')->will($this->returnValue('MyCustomClass'));
@@ -337,7 +349,7 @@ class TestTaskTest extends CakeTestCase {
 		$this->assertEquals('MyCustomClass', $result);
 
 		$result = $this->Task->getClassName('Model');
-		$options = App::objects('model');
+		$options = App::objects('Model');
 		$this->assertEquals($options[0], $result);
 	}
 

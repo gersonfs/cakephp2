@@ -593,10 +593,17 @@ class Debugger {
 				foreach ($filters as $filter => $visibility) {
 					$reflectionProperties = $ref->getProperties($filter);
 					foreach ($reflectionProperties as $reflectionProperty) {
+						$key = $reflectionProperty->name;
+						// Reading a typed property that was never assigned is an
+						// Error, so debug() would blow up on any object holding
+						// one - which is most modern dependencies.
+						if (!$reflectionProperty->isInitialized($var)) {
+							$props[] = sprintf('[%s] %s => uninitialized', $visibility, $key);
+							continue;
+						}
 						$property = $reflectionProperty->getValue($var);
 
 						$value = static::_export($property, $depth - 1, $indent);
-						$key = $reflectionProperty->name;
 						$props[] = sprintf('[%s] %s => %s', $visibility, $key, $value);
 					}
 				}

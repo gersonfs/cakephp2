@@ -479,8 +479,15 @@ class CookieComponent extends Component {
  * @return string|array Decoded value.
  */
 	protected function _decode($value) {
+		if (is_array($value)) {
+			$decoded = array();
+			foreach ($value as $key => $val) {
+				$decoded[$key] = $this->_decode($val);
+			}
+			return $decoded;
+		}
 		$prefix = 'Q2FrZQ==.';
-		$pos = strpos($value, $prefix);
+		$pos = strpos((string)$value, $prefix);
 		if ($pos === false) {
 			return $this->_explode($value);
 		}

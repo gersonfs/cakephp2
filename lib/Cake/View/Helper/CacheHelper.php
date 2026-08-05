@@ -149,7 +149,13 @@ class CacheHelper extends AppHelper {
 			$cacheTime = $cacheAction;
 		}
 
-		if ($cacheTime && ($cacheTime > 0 || (is_string($cacheTime) && strlen($cacheTime)))) {
+		if (is_string($cacheTime) && !is_numeric($cacheTime)) {
+			// Relative expressions have to resolve to a point in the future;
+			// '-1 day' used to pass the non-empty-string check and wrote an
+			// already expired cache file on every request.
+			$cacheTime = strtotime($cacheTime, 0);
+		}
+		if ($cacheTime > 0) {
 			$cached = $this->_parseOutput($out);
 			try {
 				$this->_writeFile($cached, $cacheTime, $useCallbacks);

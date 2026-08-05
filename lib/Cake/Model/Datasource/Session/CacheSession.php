@@ -99,7 +99,11 @@ class CacheSession implements CakeSessionHandlerInterface, \SessionHandlerInterf
  */
 	#[\ReturnTypeWillChange]
 	public function gc($expires = null) {
-		Cache::gc(Configure::read('Session.handler.config'), $expires);
+		// Cache::gc() delegates to the engine; propagate an explicit failure
+		// instead of reporting success unconditionally.
+		if (Cache::gc(Configure::read('Session.handler.config'), $expires) === false) {
+			return false;
+		}
 		return 0;
 	}
 

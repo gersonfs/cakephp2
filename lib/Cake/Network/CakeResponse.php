@@ -1093,7 +1093,7 @@ class CakeResponse {
 	public function compress() {
 		$compressionEnabled = ini_get("zlib.output_compression") !== '1' &&
 			extension_loaded("zlib") &&
-			(strpos(env('HTTP_ACCEPT_ENCODING'), 'gzip') !== false);
+			(strpos((string)env('HTTP_ACCEPT_ENCODING'), 'gzip') !== false);
 		return $compressionEnabled && ob_start('ob_gzhandler');
 	}
 

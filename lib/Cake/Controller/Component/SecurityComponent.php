@@ -870,6 +870,9 @@ class SecurityComponent extends Component {
  * @return string Error message about expected fields
  */
 	protected function _debugExpectedFields($expectedFields = array(), $missingMessage = '') {
+		if (!is_array($expectedFields) && !$expectedFields instanceof Countable) {
+			return null;
+		}
 		if (count($expectedFields) === 0) {
 			return null;
 		}

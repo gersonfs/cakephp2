@@ -3162,10 +3162,12 @@ class FormHelper extends AppHelper {
 			$action = substr($action, 0, $position);
 		}
 
-		// Drop the scheme://host portion, keeping only the path.
-		$position = strpos($action, '://');
-		if ($position !== false) {
-			$slash = strpos($action, '/', $position + 3);
+		// Drop the [scheme:]//host portion, keeping only the path. The scheme
+		// is optional: a protocol-relative App.fullBaseUrl ('//example.com')
+		// would otherwise leave the host in _lastAction, and the security token
+		// hashed from it stops matching the plain path SecurityComponent uses.
+		if (preg_match('#^([a-z0-9+.-]+:)?//#i', $action, $matches)) {
+			$slash = strpos($action, '/', strlen($matches[0]));
 			$action = ($slash === false) ? '/' : substr($action, $slash);
 		}
 

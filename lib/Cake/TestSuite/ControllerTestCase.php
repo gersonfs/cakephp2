@@ -367,10 +367,13 @@ abstract class ControllerTestCase extends CakeTestCase {
 
 		list($plugin, $name) = pluginSplit($controller);
 		/** @var Controller|PHPUnit_Framework_MockObject_MockObject $controllerObj */
-		$controllerObj = $this->getMockBuilder($name . 'Controller')
-            ->onlyMethods($mocks['methods'])
-            ->disableOriginalConstructor()
-            ->getMock();
+		$controllerObj = $this->_buildMock(
+			$name . 'Controller',
+			$mocks['methods'],
+			array(),
+			'',
+			false
+		);
 
 		$controllerObj->name = $name;
 		$request = $this->getMock('CakeRequest');

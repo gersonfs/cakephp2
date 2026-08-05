@@ -165,7 +165,7 @@ class DatabaseSession implements CakeSessionHandlerInterface, \SessionHandlerInt
 			$expires = time() - $expires;
 		}
 		$this->_model->deleteAll(array($this->_model->alias . ".expires <" => $expires), false, false);
-		return 0;
+		return (int)$this->_model->getAffectedRows();
 	}
 
 }
