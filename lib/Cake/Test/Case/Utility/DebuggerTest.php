@@ -44,6 +44,10 @@ class DebuggerTest extends CakeTestCase {
 		parent::setUp();
 		Configure::write('debug', 2);
 		Configure::write('log', false);
+		// Several tests switch the output format. It is global state on
+		// Debugger, so leaving it behind changes how later tests render errors
+		// (an xml/js format skips the HTML escaping they assert on).
+		$this->_outputAs = Debugger::outputAs();
 	}
 
 /**
@@ -54,6 +58,9 @@ class DebuggerTest extends CakeTestCase {
 	public function tearDown(): void {
 		parent::tearDown();
 		Configure::write('log', true);
+		if (isset($this->_outputAs)) {
+			Debugger::outputAs($this->_outputAs);
+		}
 		// testLog()/testLogDepth() configure an extra file stream. Leaving it
 		// behind gives later tests two streams pointing at the same log file,
 		// so every message is written twice.

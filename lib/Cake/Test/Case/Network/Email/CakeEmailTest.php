@@ -152,6 +152,11 @@ class CakeEmailTest extends CakeTestCase {
 	public function setUp(): void {
 		parent::setUp();
 
+		// testMessageIdWithPort() overwrites HTTP_HOST with a port suffix.
+		// CakeEmail::_getDomain() strips the port, so leaving it behind makes
+		// testDomain() compare 'example.org' against 'example.org:81'.
+		$this->_httpHost = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null;
+
 		$this->_configFileExists = true;
 		$emailConfig = new File(CONFIG . 'email.php');
 		if (!$emailConfig->exists()) {
@@ -174,6 +179,12 @@ class CakeEmailTest extends CakeTestCase {
 	public function tearDown(): void {
 		parent::tearDown();
 		App::build();
+
+		if ($this->_httpHost === null) {
+			unset($_SERVER['HTTP_HOST']);
+		} else {
+			$_SERVER['HTTP_HOST'] = $this->_httpHost;
+		}
 
 		if (!$this->_configFileExists) {
 			unlink(CONFIG . 'email.php');

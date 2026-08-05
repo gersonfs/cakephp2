@@ -142,7 +142,7 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	public static function getObjectAttributeCake($object, string $attributeName)
 	{
 		if (!is_object($object)) {
-			throw InvalidArgumentException::create(1, 'object');
+			throw new InvalidArgumentException('Argument #1 of ' . __METHOD__ . '() must be an object.');
 		}
 
 		$reflector = new ReflectionObject($object);
@@ -684,7 +684,10 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	public function assertTextContains($needle, $haystack, $message = '', $ignoreCase = false) {
 		$needle = str_replace(array("\r\n", "\r"), "\n", $needle);
 		$haystack = str_replace(array("\r\n", "\r"), "\n", $haystack);
-		return $this->assertStringContainsString($needle, $haystack, $message, $ignoreCase);
+		if ($ignoreCase) {
+			return $this->assertStringContainsStringIgnoringCase($needle, $haystack, $message);
+		}
+		return $this->assertStringContainsString($needle, $haystack, $message);
 	}
 
 /**
@@ -700,7 +703,10 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
 	public function assertTextNotContains($needle, $haystack, $message = '', $ignoreCase = false) {
 		$needle = str_replace(array("\r\n", "\r"), "\n", $needle);
 		$haystack = str_replace(array("\r\n", "\r"), "\n", $haystack);
-		return $this->assertStringNotContainsString($needle, $haystack, $message, $ignoreCase);
+		if ($ignoreCase) {
+			return $this->assertStringNotContainsStringIgnoringCase($needle, $haystack, $message);
+		}
+		return $this->assertStringNotContainsString($needle, $haystack, $message);
 	}
 
 /**
@@ -982,7 +988,7 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  * @return void
  */
 	protected static function assertNoPattern($pattern, $string, $message = '') {
-		return static::assertNotRegExp($pattern, $string, $message);
+		return static::assertDoesNotMatchRegularExpression($pattern, $string, $message);
 	}
 
 /**
@@ -992,18 +998,6 @@ abstract class CakeTestCase extends \PHPUnit\Framework\TestCase {
  * @return void
  */
 	protected function assertNoErrors() {
-	}
-
-/**
- * Compatibility wrapper function for setExpectedException
- *
- * @param mixed $expected the name of the Exception or error
- * @param string $message the text to display if the assertion is not correct
- * @deprecated 3.0.0 This is a compatibility wrapper for 1.x. It will be removed in 3.0
- * @return void
- */
-	public function expectError(): void {
-		parent::expectError();
 	}
 
 	protected function setExpectedException($name = 'Exception', $message = null) {

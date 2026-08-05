@@ -86,7 +86,6 @@ class CakeTestCaseTest extends CakeTestCase {
  */
 	public function setUp(): void {
 		parent::setUp();
-		$this->markTestSkipped('CakeTestCaseTest depends on PHPUnit < 10 TestResult API.');
 	}
 
 /**
@@ -105,6 +104,7 @@ class CakeTestCaseTest extends CakeTestCase {
  * @return void
  */
 	public function testAssertTagsBasic() {
+		$this->markTestSkipped('Needs the TestResult API PHPUnit 10 removed: there is no supported way to run a nested test case and inspect its result.');
 		$test = new AssertTagsTestCase('testAssertTagsQuotes');
 		$result = $test->run();
 		$this->assertEquals(0, $result->errorCount());
@@ -196,6 +196,7 @@ class CakeTestCaseTest extends CakeTestCase {
  * @return void
  */
 	public function testNumericValuesInExpectationForAssertTags() {
+		$this->markTestSkipped('Needs the TestResult API PHPUnit 10 removed: there is no supported way to run a nested test case and inspect its result.');
 		$test = new AssertTagsTestCase('testNumericValuesInExpectationForAssertTags');
 		$result = $test->run();
 		$this->assertEquals(0, $result->errorCount());
@@ -209,6 +210,7 @@ class CakeTestCaseTest extends CakeTestCase {
  * @return void
  */
 	public function testBadAssertTags() {
+		$this->markTestSkipped('Needs the TestResult API PHPUnit 10 removed: there is no supported way to run a nested test case and inspect its result.');
 		$test = new AssertTagsTestCase('testBadAssertTags');
 		$result = $test->run();
 		$this->assertEquals(0, $result->errorCount());
@@ -228,6 +230,7 @@ class CakeTestCaseTest extends CakeTestCase {
  * @return void
  */
 	public function testLoadFixtures() {
+		$this->markTestSkipped('Needs the TestResult API PHPUnit 10 removed: there is no supported way to run a nested test case and inspect its result.');
 		$test = new FixturizedTestCase('testFixturePresent');
 		$manager = $this->getMock('CakeFixtureManager');
 		$manager->fixturize($test);
@@ -246,6 +249,7 @@ class CakeTestCaseTest extends CakeTestCase {
  * @return void
  */
 	public function testLoadFixturesOnDemand() {
+		$this->markTestSkipped('Needs the TestResult API PHPUnit 10 removed: there is no supported way to run a nested test case and inspect its result.');
 		$test = new FixturizedTestCase('testFixtureLoadOnDemand');
 		$test->autoFixtures = false;
 		$manager = $this->getMock('CakeFixtureManager');
@@ -262,6 +266,7 @@ class CakeTestCaseTest extends CakeTestCase {
  * @return void
  */
 	public function testUnoadFixturesAfterFailure() {
+		$this->markTestSkipped('Needs the TestResult API PHPUnit 10 removed: there is no supported way to run a nested test case and inspect its result.');
 		$test = new FixturizedTestCase('testFixtureLoadOnDemand');
 		$test->autoFixtures = false;
 		$manager = $this->getMock('CakeFixtureManager');
@@ -278,6 +283,7 @@ class CakeTestCaseTest extends CakeTestCase {
  * @return void
  */
 	public function testThrowException() {
+		$this->markTestSkipped('Needs the TestResult API PHPUnit 10 removed: there is no supported way to run a nested test case and inspect its result.');
 		$test = new FixturizedTestCase('testThrowException');
 		$test->autoFixtures = false;
 		$manager = $this->getMock('CakeFixtureManager');
@@ -294,6 +300,7 @@ class CakeTestCaseTest extends CakeTestCase {
  * @return void
  */
 	public function testSkipIf() {
+		$this->markTestSkipped('Needs the TestResult API PHPUnit 10 removed: there is no supported way to run a nested test case and inspect its result.');
 		$test = new FixturizedTestCase('testSkipIfTrue');
 		$result = $test->run();
 		$this->assertEquals(1, $result->skippedCount());

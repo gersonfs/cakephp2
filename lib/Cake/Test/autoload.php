@@ -39,7 +39,24 @@ App::uses('CakeTestCase', 'TestSuite');
 App::uses('CakeTestModel', 'TestSuite/Fixture');
 App::uses('CakeFixtureManager', 'TestSuite/Fixture');
 
-// The framework's own test suite drops/recreates fixture tables across
-// many test classes, so we opt-out of the cross-instance fixture cache
-// that is enabled by default for application test suites.
-CakeFixtureManager::$cacheInstances = false;
+// Share loaded fixtures across CakeFixtureManager instances.
+//
+// PHPUnit builds one CakeTestCase instance per test method, and each one used
+// to get its own manager with an empty $_loaded. Every fixture therefore took
+// the slow path in _setupTable(): listSources() + DROP + CREATE on setUp and a
+// TRUNCATE on tearDown, instead of the single TRUNCATE upstream did once the
+// table existed. Measured on the full suite: 6m07 without the cache, 1m37 with
+// it, both green.
+//
+// The cache was previously off because a table dropped by one test class would
+// leave a stale entry behind; _setupTable() guards against that by confirming
+// the table still exists before truncating.
+CakeFixtureManager::$cacheInstances = true;
+
+// CakeTestRunner used to drop the fixture tables when the run ended. It was
+// deleted in the PHPUnit 12 migration, leaving CakeFixtureManager::shutDown()
+// with no caller and the test schema full of leftover tables.
+register_shutdown_function(function () {
+	$manager = new CakeFixtureManager();
+	$manager->shutDown();
+});

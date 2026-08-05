@@ -12,6 +12,14 @@ trait CakeStubTrait {
 	public $_cakeMockedMethods = array();
 
 /**
+ * Whether every intercepted method is doubled, i.e. getMock() was called
+ * without a method list.
+ *
+ * @var bool
+ */
+	public $_cakeDoubleAll = false;
+
+/**
  * Expectations declared through expects(), verified by _cakeVerify().
  *
  * @var array
@@ -73,6 +81,11 @@ trait CakeStubTrait {
  */
 	public function _cakeSetMockedMethods(array $methods) {
 		$this->_cakeMockedMethods = $methods;
+		// getMock($class) without a method list doubles every method, so no
+		// call may reach the real implementation. Without this the stub runs
+		// the parent for anything it intercepts: CakeResponse::send() then
+		// actually echoes the response body during tests.
+		$this->_cakeDoubleAll = empty($methods);
 	}
 
 /**
@@ -185,7 +198,7 @@ trait CakeStubTrait {
 		if (array_key_exists($method, $this->_cakeStubs)) {
 			return CakeStubBuilder::invoke($this->_cakeStubs[$method], $args);
 		}
-		if (in_array($method, $this->_cakeMockedMethods, true)) {
+		if ($this->_cakeDoubleAll || in_array($method, $this->_cakeMockedMethods, true)) {
 			return null;
 		}
 		return $default();

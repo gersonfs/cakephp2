@@ -642,6 +642,13 @@ class ModelWriteTest extends BaseModelTest {
 		$Category->updateCounterCache(array('parent_id' => 5));
 		$result = Hash::extract($Category->find('all', array('conditions' => array('CategoryThread.id' => 5))), '{n}.CategoryThread.child_count');
 		$expected = array(1);
+
+		// The column has to go before asserting: a failure here would otherwise
+		// leave category_threads with an extra field, and every later test
+		// reading that table sees a 'child_count' key it does not expect.
+		$this->db->query('ALTER TABLE ' . $this->db->fullTableName('category_threads') . ' DROP COLUMN child_count');
+		$this->db->flushMethodCache();
+
 		$this->assertEquals($expected, $result);
 	}
 
