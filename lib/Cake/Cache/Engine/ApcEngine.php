@@ -142,12 +142,15 @@ class ApcEngine extends CacheEngine {
 			return true;
 		}
 		$func = $this->_apcExtension . '_delete';
-		if (class_exists('APCIterator', false)) {
-			$iterator = new APCIterator(
-				'user',
-				'/^' . preg_quote($this->settings['prefix'], '/') . '/',
-				APC_ITER_NONE
-			);
+		$pattern = '/^' . preg_quote($this->settings['prefix'], '/') . '/';
+		$format = defined('APC_ITER_NONE') ? APC_ITER_NONE : 0;
+		$iterator = null;
+		if (class_exists('APCUIterator', false)) {
+			$iterator = new APCUIterator($pattern, $format);
+		} elseif (class_exists('APCIterator', false)) {
+			$iterator = new APCIterator('user', $pattern, $format);
+		}
+		if ($iterator !== null) {
 			$func($iterator);
 			return true;
 		}

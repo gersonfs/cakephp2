@@ -68,11 +68,7 @@ class MemcachedEngine extends CacheEngine {
  *
  * @var array
  */
-	protected $_serializers = array(
-		'igbinary' => Memcached::SERIALIZER_IGBINARY,
-		'json' => Memcached::SERIALIZER_JSON,
-		'php' => Memcached::SERIALIZER_PHP
-	);
+	protected $_serializers = array();
 
 /**
  * Initialize the Cache Engine
@@ -88,6 +84,13 @@ class MemcachedEngine extends CacheEngine {
 		if (!class_exists('Memcached')) {
 			return false;
 		}
+		// Populated here, not as a property default: those are evaluated when
+		// the object is built, which happens before the guard above.
+		$this->_serializers = array(
+			'igbinary' => Memcached::SERIALIZER_IGBINARY,
+			'json' => Memcached::SERIALIZER_JSON,
+			'php' => Memcached::SERIALIZER_PHP
+		);
 		if (!isset($settings['prefix'])) {
 			$settings['prefix'] = Inflector::slug(APP_DIR) . '_';
 		}
