@@ -92,13 +92,24 @@ class ApplicationControllerTest extends ControllerTestCase {
 			ob_end_clean();
 		}
 		$this->assertStringContainsString('/trans_session_id/next_step?CAKEPHP=' . $sessionId, $this->headers['Location']);
-		$actualConfig = Configure::read('Session');
-		$this->assertEquals('CAKEPHP', $actualConfig['cookie']);
-		$this->assertEquals(240, $actualConfig['timeout']);
-		$this->assertEquals('php', $actualConfig['defaults']);
-		$this->assertEquals(1, $actualConfig['ini']['session.use_trans_sid']);
-		$this->assertEquals(0, $actualConfig['ini']['session.use_cookies']);
-		$this->assertEquals(0, $actualConfig['ini']['session.use_only_cookies']);
+		$expectedConfig = array(
+			'cookie' => 'CAKEPHP',
+			'timeout' => 240,
+			'ini' => array(
+				'session.use_trans_sid' => 1,
+				'session.cookie_path' => '/',
+				'session.cookie_lifetime' => 14400,
+				'session.name' => 'CAKEPHP',
+				'session.gc_maxlifetime' => 14400,
+				'session.cookie_httponly' => 1,
+				'session.use_cookies' => 0,
+				'session.use_only_cookies' => 0,
+			),
+			'defaults' => 'php',
+			'cookieTimeout' => 240,
+			'cacheLimiter' => 'must-revalidate',
+		);
+		$this->assertEquals($expectedConfig, Configure::read('Session'));
 	}
 
 }

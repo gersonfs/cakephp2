@@ -134,16 +134,22 @@ class Xml {
  */
 	protected static function _loadXml($input, $options) {
 		$internalErrors = libxml_use_internal_errors(true);
+		// $flags used to be computed and never passed, so parseHuge was a no-op.
+		// The two paths differ on CDATA and must keep doing so: SimpleXML folds
+		// CDATA into text (LIBXML_NOCDATA) while DOMDocument preserves it, which
+		// is what RssHelper relies on to emit CDATA sections.
 		$flags = LIBXML_NOCDATA;
+		$domFlags = 0;
 		if (!empty($options['parseHuge'])) {
 			$flags |= LIBXML_PARSEHUGE;
+			$domFlags |= LIBXML_PARSEHUGE;
 		}
 		try {
 			if ($options['return'] === 'simplexml' || $options['return'] === 'simplexmlelement') {
-				$xml = new SimpleXMLElement($input, LIBXML_NOCDATA);
+				$xml = new SimpleXMLElement($input, $flags);
 			} else {
 				$xml = new DOMDocument();
-				$xml->loadXML($input);
+				$xml->loadXML($input, $domFlags);
 			}
 		} catch (Exception $e) {
 			$xml = null;

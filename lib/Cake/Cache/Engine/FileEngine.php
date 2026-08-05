@@ -78,6 +78,12 @@ class FileEngine extends CacheEngine {
 		);
 		parent::init($settings);
 
+		// A null prefix is the documented way of disabling the filename prefix.
+		// Normalizing it keeps _clearDirectory()'s comparison meaningful: with
+		// null, substr($entry, 0, 0) === '' never matched and clear()/gc()
+		// silently skipped every file.
+		$this->settings['prefix'] = (string)$this->settings['prefix'];
+
 		if (DS === '\\') {
 			$this->settings['isWindows'] = true;
 		}
@@ -260,7 +266,7 @@ class FileEngine extends CacheEngine {
  * @return void
  */
 	protected function _clearDirectory($path, $now, $threshold) {
-		$prefixLength = strlen((string)$this->settings['prefix']);
+		$prefixLength = strlen($this->settings['prefix']);
 
 		if (!is_dir($path)) {
 			return;
@@ -424,7 +430,7 @@ class FileEngine extends CacheEngine {
 		foreach ($contents as $object) {
 			$containsGroup = strpos($object->getPathName(), DS . $group . DS) !== false;
 			$hasPrefix = true;
-			if (strlen((string)$this->settings['prefix']) !== 0) {
+			if (strlen($this->settings['prefix']) !== 0) {
 				$hasPrefix = strpos($object->getBaseName(), $this->settings['prefix']) === 0;
 			}
 			if ($object->isFile() && $containsGroup && $hasPrefix) {

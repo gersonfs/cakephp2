@@ -1904,7 +1904,6 @@ class CakeRequestTest extends CakeTestCase {
 						'REQUEST_URI' => '/site/index.php/',
 						'SCRIPT_NAME' => '/site/index.php',
 						'PHP_SELF' => '/site/index.php/',
-						'PATH_INFO' => '/',
 					),
 				),
 				array(
@@ -1957,7 +1956,6 @@ class CakeRequestTest extends CakeTestCase {
 						'REQUEST_URI' => '/site/',
 						'SCRIPT_NAME' => '/site/app/webroot/index.php',
 						'PHP_SELF' => '/site/app/webroot/index.php',
-						'PATH_INFO' => '/',
 					),
 				),
 				array(
@@ -1981,7 +1979,6 @@ class CakeRequestTest extends CakeTestCase {
 						'SCRIPT_FILENAME' => '/Library/WebServer/Documents/site/index.php',
 						'SCRIPT_NAME' => '/site/app/webroot/index.php',
 						'PHP_SELF' => '/site/app/webroot/index.php',
-						'PATH_INFO' => null,
 						'REQUEST_URI' => null,
 					),
 				),
@@ -2006,7 +2003,6 @@ class CakeRequestTest extends CakeTestCase {
 						'SCRIPT_FILENAME' => '/Library/WebServer/Documents/site/app/webroot/index.php',
 						'SCRIPT_NAME' => '/index.php',
 						'PHP_SELF' => '/index.php',
-						'PATH_INFO' => null,
 						'REQUEST_URI' => null,
 					),
 				),

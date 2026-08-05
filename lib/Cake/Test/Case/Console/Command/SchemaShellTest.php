@@ -269,16 +269,16 @@ class SchemaShellTest extends CakeTestCase {
 		$this->Shell->params['file'] = 'schema.php';
 		$this->Shell->params['force'] = false;
 		$this->Shell->args = array('snapshot');
-		$this->Shell->Schema = $this->getMock('CakeSchema');
-		//todo implementar metodos abaixo
-		//$this->Shell->Schema->expects($this->at(0))->method('read')->will($this->returnValue(array('schema data')));
-		//$this->Shell->Schema->expects($this->at(0))->method('write')->will($this->returnValue(true));
-
-		//$this->Shell->Schema->expects($this->at(1))->method('read');
-		//$this->Shell->Schema->expects($this->at(1))->method('write')->with(array('schema data', 'file' => 'schema_0.php'));
+		$this->Shell->Schema = $this->getMock('CakeSchema', array('read', 'write'));
+		$this->Shell->Schema->expects($this->once())
+			->method('read')
+			->will($this->returnValue(array('schema data')));
+		$this->Shell->Schema->expects($this->once())
+			->method('write')
+			->with(array('schema data', 'file' => 'schema_0.php'))
+			->will($this->returnValue(true));
 
 		$this->Shell->generate();
-		$this->assertTrue(true);
 	}
 
 /**
